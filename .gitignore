@@ -1,0 +1,6 @@
+# ignore these
+/*/
+# except foo
+!.gitignore
+!/rhlib3/
+!/rhrogue/

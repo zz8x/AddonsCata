@@ -1,0 +1,13 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "rhlib3"
+		},
+		{
+		"follow_symlinks": true,
+			"path": "rhrogue"
+		}
+	]
+}

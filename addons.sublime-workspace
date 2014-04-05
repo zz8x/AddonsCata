@@ -1,0 +1,922 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"Unit",
+				"UnitHealth100"
+			],
+			[
+				"Is",
+				"IsAOE"
+			],
+			[
+				"IsC",
+				"IsControlKeyDown"
+			],
+			[
+				"e",
+				"else"
+			],
+			[
+				"USe",
+				"UseEquippedItem"
+			],
+			[
+				"In",
+				"InMelee"
+			],
+			[
+				"dO",
+				"DoSpell"
+			],
+			[
+				"spe",
+				"spellName"
+			],
+			[
+				"hex",
+				"hexTime"
+			],
+			[
+				"re",
+				"return"
+			],
+			[
+				"Has",
+				"HasBuff"
+			],
+			[
+				"tae",
+				"target"
+			],
+			[
+				"de",
+				"debuff"
+			],
+			[
+				"Run",
+				"RunMacroText"
+			],
+			[
+				"t",
+				"then"
+			],
+			[
+				"InCo",
+				"InCombatLockdown"
+			],
+			[
+				"stop",
+				"stopcasting"
+			],
+			[
+				"Do",
+				"Dotes"
+			],
+			[
+				"IsS",
+				"IsShiftKeyDown"
+			],
+			[
+				"I",
+				"IUNITS"
+			],
+			[
+				"fo",
+				"for	for i=1,10"
+			],
+			[
+				"U",
+				"UNITS"
+			],
+			[
+				"Пере",
+				"Перерождение"
+			],
+			[
+				"sp",
+				"spell"
+			],
+			[
+				"IsReady",
+				"IsReadySpell"
+			],
+			[
+				"spell",
+				"spellName"
+			],
+			[
+				"не",
+				"нечестивости"
+			],
+			[
+				"run",
+				"runes"
+			],
+			[
+				"ме",
+				"мертвых"
+			],
+			[
+				"Вой",
+				"Войско"
+			],
+			[
+				"IsRa",
+				"IsReadySpell"
+			],
+			[
+				"f",
+				"false"
+			],
+			[
+				"can",
+				"cancelaura"
+			],
+			[
+				"Pla",
+				"IsPlayerCasting"
+			],
+			[
+				"start",
+				"startattack"
+			],
+			[
+				"n",
+				"null"
+			],
+			[
+				"IsMo",
+				"IsMouse3"
+			],
+			[
+				"IsM",
+				"IsMouse3"
+			],
+			[
+				"InG",
+				"InGCD"
+			],
+			[
+				"E",
+				"IsEquippedItem"
+			],
+			[
+				"Use",
+				"UseItem"
+			],
+			[
+				"get",
+				"GetTime"
+			],
+			[
+				"IsA",
+				"IsAOE"
+			],
+			[
+				"ite",
+				"itemName"
+			],
+			[
+				"ti",
+				"tinsert"
+			],
+			[
+				"IsRead",
+				"IsReadySpell"
+			],
+			[
+				"UnitHealth",
+				"UnitHealth100"
+			],
+			[
+				"teh",
+				"then"
+			],
+			[
+				"def",
+				"defPhys"
+			],
+			[
+				"IsSpell",
+				"IsSpellInUse"
+			],
+			[
+				"sou",
+				"sourceGUID"
+			],
+			[
+				"un",
+				"unknown"
+			],
+			[
+				"fri",
+				"freedomTime"
+			],
+			[
+				"mou",
+				"mouseover"
+			],
+			[
+				"Uni",
+				"UnitHealth100"
+			],
+			[
+				"p",
+				"pet"
+			],
+			[
+				"IsRea",
+				"IsRuneReady"
+			],
+			[
+				"GetRune",
+				"GetRuneCooldownLeft"
+			],
+			[
+				"Tr",
+				"TryInterrupt"
+			],
+			[
+				"for",
+				"for	for i=1,10"
+			],
+			[
+				"Can",
+				"CanInterrupt"
+			],
+			[
+				"Get",
+				"GetTime"
+			],
+			[
+				"UnitDe",
+				"UnitIsDeadOrGhost"
+			],
+			[
+				"pr",
+				"print"
+			],
+			[
+				"P",
+				"Paused"
+			],
+			[
+				"mem",
+				"members"
+			],
+			[
+				"Upda",
+				"UpdateInterval"
+			],
+			[
+				"el",
+				"else"
+			],
+			[
+				"up",
+				"update"
+			],
+			[
+				"las",
+				"lastUpdate"
+			],
+			[
+				"fun",
+				"function	function"
+			],
+			[
+				"Noti",
+				"Notify"
+			],
+			[
+				"max",
+				"maxT"
+			],
+			[
+				"in",
+				"interactSpells"
+			],
+			[
+				"retu",
+				"return"
+			],
+			[
+				"Inc",
+				"InCombatLockdown"
+			],
+			[
+				"se",
+				"spell"
+			],
+			[
+				"fu",
+				"function	function"
+			],
+			[
+				"Ta",
+				"TARGETS"
+			],
+			[
+				"lca",
+				"local	local x = 1"
+			],
+			[
+				"i",
+				"IUNITS"
+			],
+			[
+				"the",
+				"then"
+			],
+			[
+				"en",
+				"enchant"
+			],
+			[
+				"C",
+				"ClearLines"
+			],
+			[
+				"te",
+				"tempTooltip"
+			],
+			[
+				"ret",
+				"return"
+			],
+			[
+				"wi",
+				"weight"
+			],
+			[
+				"w",
+				"water"
+			],
+			[
+				"fear",
+				"fearClass"
+			],
+			[
+				"no",
+				"nointerruptBuffs"
+			],
+			[
+				"Lo",
+				"UnitLostHP"
+			],
+			[
+				"Un",
+				"UnitHealth100"
+			],
+			[
+				"unit",
+				"units"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "rhlib3/rhlib3.toc",
+			"settings":
+			{
+				"buffer_size": 356,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "rhrogue/rotation.lua",
+			"settings":
+			{
+				"buffer_size": 6234,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "rhlib3/spells.lua",
+			"settings":
+			{
+				"buffer_size": 15056,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "rhlib3/binds.lua",
+			"settings":
+			{
+				"buffer_size": 12380,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"ip",
+				"Package Control: Install Package"
+			],
+			[
+				"rp",
+				"Package Control: Remove Package"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"pc up",
+				"Package Control: Upgrade Package"
+			],
+			[
+				"pc",
+				"Package Control: Add Repository"
+			],
+			[
+				"Package Control: lp",
+				"Package Control: List Packages"
+			],
+			[
+				"",
+				"Preferences: Browse Packages"
+			],
+			[
+				"Pack",
+				"Preferences: Browse Packages"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhlib3/binds.lua",
+		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhrogue/commands.lua",
+		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhrogue/binds.lua",
+		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhlib3/units.lua",
+		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhrogue/Bindings.xml",
+		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhrogue/rhrogue.toc",
+		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhdeathknight/commands.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhshaman/rotation.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdruid/rotation.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhpaladin/binds.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdeathknight/rotation.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhshaman/binds.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhwarrior/commands.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdeathknight/binds.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/misc.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhwarrior/Bindings.xml",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhwarrior/rhwarrior.toc",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhwarrior/binds.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdruid/binds.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/commands.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhwarrior/rotation.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhwarrior/DoIt.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/binds.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/Bindings.xml",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/spells.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhwarrior/rhdeathknight.toc",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdeathknight/commands.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdeathknight/Bindings.xml",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhshaman/commands.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhshaman/totems.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/addons.sublime-project",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhpaladin/commands.lua",
+		"/D/Dropbox/SublimeText/Data/Packages/Default/Preferences.sublime-settings",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/data.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/units.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhpaladin/rotation.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/auras.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/lib.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/zones.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/items.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhlib2/runes.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhpaladin/rhpaladin.toc",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdeathknight/rhdeathknight.toc",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdruid/rhdruid.toc",
+		"/C/Projects/ArtMedia/PhotoStore/PhotoStore.WebUI/App_Start/BundleConfig.cs",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhdruid/commands.lua",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhpaladin/Bindings.xml",
+		"/C/Games/World of Warcraft/Interface/AddOns/rhpaladin/prh.toc",
+		"/D/AddOns/rhlib2/units.lua",
+		"/D/AddOns/rhlib2/binds.lua",
+		"/D/AddOns/rhlib2/spells.lua",
+		"/D/AddOns/rhshaman/commands.lua",
+		"/D/AddOns/rhshaman/totems.lua",
+		"/D/AddOns/rhdruid/commands.lua",
+		"/D/AddOns/rhlib2/runes.lua",
+		"/D/AddOns/rhlib2/rhlib2.wowproj",
+		"/D/AddOns/rhlib2/rhlib2.toc",
+		"/D/AddOns/rhlib2/misc.lua",
+		"/D/AddOns/rhlib2/data.lua",
+		"/D/AddOns/rhlib2/commands.lua",
+		"/D/AddOns/rhlib2/Bindings.xml",
+		"/D/AddOns/rhlib2/auras.lua",
+		"/D/AddOns/rhshaman/rotation.lua",
+		"/D/AddOns/addons.sublime-project",
+		"/D/AddOns/rhshaman/rhshaman.toc"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			"<open folders>",
+			"/rhpaladin/*.*",
+			"rhpaladin",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"COMBAT_LOG_EVENT_UNFILTERED",
+			"...",
+			"\n------------------------------------------------------------------------------------------------------------------",
+			"HasSpell",
+			"щит земли",
+			"rootDispelList",
+			"DispelRedList",
+			"CheckHealCast",
+			"\n------------------------------------------------------------------------------------------------------------------",
+			"------------------------------------------------------------------------------------------------------------------",
+			"BINDING_NAME_RHLIB_DEBUG",
+			"DoSpell",
+			"гнев",
+			"Жаж",
+			"Лик",
+			"WAr",
+			"IsAre",
+			"inCO",
+			"InPla",
+			"force[earth]",
+			"forceTotems",
+			"лик см",
+			"TryPestilence",
+			"UnitMana",
+			"HasMyDebuff",
+			"if",
+			"Длань свободы",
+			"IsFinishHim",
+			"\"Священный щит\"",
+			"InInteractRange",
+			"CanHeal",
+			"Длан",
+			"Сжаться",
+			"\")\n",
+			"UseSpell",
+			"Run",
+			"DoMa",
+			"DoMac",
+			"RunMa",
+			"DoMacro",
+			"RunMacroTe",
+			"DoMacro",
+			"RunMa",
+			"RunMacroText",
+			"RunMacro",
+			"UseSp",
+			"антимагии",
+			"Уничтожение",
+			",\n",
+			"\n    ",
+			"55",
+			"\", ",
+			"------------------------------------------------------------------------------------------------------------------",
+			"()\n",
+			"CanMagicAttack",
+			"Dotes",
+			"HasSpel",
+			"advansedMod",
+			"IsMouse3",
+			"IsMo",
+			"IsNe",
+			"IsDe",
+			"IsBe",
+			"темн",
+			"темня",
+			"if not HasSpe",
+			"------------------------------------------------------------------------------------------------------------------",
+			"Equ",
+			"Dotes(\"",
+			"HasRunes",
+			"then",
+			"CanMagicAttack",
+			"UnitMana",
+			"\")\n",
+			"UnitMana",
+			"() ",
+			"()",
+			"HasRunes",
+			"SpellIsTargeting",
+			"\")\n",
+			"мор",
+			"TrashList",
+			"casting",
+			"Rune",
+			"focus",
+			"Target",
+			"target",
+			"Target",
+			"Костяной щит",
+			" --",
+			"тотем",
+			"\")\n",
+			"{}\n",
+			"------------------------------------------------------------------------------------------------------------------",
+			"Notify",
+			"notify",
+			"altkey",
+			"alt",
+			"Мор",
+			"IsPestilenceTime",
+			"TryPestilence()",
+			"(100",
+			"100",
+			"\"}\n",
+			"HasRunes",
+			"InMelee",
+			"and",
+			"UnitMana",
+			"------------------------------------------------------------------------------------------------------------------",
+			"\",\n",
+			")\" rel=\"stylesheet\">",
+			"<link href=\"@Url.Content(",
+			"<script src.*",
+			"<script src",
+			"<script src=\"@Url.Content(",
+			"<link.*$",
+			"<link",
+			"<link.*$",
+			"jquery",
+			"RunMacroText",
+			"IsHarmfulSpell",
+			"RunMacroText",
+			"UnitMana",
+			"5",
+			"if",
+			"        --",
+			"PRIEST",
+			"LockBloodRunes"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"RunMacroText",
+			"DoMacro",
+			"TrashList",
+			"Focus",
+			"focus",
+			"Focus",
+			"Alert",
+			"alert",
+			"",
+			"LagTime",
+			"GetSpellInfo",
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "rhlib3/rhlib3.toc",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 356,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "rhrogue/rotation.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6234,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6196,
+								6196
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2054.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "rhlib3/spells.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15056,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								8737,
+								9154
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4578.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "rhlib3/binds.lua",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 12380,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								10352,
+								10352
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3392.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 35.0
+	},
+	"input":
+	{
+		"height": 35.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"project": "addons.sublime-project",
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"settings":
+	{
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 200.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
