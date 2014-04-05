@@ -360,3 +360,7 @@ end
 function IsPvP()
     return (IsBattleground() or IsArena() or (IsValidTarget("target") and UnitIsPlayer("target")))
 end
+------------------------------------------------------------------------------------------------------------------
+function PlayerInPlace()
+    return (GetUnitSpeed("player") == 0) and not IsFalling()
+end

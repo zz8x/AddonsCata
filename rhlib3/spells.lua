@@ -64,24 +64,21 @@ function HasSpell(spellName)
     return (spell == spellName)
 end
 ------------------------------------------------------------------------------------------------------------------
--- Use these spells to detect GCD
-local GCDSpells = {
-    PALADIN = 635,       -- Holy Light I [OK]
-    PRIEST = 1243,       -- Power Word: Fortitude I
-    SHAMAN = 8071,       -- Rockbiter I
-    WARRIOR = 772,       -- Rend I (only from level 4) [OK]
-    DRUID = 5176,        -- Wrath I
-    MAGE = 168,          -- Frost Armor I
-    WARLOCK = 687,       -- Demon Skin I
-    ROGUE = 1752,        -- Sinister Strike I
-    HUNTER = 1978,       -- Serpent Sting I (only from level 4)
-    DEATHKNIGHT = 45902, -- Blood Strike I
-}
-GCDSpellID = GCDSpells[GetClass()]
+local gcd_starttime, gcd_duration
+local function UpdateGCD(event, unit, spell)
+    if unit == "player" then
+        local start, dur = GetSpellCooldown(spell)
+        if dur and dur > 0 and dur <= 1.5 then
+            gcd_starttime = start
+            gcd_duration = dur
+        end
+    end
+end
+AttachEvent('UNIT_SPELLCAST_SENT', UpdateGCD)
+AttachEvent('UNIT_SPELLCAST_SUCCEEDED', UpdateGCD)
 
 function InGCD()
-    local left = GetSpellCooldownLeft(GCDSpellID)
-    return (left > LagTime)
+    return gcd_starttime and not ((GetTime() - gcd_starttime) / gcd_duration > 1)
 end
 ------------------------------------------------------------------------------------------------------------------
 -- Interact range - 40 yards
@@ -97,9 +94,8 @@ function InInteractRange(unit)
     -- need test and review
     if (unit == nil) then unit = "target" end
     if not IsInteractUnit(unit) then return false end
-    if spell then return IsSpellInRange(InteractRangeSpell,unit) == 1 end
-    if IsArena() then return true end
-    return InDistance("player", unit, 40)
+    if InteractRangeSpell then return IsSpellInRange(InteractRangeSpell,unit) == 1 end
+    return  CheckInteractDistance(unit, 4) == 1
 end
 ------------------------------------------------------------------------------------------------------------------
 local meleeSpells = {
@@ -107,7 +103,8 @@ local meleeSpells = {
     DEATHKNIGHT = "Удар чумы", 
     PALADIN = "Щит праведности",
     SHAMAN = "Удар бури",
-    WARRIOR = "Кровопускание"
+    WARRIOR = "Кровопускание",
+    ROGUE = "Коварный удар"
 }
 MeleeSpell = meleeSpells[GetClass()]
 function InMelee(target)

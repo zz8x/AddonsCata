@@ -193,9 +193,9 @@ function NotInCombat(t)
     if not t then t = 0 end
     return not InCombatLockdown() and endCombatTime and GetTime() - endCombatTime > t
 end
-
+------------------------------------------------------------------------------------------------------------------
 -- Лайфхак, чтоб не разбиться об воду при падении с высоты (защита от ДК с повышенным чувством юмора)
-local FallingTime
+--[[local FallingTime
 local function UpdateFallingFix()
     if IsFalling() then
         if FallingTime == nil then FallingTime = GetTime() end
@@ -207,11 +207,11 @@ local function UpdateFallingFix()
         if FallingTime ~= nil then FallingTime = nil end
     end
 end
-AttachUpdate(UpdateFallingFix)
+AttachUpdate(UpdateFallingFix)]]
 
 ------------------------------------------------------------------------------------------------------------------
 -- нас сапнул рога
-function UpdateSapped(event, ...)
+--[[function UpdateSapped(event, ...)
     local timestamp, type, hideCaster,                                                                      
       sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,   
       spellId, spellName, spellSchool,                                                                     
@@ -224,7 +224,7 @@ function UpdateSapped(event, ...)
 		Notify("Словил сап от роги: "..(sourceName or "(unknown)"))
 	end
 end
-AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateSapped)
+AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateSapped)]]
 ------------------------------------------------------------------------------------------------------------------
 -- Alert опасных спелов
 local checkedTargets = {"target", "focus", "arena1", "arena2", "mouseover"}
@@ -298,7 +298,7 @@ debugFrame:SetScript('OnUpdate', debugFrame_OnUpdate)
 debugFrame:Hide()
 debugFrame.text = debugFrame:CreateFontString(nil, 'BACKGROUND', 'GameFontNormalSmallLeft')
 debugFrame.text:SetAllPoints()
-debugFrame:SetPoint('TOPLEFT', 70, 0)
+debugFrame:SetPoint('TOPLEFT', 10, 0)
 
 -- Debug messages.
 function debug(message)
@@ -314,8 +314,9 @@ local function UpdateDebugStats()
     updateDebugStatsTime = GetTime()
 	UpdateAddOnMemoryUsage()
     UpdateAddOnCPUUsage()
-    local mem  = GetAddOnMemoryUsage("rhlib2")
+    local mem  = GetAddOnMemoryUsage("rhlib3")
     local fps = GetFramerate();
-    debug(format('MEM: %.1fKB, LAG: %ims, FPS: %i', mem, LagTime * 1000, fps))
+    local speed = GetUnitSpeed("Player") / 7 * 100
+    debug(format('MEM: %.1fKB, LAG: %ims, FPS: %i, SPD: %d%%', mem, LagTime * 1000, fps, speed))
 end
 AttachUpdate(UpdateDebugStats) 
