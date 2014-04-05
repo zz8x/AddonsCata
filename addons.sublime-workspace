@@ -380,34 +380,29 @@
 	"buffers":
 	[
 		{
-			"file": "rhlib3/rhlib3.toc",
+			"file": "rhrogue/rhrogue.toc",
 			"settings":
 			{
-				"buffer_size": 356,
+				"buffer_size": 260,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "rhrogue/rotation.lua",
+			"file": "rhdruid/rhdruid.toc",
 			"settings":
 			{
-				"buffer_size": 6234,
+				"buffer_size": 260,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "rhlib3/spells.lua",
+			"contents": "-- Druid Rotation Helper by Timofeev Alexey\n------------------------------------------------------------------------------------------------------------------\nlocal peaceBuff = {\"Пища\", \"Питье\", \"Походный облик\", \"Облик стремительной птицы\", \"Водный облик\"}\nfunction Idle()\n    if IsAttack() then\n        if CanExitVehicle() then VehicleExit() end\n        if IsMounted() then Dismount() return end \n    end\n    -- дайте поесть (побегать) спокойно \n    if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end\n    -- чтоб контроли не сбивать\n    if not CanControl(\"target\") then RunMacroText(\"/stopattack\") end\n	if IsAttack() or InCombatLockdown() then TryTarget() end\n	if IsAttack() or InCombatLockdown() and IsDD() then\n    \n        return\n    end\nend\n\n------------------------------------------------------------------------------------------------------------------\n\n\n------------------------------------------------------------------------------------------------------------------\nfunction TryTarget()\n    -- помощь в группе\n    if not IsValidTarget(\"target\") and InGroup() then\n        -- если что-то не то есть в цели\n        if UnitExists(\"target\") then RunMacroText(\"/cleartarget\") end\n        for i = 1, #TARGET do\n            local t = TARGET[i]\n            if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t))  then \n                RunMacroText(\"/startattack \" .. target) \n                break\n            end\n        end\n    end\n    -- пытаемся выбрать ну хоть что нибудь\n    if not IsValidTarget(\"target\") then\n        -- если что-то не то есть в цели\n        if UnitExists(\"target\") then RunMacroText(\"/cleartarget\") end\n\n        if IsPvP() then\n            RunMacroText(\"/targetenemyplayer [nodead]\")\n        else\n            RunMacroText(\"/targetenemy [nodead]\")\n        end\n        if not IsAttack()  -- если в авторежиме\n            and (\n            not IsValidTarget(\"target\")  -- вообще не цель\n            or not ActualDistance(\"target\")  -- далековато\n            or (not IsPvP() and not UnitAffectingCombat(\"target\")) -- моб не в бою\n            or (IsPvP() and not UnitIsPlayer(\"target\")) -- не игрок в пвп\n            )  then \n            if UnitExists(\"target\") then RunMacroText(\"/cleartarget\") end\n        end\n    end\nend",
+			"file": "rhdruid/rotation.lua",
+			"file_size": 2648,
+			"file_write_time": 130412039474774864,
 			"settings":
 			{
-				"buffer_size": 15056,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "rhlib3/binds.lua",
-			"settings":
-			{
-				"buffer_size": 12380,
+				"buffer_size": 2341,
 				"line_ending": "Windows"
 			}
 		}
@@ -459,10 +454,7 @@
 	},
 	"console":
 	{
-		"height": 0.0,
-		"history":
-		[
-		]
+		"height": 0.0
 	},
 	"distraction_free":
 	{
@@ -475,6 +467,15 @@
 	},
 	"file_history":
 	[
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/drh/binds.lua",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/drh/rotation.lua",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/drh/commands.lua",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/drh/Bindings.xml",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/drh/drh.toc",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhlib3/rhlib3.toc",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhlib3/binds.lua",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhlib3/spells.lua",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhrogue/rotation.lua",
 		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhlib3/binds.lua",
 		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhrogue/commands.lua",
 		"/C/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhrogue/binds.lua",
@@ -547,7 +548,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 90.0,
+		"height": 0.0,
 		"where_history":
 		[
 			"<open folders>",
@@ -718,16 +719,15 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 2,
 			"sheets":
 			[
 				{
 					"buffer": 0,
-					"file": "rhlib3/rhlib3.toc",
-					"semi_transient": false,
+					"file": "rhrogue/rhrogue.toc",
 					"settings":
 					{
-						"buffer_size": 356,
+						"buffer_size": 260,
 						"regions":
 						{
 						},
@@ -746,54 +746,48 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "rhrogue/rotation.lua",
-					"semi_transient": false,
+					"file": "rhdruid/rhdruid.toc",
 					"settings":
 					{
-						"buffer_size": 6234,
+						"buffer_size": 260,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6196,
-								6196
+								183,
+								183
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Lua/Lua.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 2054.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 2,
-					"file": "rhlib3/spells.lua",
-					"semi_transient": false,
+					"file": "rhdruid/rotation.lua",
 					"settings":
 					{
-						"buffer_size": 15056,
+						"buffer_size": 2341,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8737,
-								9154
+								907,
+								907
 							]
 						],
 						"settings":
@@ -803,40 +797,9 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 4578.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
-					"file": "rhlib3/binds.lua",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 12380,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								10352,
-								10352
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Lua/Lua.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 3392.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -877,7 +840,6 @@
 	{
 		"height": 0.0
 	},
-	"project": "addons.sublime-project",
 	"replace":
 	{
 		"height": 64.0
@@ -899,24 +861,10 @@
 		],
 		"width": 0.0
 	},
-	"select_symbol":
-	{
-		"height": 0.0,
-		"selected_items":
-		[
-		],
-		"width": 0.0
-	},
-	"settings":
-	{
-	},
 	"show_minimap": false,
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
 	"side_bar_width": 200.0,
-	"status_bar_visible": true,
-	"template_settings":
-	{
-	}
+	"status_bar_visible": true
 }
