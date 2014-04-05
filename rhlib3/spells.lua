@@ -60,8 +60,8 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 function HasSpell(spellName)
-    local spell = GetSpellInfo(spellName)
-    return (spell == spellName)
+    if GetSpellInfo(spellName) then return true end
+    return false
 end
 ------------------------------------------------------------------------------------------------------------------
 local gcd_starttime, gcd_duration

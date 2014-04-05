@@ -68,8 +68,6 @@ function TryInterrupt(target)
     
     if not spell then return false end
 
-    if tContains(conrLichSpells, spell) then RunMacroText("/cancelaura Перерождение") end
-
     if IsPvP() and not InInterruptRedList(spell) then return false end
     local t = endTime/1000 - GetTime()
 
