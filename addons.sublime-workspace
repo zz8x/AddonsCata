@@ -380,29 +380,26 @@
 	"buffers":
 	[
 		{
-			"file": "rhrogue/rhrogue.toc",
-			"settings":
-			{
-				"buffer_size": 260,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "rhdruid/rhdruid.toc",
-			"settings":
-			{
-				"buffer_size": 260,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"contents": "-- Druid Rotation Helper by Timofeev Alexey\n------------------------------------------------------------------------------------------------------------------\nlocal peaceBuff = {\"Пища\", \"Питье\", \"Походный облик\", \"Облик стремительной птицы\", \"Водный облик\"}\nfunction Idle()\n    if IsAttack() then\n        if CanExitVehicle() then VehicleExit() end\n        if IsMounted() then Dismount() return end \n    end\n    -- дайте поесть (побегать) спокойно \n    if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end\n    -- чтоб контроли не сбивать\n    if not CanControl(\"target\") then RunMacroText(\"/stopattack\") end\n	if IsAttack() or InCombatLockdown() then TryTarget() end\n	if IsAttack() or InCombatLockdown() and IsDD() then\n    \n        return\n    end\nend\n\n------------------------------------------------------------------------------------------------------------------\n\n\n------------------------------------------------------------------------------------------------------------------\nfunction TryTarget()\n    -- помощь в группе\n    if not IsValidTarget(\"target\") and InGroup() then\n        -- если что-то не то есть в цели\n        if UnitExists(\"target\") then RunMacroText(\"/cleartarget\") end\n        for i = 1, #TARGET do\n            local t = TARGET[i]\n            if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t))  then \n                RunMacroText(\"/startattack \" .. target) \n                break\n            end\n        end\n    end\n    -- пытаемся выбрать ну хоть что нибудь\n    if not IsValidTarget(\"target\") then\n        -- если что-то не то есть в цели\n        if UnitExists(\"target\") then RunMacroText(\"/cleartarget\") end\n\n        if IsPvP() then\n            RunMacroText(\"/targetenemyplayer [nodead]\")\n        else\n            RunMacroText(\"/targetenemy [nodead]\")\n        end\n        if not IsAttack()  -- если в авторежиме\n            and (\n            not IsValidTarget(\"target\")  -- вообще не цель\n            or not ActualDistance(\"target\")  -- далековато\n            or (not IsPvP() and not UnitAffectingCombat(\"target\")) -- моб не в бою\n            or (IsPvP() and not UnitIsPlayer(\"target\")) -- не игрок в пвп\n            )  then \n            if UnitExists(\"target\") then RunMacroText(\"/cleartarget\") end\n        end\n    end\nend",
 			"file": "rhdruid/rotation.lua",
-			"file_size": 2648,
-			"file_write_time": 130412039474774864,
 			"settings":
 			{
-				"buffer_size": 2341,
+				"buffer_size": 7641,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "rhdruid/binds.lua",
+			"settings":
+			{
+				"buffer_size": 1340,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "rhlib3/spells.lua",
+			"settings":
+			{
+				"buffer_size": 14896,
 				"line_ending": "Windows"
 			}
 		}
@@ -467,6 +464,9 @@
 	},
 	"file_history":
 	[
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhdruid/binds.lua",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhrogue/rhrogue.toc",
+		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/rhdruid/rhdruid.toc",
 		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/drh/binds.lua",
 		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/drh/rotation.lua",
 		"/D/Games/World of Warcraft. Cataclysm/Interface/AddOns/drh/commands.lua",
@@ -562,6 +562,13 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Звериный рывок(Облик кошки)",
+			"Увечье (медведь)",
+			"Увечье (кошка)",
+			"Волшебный огонь (зверь)",
+			"Звериная атака - медведь",
+			"Звериная атака - кошка",
+			"Облик лютого медведя(Смена облика)",
 			"COMBAT_LOG_EVENT_UNFILTERED",
 			"...",
 			"\n------------------------------------------------------------------------------------------------------------------",
@@ -682,14 +689,7 @@
 			"<link.*$",
 			"jquery",
 			"RunMacroText",
-			"IsHarmfulSpell",
-			"RunMacroText",
-			"UnitMana",
-			"5",
-			"if",
-			"        --",
-			"PRIEST",
-			"LockBloodRunes"
+			"IsHarmfulSpell"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -697,6 +697,13 @@
 		"regex": false,
 		"replace_history":
 		[
+			"Звериный рывок(облик кошки)",
+			"Увечье (облик медведя)",
+			"Увечье (облик кошки)",
+			"Волшебный огонь (облик зверя)",
+			"Звериный рывок(Облик медведя)",
+			"Звериный рывок(Облик кошки)",
+			"Облик медведя",
 			"RunMacroText",
 			"DoMacro",
 			"TrashList",
@@ -724,10 +731,66 @@
 			[
 				{
 					"buffer": 0,
-					"file": "rhrogue/rhrogue.toc",
+					"file": "rhdruid/rotation.lua",
 					"settings":
 					{
-						"buffer_size": 260,
+						"buffer_size": 7641,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2478,
+								2478
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 129.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "rhdruid/binds.lua",
+					"settings":
+					{
+						"buffer_size": 1340,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1001,
+								1001
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Lua/Lua.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "rhlib3/spells.lua",
+					"settings":
+					{
+						"buffer_size": 14896,
 						"regions":
 						{
 						},
@@ -740,64 +803,12 @@
 						],
 						"settings":
 						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "rhdruid/rhdruid.toc",
-					"settings":
-					{
-						"buffer_size": 260,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								183,
-								183
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Text/Plain text.tmLanguage"
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "rhdruid/rotation.lua",
-					"settings":
-					{
-						"buffer_size": 2341,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								907,
-								907
-							]
-						],
-						"settings":
-						{
 							"syntax": "Packages/Lua/Lua.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 3735.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
