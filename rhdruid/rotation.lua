@@ -37,7 +37,7 @@ function Idle()
         -- if not HasDebuff("Устрашающий рев",3) and DoSpell("Устрашающий рев") then return end
     end
     if HasBuff("Облик кошки") then
-        if not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок(облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
+        if not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок (облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
             UseMount("Облик медведя")
             return
         end
@@ -50,7 +50,7 @@ function Idle()
     
         if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then return end
         
-        if IsAttack() and HasSpell("Звериный рывок(облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок(облик кошки)") then return end
+        if IsAttack() and HasSpell("Звериный рывок (облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок (облик кошки)") then return end
         
         if IsStealthed() then 
             
@@ -64,7 +64,7 @@ function Idle()
        
         
         
-        if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(облик кошки)", "target") and DoSpell("Звериный рывок(облик кошки)") then return end
+        if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок (облик кошки)", "target") and DoSpell("Звериный рывок (облик кошки)") then return end
                 
         RunMacroText("/startattack")
 

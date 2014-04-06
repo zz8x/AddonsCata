@@ -383,7 +383,7 @@
 			"file": "rhdruid/rotation.lua",
 			"settings":
 			{
-				"buffer_size": 7641,
+				"buffer_size": 7646,
 				"line_ending": "Windows"
 			}
 		},
@@ -562,6 +562,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Звериный рывок(облик кошки)",
 			"Звериный рывок(Облик кошки)",
 			"Увечье (медведь)",
 			"Увечье (кошка)",
@@ -688,8 +689,7 @@
 			"<link",
 			"<link.*$",
 			"jquery",
-			"RunMacroText",
-			"IsHarmfulSpell"
+			"RunMacroText"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -697,6 +697,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"Звериный рывок (облик кошки)",
 			"Звериный рывок(облик кошки)",
 			"Увечье (облик медведя)",
 			"Увечье (облик кошки)",
@@ -726,7 +727,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -734,15 +735,15 @@
 					"file": "rhdruid/rotation.lua",
 					"settings":
 					{
-						"buffer_size": 7641,
+						"buffer_size": 7646,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2478,
-								2478
+								2480,
+								2480
 							]
 						],
 						"settings":
@@ -752,7 +753,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 129.0,
+						"translation.y": 810.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -808,7 +809,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3735.0,
+						"translation.y": 3555.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
