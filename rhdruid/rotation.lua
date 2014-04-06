@@ -13,7 +13,7 @@ function Idle()
     
 	if not (IsAttack() or InCombatLockdown()) then return end
 	TryTarget()
-    
+    TryBuffs()
 
     local myHP = CalculateHP("player")
     
@@ -27,17 +27,16 @@ function Idle()
     
     if HasBuff("Облик медведя") and IsValidTarget("target")  then
         if UnitMana("target") < 50 and DoSpell("Исступление") then return end
-    
-        if HasSpell("Звериный рывок(Облик медведя)")and InRange("Звериный рывок(Облик медведя)", "target")  and (UnitMana("target") >= 5 or IsReadySpell("Исступление")) then 
+        if HasSpell("Звериный рывок(Облик медведя)") and InRange("Звериный рывок(Облик медведя)", "target") then 
             DoSpell("Звериный рывок(Облик медведя)")
             return
         end
-    
-        -- if DoSpell("Оглушить") then return end
-        -- if not HasDebuff("Устрашающий рев",3) and DoSpell("Устрашающий рев") then return end
+        if not HasDebuff("Устрашающий рев",3) and DoSpell("Устрашающий рев") then return end
+        if DoSpell("Оглушить") then return end
+        if IsReadySpell("Оглушить") then return end
     end
     if HasBuff("Облик кошки") then
-        if not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок (облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
+        if not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок(Облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
             UseMount("Облик медведя")
             return
         end
@@ -50,7 +49,7 @@ function Idle()
     
         if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then return end
         
-        if IsAttack() and HasSpell("Звериный рывок (облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок (облик кошки)") then return end
+        if IsAttack() and HasSpell("Звериный рывок(Облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок(Облик кошки)") then return end
         
         if IsStealthed() then 
             
@@ -64,7 +63,7 @@ function Idle()
        
         
         
-        if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок (облик кошки)", "target") and DoSpell("Звериный рывок (облик кошки)") then return end
+        if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик кошки)", "target") and DoSpell("Звериный рывок(Облик кошки)") then return end
                 
         RunMacroText("/startattack")
 
@@ -72,7 +71,7 @@ function Idle()
 --~      Ротация для кошки 
         if IsAOE() then
             if UnitMana("player") < 35 and UnitMana("player") > 25 and not HasBuff("Берсерк") and DoSpell("Тигриное неистовство") then return end
-            DoSpell("Размах (кошка)")
+            DoSpell("Размах(Облик кошки)")
             return
         end
         
@@ -85,8 +84,8 @@ function Idle()
         
         if HasBuff("Ясность мысли") then
             if not IsBehind() then
-                if HasSpell("Увечье (облик кошки)") then
-                    if DoSpell("Увечье (облик кошки)") then return end
+                if HasSpell("Увечье(Облик кошки)") then
+                    if DoSpell("Увечье(Облик кошки)") then return end
                 else
                     if DoSpell("Цапнуть") then return end
                 end
@@ -96,10 +95,10 @@ function Idle()
         end
         
         
-        --if not HasDebuff("Волшебный огонь (облик зверя)", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
+        if not HasDebuff("Волшебный огонь (облик зверя)", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
         
-        if HasSpell("Увечье (облик кошки)") and not (HasDebuff("Увечье (облик медведя)") or HasDebuff("Увечье (облик кошки)"))then
-                DoSpell("Увечье (облик кошки)") 
+        if HasSpell("Увечье(Облик кошки)") and not HasMyDebuff("Увечье") then
+                DoSpell("Увечье(Облик кошки)") 
             return
         end
         if not HasDebuff("Глубокая рана") then 
@@ -109,11 +108,11 @@ function Idle()
         
         local CP = GetComboPoints("player", "target")
 
-        --if (CP > 3) and not HasBuff("Дикий рев", 3) and DoSpell("Дикий рев") then return end
-        --if (CP > 0) and not HasBuff("Дикий рев") then 
-            --DoSpell("Дикий рев")
-            --return 
-        --end
+        --[[if (CP > 3) and not HasBuff("Дикий рев", 3) and DoSpell("Дикий рев") then return end
+        if (CP > 0) and not HasBuff("Дикий рев") then 
+            DoSpell("Дикий рев")
+            return 
+        end]]
         if (CP == 5) then
             if UnitMana("player") < 40 and HasSpell("Берсерк") and HasDebuff("Разорвать", 5) and DoSpell("Свирепый укус") then return end
             if not HasDebuff("Разорвать", 0.8) and DoSpell("Разорвать") then return end
@@ -123,8 +122,8 @@ function Idle()
       
       
         if not IsBehind() then
-            if HasSpell("Увечье (облик кошки)") then
-                if DoSpell("Увечье (облик кошки)") then return end
+            if HasSpell("Увечье(Облик кошки)") then
+                if DoSpell("Увечье(Облик кошки)") then return end
             else
                 if DoSpell("Цапнуть") then return end
             end
@@ -132,13 +131,15 @@ function Idle()
             if DoSpell("Полоснуть")  then return end
         end
         
-        --if not HasDebuff("Волшебный огонь (облик зверя)", 7) and DoSpell("Волшебный огонь (облик зверя)") then return end
-        
     else
         if HasBuff("дикой природы") and UseMount("Облик кошки") then return end
     end
 end
 
+function ActualDistance(target)
+    if target == nil then target = "target" end
+    return (CheckInteractDistance(target, 3) == 1) and not InRange("Звериный рывок(Облик кошки)", target)
+end
 
 function TryTarget()
     -- помощь в группе

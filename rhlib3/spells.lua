@@ -286,7 +286,7 @@ function UseSpell(spellName, target)
     if target == nil and IsHarmfulSpell(spellName) then target = "target" end
     -- Проверяем на наличе спела в спелбуке
     local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(spellName)
-    if not name or (name ~= spellName)  then
+    if not name then
         if Debug then error("Спел [".. spellName .. "] не найден!") end
         return false;
     end
