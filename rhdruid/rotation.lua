@@ -41,7 +41,7 @@ function Idle()
             return
         end
     
-        if IsAttack() and InRange("Волшебный огонь (облик зверя)", "target") and IsValidTarget("target") and not InCombatLockdown() and HasBuff("Облик кошки") and IsReadySpell("Крадущийся зверь") then 
+        if IsAttack() --[[and InRange("Волшебный огонь (облик зверя)", "target") and IsValidTarget("target")]] and not InCombatLockdown() and HasBuff("Облик кошки") and IsReadySpell("Крадущийся зверь") then 
             DoSpell("Крадущийся зверь")
             return 
         end
@@ -53,9 +53,8 @@ function Idle()
         
         if IsStealthed() then 
             
-            if not IsBehind() then
+            if IsBehind() then
                 if DoSpell("Наскок") then return end
-            else
                 if DoSpell("Накинуться") then return end
             end
             return 
@@ -65,7 +64,7 @@ function Idle()
         
         if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик кошки)", "target") and DoSpell("Звериный рывок(Облик кошки)") then return end
                 
-        RunMacroText("/startattack")
+        --RunMacroText("/startattack")
 
 
 --~      Ротация для кошки 
@@ -82,7 +81,22 @@ function Idle()
             if UnitMana("player") > 25 and UnitMana("player") < 85 and HasSpell("Берсерк") and DoSpell("Берсерк") then return end
         end
         
-        if HasBuff("Ясность мысли") then
+ 
+        if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and not IsStealthed() and not HasDebuff("Волшебный огонь", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
+        
+        if HasSpell("Увечье(Облик кошки)") and not HasMyDebuff("Увечье") then
+                DoSpell("Увечье(Облик кошки)") 
+            return
+        end
+        if not HasDebuff("Глубокая рана") then 
+            DoSpell("Глубокая рана") 
+            return 
+        end
+
+        if HasBuff("Обращение в бегство") and RunMacroText("/cast Накинуться!") then return end
+
+
+        if HasBuff("Ясность мысли") and HasBuff("Разорвать") then
             if not IsBehind() then
                 if HasSpell("Увечье(Облик кошки)") then
                     if DoSpell("Увечье(Облик кошки)") then return end
@@ -93,19 +107,8 @@ function Idle()
                 if DoSpell("Полоснуть")  then return end
             end
         end
-        
-        
-        if not HasDebuff("Волшебный огонь (облик зверя)", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
-        
-        if HasSpell("Увечье(Облик кошки)") and not HasMyDebuff("Увечье") then
-                DoSpell("Увечье(Облик кошки)") 
-            return
-        end
-        if not HasDebuff("Глубокая рана") then 
-            DoSpell("Глубокая рана") 
-            return 
-        end
-        
+          
+
         local CP = GetComboPoints("player", "target")
 
         --[[if (CP > 3) and not HasBuff("Дикий рев", 3) and DoSpell("Дикий рев") then return end
@@ -114,9 +117,10 @@ function Idle()
             return 
         end]]
         if (CP == 5) then
-            if UnitMana("player") < 40 and HasSpell("Берсерк") and HasDebuff("Разорвать", 5) and DoSpell("Свирепый укус") then return end
+            if UnitMana("player") < 40 and DoSpell("Тигриное неистовство") then return end
+            if HasDebuff("Разорвать", 5) and DoSpell("Свирепый укус") then return end
             if not HasDebuff("Разорвать", 0.8) and DoSpell("Разорвать") then return end
-            if UnitMana("player") < 40 and HasDebuff("Разорвать", 6) and DoSpell("Свирепый укус") then return end
+            --if UnitMana("player") < 40 and HasDebuff("Разорвать", 6) and DoSpell("Свирепый укус") then return end
             if InGCD() or UnitMana("player") < 40 then return end
         end
       
