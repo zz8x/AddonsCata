@@ -21,7 +21,7 @@ function Idle()
    
     if HasBuff("Быстрота хищника") then
         if IsControlKeyDown() and HasDebuff("Смерч",1,"target") then DoSpell("Смерч") return end
-        if myHP < 60 then DoSpell("Целительное прикосновение", "player") return end
+        if myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
     
     
@@ -31,10 +31,20 @@ function Idle()
             DoSpell("Звериный рывок(Облик медведя)")
             return
         end
-        if not HasDebuff("Устрашающий рев",3) and DoSpell("Устрашающий рев") then return end
         if DoSpell("Оглушить") then return end
         if IsReadySpell("Оглушить") then return end
     end
+
+    if HasBuff("Облик медведя") and IsValidTarget("target")  then
+    
+            if myHP < 60 then DoSpell("Неистовое восстановление") return end
+            if myHP < 60 then DoSpell("Дубовая кожа") return end
+            if UnitMana("target") < 60 and DoSpell("Исступление") then return end
+            if DoSpell("Увечье(Облик медведя)") then return end
+            if DoSpell("Взбучка") then return end
+            if DoSpell("Растерзать") then return end
+        end
+
     if HasBuff("Облик кошки") then
         if not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок(Облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
             UseMount("Облик медведя")
@@ -136,7 +146,8 @@ function Idle()
         end
         
     else
-        if HasBuff("дикой природы") and UseMount("Облик кошки") then return end
+        if HasBuff("Облик медведя") and InCombatLockdown() then return end
+        if HasBuff("дикой природы") and not HasBuff("Неистовое восстановление") and UseMount("Облик кошки") then return end
     end
 end
 

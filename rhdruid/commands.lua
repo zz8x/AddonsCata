@@ -74,7 +74,27 @@ SetCommand("mount",
 )
  
 ------------------------------------------------------------------------------------------------------------------
- SetCommand("starfall", 
-   function() return DoSpell("Звездопад") end, 
-   function() return not InGCD() and not IsReadySpell("Звездопад") end
+ SetCommand("bear", 
+   function() return DoSpell("Облик медведя") end, 
+   function() return HasBuff("Облик медведя") end
+)
+------------------------------------------------------------------------------------------------------------------
+ SetCommand("сyclone", 
+   function() return DoSpell("Смерч") end, 
+   function() return not IsSpellNotUsed("Смерч",1) end
+)
+------------------------------------------------------------------------------------------------------------------
+ SetCommand("roots", 
+   function() return DoSpell("Гнев деревьев") end, 
+   function() return not IsSpellNotUsed("Гнев деревьев",1) end
+)
+------------------------------------------------------------------------------------------------------------------
+ SetCommand("root", 
+   function() return DoSpell("Хватка природы") end, 
+   function() return HasBuff("Хватка природы") end
+)
+------------------------------------------------------------------------------------------------------------------
+ SetCommand("stun", 
+   function() return DoSpell("Калечение") end, 
+   function() return HasDebuff("Калечение", 1, "target") end
 )
