@@ -23,7 +23,13 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 function GetItemCooldownLeft(name)
-    local start, duration, enabled = GetItemCooldown(name);
+    local itemName, itemLink =  GetItemInfo(name)
+    if not itemName then
+        if Debug then error("Итем [".. name .. "] не найден!") end
+        return false;
+    end
+    local itemID =  itemLink:match("item:(%d+):")
+    local start, duration, enabled = GetItemCooldown(itemID);
     if enabled ~= 1 then return 1 end
     if not start then return 0 end
     if start == 0 then return 0 end

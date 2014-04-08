@@ -58,7 +58,8 @@ SetCommand("mount",
             return
         end
         --local mount = (IsFlyableArea() and not IsShift()) and "Крылатый скакун Черного Клинка" or "Конь смерти Акеруса"
-        local mount = "Стремительный белый рысак"
+        --local mount = "Стремительный белый рысак"
+        local mount = "Белоснежный грифон"
         --if IsAlt() then mount = "Тундровый мамонт путешественника" end
         if UseMount(mount) then 
             tryMount = GetTime() 

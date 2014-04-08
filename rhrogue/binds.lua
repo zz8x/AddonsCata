@@ -76,18 +76,18 @@ function TryInterrupt(target)
 
     m = " -> " .. spell .. " ("..target..")"
 
-    --[[if not notinterrupt and not HasBuff(nointerruptBuffs, 0.1, target) and CanMagicAttack(target) then 
-        if (channel or t < 0.8) and InMelee(target) and DoSpell("Заморозка разума", target) then 
-            echo("Заморозка разума"..m)
+    if not notinterrupt and not HasBuff(nointerruptBuffs, 0.1, target) then 
+        if (channel or t < 0.8) and InMelee(target) and DoSpell("Пинок", target) then 
+            echo("Пинок"..m)
             interruptTime = GetTime() + 4
             return true 
         end
-        if (not channel and t < 1.8) and DoSpell("Удушение", target) then 
+        --[[if (not channel and t < 1.8) and DoSpell("Удушение", target) then 
             echo("Удушение"..m)
             interruptTime = GetTime() + 2
             return true 
-        end
-    end]]
+        end]]
+    end
 
 end
 ------------------------------------------------------------------------------------------------------------------

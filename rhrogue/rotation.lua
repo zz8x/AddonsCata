@@ -102,27 +102,26 @@ function Rotation()
         end
     end
 
+    if IsAttack() and not IsStealthed() and not InCombatLockdown() and DoSpell("Незаметность") then return end
     
-    if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then return end
-    
-    --if IsAttack() and HasSpell("Звериная атака - кошка") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериная атака - кошка") then return end
-    
-    if IsStealthed() then 
-        
-        --[[if IsNotBehindTarget() then
-            if DoSpell("Наскок") then return end
-        else
-            if DoSpell("Накинуться") then return end
-        end]]
+    if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then 
+        if DoSpell("Заживление ран") then return end
+        return 
+    end
+
+    if IsStealthed() and IsAttack()  then 
+        DoSpell("Умысел")
+        if DoSpell("Внезапный удар") then return end
+       --if IsAttack() and DoSpell("Гаррота") then return end
         return 
     end
    
     
+    --if IsAttack() and DoSpell(InRange("Ошеломление") and IsReadySpell("Ошеломление") and "Ошеломление" or "Шаг сквозь тень") then return end
     
-    --if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериная атака - кошка", "target") and DoSpell("Звериная атака - кошка") then return end
             
     RunMacroText("/startattack")
-    
+    if InMelee() and UseEquippedItem("Дар Омариона") then return end
     --[[if InGroup() then
         if TryEach(TARGETS, function(t) 
             if tContains({"worldboss", "rareelite", "elite"}, UnitClassification(t)) then 
@@ -150,6 +149,7 @@ function Rotation()
         return
     end
     if not IsBehind() and DoSpell("Парализующий удар") then return end
+    if DoSpell("Кровоизлияние") then return end
     if DoSpell(IsBehind() and "Удар в спину" or "Коварный удар" ) then return end
-    if PlayerInPlace() and DoSpell("Бросок") then return end
+    if IsAttack() and UnitAffectingCombat("target") and PlayerInPlace() and DoSpell("Бросок") then return end
 end
