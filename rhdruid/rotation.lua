@@ -39,7 +39,7 @@ function Idle()
     
             if myHP < 60 then DoSpell("Неистовое восстановление") return end
             if myHP < 60 then DoSpell("Дубовая кожа") return end
-            if UnitMana("target") < 60 and DoSpell("Исступление") then return end
+            if UnitMana("target") < 80 and DoSpell("Исступление") then return end
             if DoSpell("Увечье(Облик медведя)") then return end
             if DoSpell("Взбучка") then return end
             if DoSpell("Растерзать") then return end
@@ -147,7 +147,7 @@ function Idle()
         
     else
         if HasBuff("Облик медведя") and InCombatLockdown() then return end
-        if HasBuff("дикой природы") and not HasBuff("Неистовое восстановление") and UseMount("Облик кошки") then return end
+        if not HasBuff("Неистовое восстановление") and UseMount("Облик кошки") then return end
     end
 end
 
@@ -193,7 +193,7 @@ end
 
 function TryBuffs()
     if HasBuff("Крадущийся зверь") or InCombatLockdown() or (IsFalling() or IsSwimming()) or not IsAttack() then return false end
-    if HasBuff("дикой природы", 15 * 60) then return false end
+    if HasBuff("дикой природы", 15 * 60) or HasBuff("королей") then return false end
     if GetShapeshiftForm() ~= 0 then RunMacroText("/cancelform") return true end
     if DoSpell("Знак дикой природы", "player") then return true end
     return false
