@@ -238,8 +238,8 @@ function UpdateSpellAlert(event, ...)
     if InAlertList(spellName) then
         for i=1,#checkedTargets do
             local t = checkedTargets[i]
-            if IsValidTarget(t) and UnitGUID(t) == sourceGUID then
-                type = strreplace(type, "SPELL_AURA_", "")
+            if type and IsValidTarget(t) and UnitGUID(t) == sourceGUID then
+                type = type:gsub("SPELL_AURA_", "")
                 Notify("|cffff7d0a" .. spellName .. " ("..(sourceName or "unknown")..")|r  - " .. type .. "!")
                 PlaySound("RaidWarning", "master");
                 break

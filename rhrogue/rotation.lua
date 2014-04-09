@@ -121,7 +121,8 @@ function Rotation()
     
             
     RunMacroText("/startattack")
-    if InMelee() and UseEquippedItem("Дар Омариона") then return end
+    if InMelee() and UseEquippedItem("Сердце зла") then return end
+    if InMelee() and UseEquippedItem("Душевная тоска") then return end
     --[[if InGroup() then
         if TryEach(TARGETS, function(t) 
             if tContains({"worldboss", "rareelite", "elite"}, UnitClassification(t)) then 

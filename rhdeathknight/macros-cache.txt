@@ -1,0 +1,70 @@
+MACRO 16777228 "army" INV_Misc_QuestionMark
+#showtooltip Войско мертвых
+/run DoCommand("spell", "Войско мертвых")
+END
+MACRO 16777229 "blood" INV_Misc_QuestionMark
+#showtooltip Власть крови
+/run if not HasBuff("Власть крови") then DoCommand("spell", "Власть крови") end
+END
+MACRO 16777226 "explod" INV_Misc_QuestionMark
+#showtooltip Взрыв трупа
+/run   DoCommand("explode")
+END
+MACRO 16777230 "frost" INV_Misc_QuestionMark
+#showtooltip Власть льда
+/run if not HasBuff("Власть льда") then DoCommand("spell", "Власть льда") end
+END
+MACRO 16777232 "mor" INV_Misc_QuestionMark
+#showtooltip Мор
+/run DoCommand("mor")
+END
+MACRO 16777223 "mount" INV_Misc_QuestionMark
+#showtooltip Конь смерти Акеруса
+/run   DoCommand("mount")
+END
+MACRO 16777227 "silence" INV_Misc_QuestionMark
+#showtooltip Удушение
+/run   DoCommand("silence", (IsAltKeyDown() == 1 and IsValidTarget("focus")) and "focus" or "target")
+END
+MACRO 16777221 "stop" INV_Misc_QuestionMark
+#showtooltip Ледяные оковы
+/run   DoCommand("stop", (IsAltKeyDown() == 1 and IsValidTarget("focus")) and "focus" or "target")
+END
+MACRO 16777224 "trash" Ability_Creature_Disease_01
+/run trashToggle()
+END
+MACRO 16777231 "unholy" INV_Misc_QuestionMark
+#showtooltip Власть нечестивости
+/run if not HasBuff("Власть нечестивости") then DoCommand("spell", "Власть нечестивости") end
+END
+MACRO 16777234 "weap" INV_Misc_QuestionMark
+#showtooltip Автоматическая атака
+/equip [nocombat,nomod] Большой меч разгневанного гладиатора
+/stopmacro [nocombat, nomod]
+/equip Бринтролль, Костяной Судья
+/equip Темная Скорбь
+END
+MACRO 16777218 "Отгрызть" INV_Misc_QuestionMark
+#showtooltip Отгрызть
+/run  DoCommand("stun", (IsAltKeyDown() == 1 and IsValidTarget("focus")) and "focus" or "target")
+END
+MACRO 16777220 "Прыжок" INV_Misc_QuestionMark
+#showtooltip
+/cast [@target] Прыжок
+END
+MACRO 16777217 "Сжаться" INV_Misc_QuestionMark
+#showtooltip
+/cast  [@target]  Сжаться
+END
+MACRO 16777219 "Цапнуть" INV_Misc_QuestionMark
+#showtooltip
+/cast  [@target] Цапнуть
+END
+MACRO 16777233 "лужа" INV_Misc_QuestionMark
+#showtooltip Смерть и разложение
+/run DoCommand("spell", "Смерть и разложение", "player")
+END
+MACRO 16777222 "хватка" INV_Misc_QuestionMark
+#showtooltip Хватка смерти
+/run   DoCommand("dg", (IsAltKeyDown() == 1 and IsValidTarget("focus")) and "focus" or "target")
+END
