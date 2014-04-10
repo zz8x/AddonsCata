@@ -36,7 +36,7 @@ function Idle()
     end
 
     if HasBuff("Облик медведя") and IsValidTarget("target")  then
-    
+            RunMacroText("/startattack")
             if myHP < 60 then DoSpell("Неистовое восстановление") return end
             if myHP < 60 then DoSpell("Дубовая кожа") return end
             if UnitMana("target") < 80 and DoSpell("Исступление") then return end
