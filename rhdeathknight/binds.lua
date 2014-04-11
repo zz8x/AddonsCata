@@ -18,7 +18,7 @@ end
 
 function IsAOE()
    if not CanAOE then return false end
-   if IsShiftKeyDown() == 1 then return true end
+   if IsShift() then return true end
    return (IsValidTarget("target") and IsValidTarget("focus") and not IsOneUnit("target", "focus") and Dotes(7) and Dotes(7, "focus"))
 end
 
@@ -49,6 +49,10 @@ function IsAlt()
     return  (IsAltKeyDown() == 1 and not GetCurrentKeyBoardFocus())
 end
 
+------------------------------------------------------------------------------------------------------------------
+function IsShift()
+    return  (IsShiftKeyDown() == 1 and not GetCurrentKeyBoardFocus())
+end
 ------------------------------------------------------------------------------------------------------------------
 
 local nointerruptBuffs = {"Мастер аур"}
@@ -102,16 +106,6 @@ function TryInterrupt(target)
         return true 
     end
 
-    if HasSpell("Отгрызть") and IsReadySpell("Отгрызть") and CanAttack(target) and (channel or t < 0.8) then 
-        RunMacroText("/cast [@" ..target.."] Прыжок")
-        RunMacroText("/cast [@" ..target.."] Отгрызть")
-        if not IsReadySpell("Отгрызть") then
-            echo("Отгрызть"..m)
-            interruptTime = GetTime() + 4
-            return false 
-        end
-    end
-
     if IsPvP() and IsHarmfulSpell(spell) and IsOneUnit("player", target .. "-target") and DoSpell("Антимагический панцирь") then 
         echo("Антимагический панцирь"..m)
         interruptTime = GetTime() + 5
@@ -119,6 +113,52 @@ function TryInterrupt(target)
     end
 
 end
+------------------------------------------------------------------------------------------------------------------
+local DeathPact = 0
+local function UpdateDeathPact(event, ...)
+    local timestamp, type, hideCaster,                                                                      
+      sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,   
+      spellId, spellName, spellSchool,                                                                     
+      amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ...
+    if amount and sourceGUID == UnitGUID("player") and (type:match("^SPELL_CAST") and spellId and spellName)  then
+        if spellName == "Смертельный союз" and amount == "У вас нет питомца." then
+            DeathPact = GetTime()
+        end
+    end
+end
+AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateDeathPact)
+
+local pact = false
+function NeedDeathPact()
+    if pact and not IsReadySpell("Смертельный союз") then
+        chat("Сожрал пета!")
+        pact = false
+    end
+    if UnitHealth100(player) > 80 then pact = false end
+    if pact then return true end
+    if (InCombatLockdown() and UnitHealth100("player") < 60) and (IsReadySpell("Войско мертвых") or IsReadySpell("Воскрешение мертвых")) and IsReadySpell("Смертельный союз") and (GetTime() - DeathPact > 10) then return true end
+    return false
+end
+
+function TryDeathPact()
+    if InGCD() or UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then return false end
+    if pact then 
+        if IsReadySpell("Смертельный союз") then
+            DoSpell("Смертельный союз")
+            return true
+        end
+        return false
+    end
+    if not NeedDeathPact() then return false end
+    if  (IsReadySpell("Войско мертвых") or IsReadySpell("Воскрешение мертвых")) and IsReadySpell("Смертельный союз") then
+        DoSpell(IsReadySpell("Воскрешение мертвых") and "Воскрешение мертвых" or "Войско мертвых")
+        chat("Вызвал пета!")
+        pact = true
+        return true
+    end
+    return false
+end
+
 ------------------------------------------------------------------------------------------------------------------
 local lichList = {
 "Сон",
@@ -177,26 +217,25 @@ local macroSpell = {
 
 local spellRunes = {
     ["Ледяные оковы"] = 010,
+    ["Ледяной столп"] = 010,
     ["Ледяное прикосновение"] = 010,
     ["Удар чумы"] = 001,
+    ["Некротический удар"] = 001,
     ["Вскипание крови"] = 100,
     ["Кровавый удар"] = 100,
     ["Удар смерти"] = 011,
-    ["Удар Плети"] = 011,
+    ["Удар Плети"] = 001,
     ["Уничтожение"] = 011,
     ["Костяной щит"] = 001,
+    ["Удар разложения"] = 110,
     ["Захват рун"] = 100,
     ["Мор"] = 100,
     ["Войско мертвых"] = 111,
-    ["Смерть и разложение"] = 111,
-    ["Власть крови"] = 100,
-    ["Власть льда"] = 010,
-    ["Власть нечестивости"] = 001,
+    ["Смерть и разложение"] = 001,
     ["Врата смерти"] = 001,
     ["Зона антимагии"] = 001,
     ["Удушение"] = 100,
     ["Удар в сердце"] = 100,
-
 }
 
 local spellCD = {}
@@ -220,13 +259,18 @@ function DoSpell(spellName, target, baseRP)
     if runes ~= nil and not HasRunes(runes) then return false end
 
     if not baseRP or IsAttack() then baseRP = 0 end
+
     local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(spellName)
-    if (powerType == 6) then
-        -- and IsReadySpell("Призыв горгульи")
-        if IsCtr() and HasSpell("Призыв горгульи") and not (spellName == "Призыв горгульи")  then 
-            --chat(spellName)
-            return false 
+
+    if NeedDeathPact() then 
+        if name ~= "Смертельный союз" then 
+            if IsReadySpell("Смертельный союз") or (powerType == 6) then return false end
         end
+        if IsReadySpell("Войско мертвых") and IsReadySpell("Смертельный союз") and name ~= "Войско мертвых" then return false end
+    end
+
+    if (powerType == 6) then
+        if IsCtr() then return false end
         if cost > 0 and UnitMana("player") - cost < baseRP then return false end
     end
 

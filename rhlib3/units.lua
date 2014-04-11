@@ -17,13 +17,13 @@ function GetHealingMembers(units)
     wipe(membersHP)
     if units == nil then 
         tinsert(members, "player")
-        membersHP["player"] = CalculateHP("player")
+        membersHP["player"] = UnitHealth100("player")
         return members, membersHP
     end
     for i = 1, #units do
         local u = units[i]
         if CanHeal(u) then 
-             local h =  CalculateHP(u)
+             local h =  UnitHealth100(u)
             if IsFriend(u) then 
                 if UnitAffectingCombat(u) and h > 99 then h = h - 1 end
                 h = h  - ((100 - h) * 1.15) 
@@ -306,10 +306,6 @@ end
 function UnitMana100(target)
     if target == nil then target = "player" end
     return UnitMana(target) * 100 / UnitManaMax(target)
-end
-------------------------------------------------------------------------------------------------------------------
-function CalculateHP(t)
-  return 100 * UnitHP(t) / UnitHealthMax(t)
 end
 
 ------------------------------------------------------------------------------------------------------------------

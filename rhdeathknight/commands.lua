@@ -146,29 +146,6 @@ SetCommand("dg",
     end
 )
 
-------------------------------------------------------------------------------------------------------------------
-local stunTime = 0
-SetCommand("stun", 
-    function(target) 
-        if not IsReadySpell("Отгрызть") then return end
-        if target == nil then target = "target" end
-        RunMacroText("/petattack "..target)
-        if DoSpell("Отгрызть", target) then 
-            stunTime = GetTime()
-            return 
-        end
-        DoSpell("Прыжок", target)
-    end, 
-    function(target) 
-        if target == nil then target = "target" end
-        if not HasSpell("Отгрызть") or not IsReadySpell("Отгрызть") or not CanAttack(target) or not CanControl(target) then return true end
-        if GetTime() - stunTime < 0.1 then
-            stunTime = 0
-            return true
-        end
-        return false  
-    end
-)
 
 ------------------------------------------------------------------------------------------------------------------
 local tryMount = 0
@@ -188,8 +165,7 @@ SetCommand("mount",
             return
         end
         --local mount = (IsFlyableArea() and not IsShiftKeyDown()) and "Крылатый скакун Черного Клинка" or "Конь смерти Акеруса"
-        --local mount = not IsShiftKeyDown() and "Непобедимый" or (IsFlyableArea() and "Прогулочная ракета X-53" or "Анжинерский чоппер")
-        local mount ="Конь смерти Акеруса"
+        local mount = IsBattleground() and  "Конь смерти Акеруса" or "Вороной грифон"
         --if IsAltKeyDown() then mount = "Тундровый мамонт путешественника" end
         if UseMount(mount) then 
             tryMount = GetTime() 
@@ -207,27 +183,5 @@ SetCommand("mount",
     end
 )
 
-------------------------------------------------------------------------------------------------------------------
 
-local explodeTime = 0
-SetCommand("explode", 
-    function() 
-        if IsPlayerCasting() and UnitMana("player") < 40 or not HasSpell("Отгрызть") or not HasSpell("Взрыв трупа") then return end
-        --DoSpell("Прыжок", "pet-target")
-        RunMacroText("/petpassive")
-        RunMacroText("/petstay")
-        if DoSpell("Взрыв трупа", "pet") then 
-            explodeTime = GetTime()
-            return 
-        end
-    end, 
-    function() 
-        if IsPlayerCasting() or UnitMana("player") < 35 or not HasSpell("Отгрызть") or not HasSpell("Взрыв трупа") or not CanAttack(target) then return true end
-        if GetTime() - explodeTime < 0.1 then
-            explodeTime = 0
-            return true
-        end
-        return false  
-    end
-)
 

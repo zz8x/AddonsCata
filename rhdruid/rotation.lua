@@ -15,7 +15,7 @@ function Idle()
 	TryTarget()
     TryBuffs()
 
-    local myHP = CalculateHP("player")
+    local myHP = UnitHealth100("player")
     
  
    
