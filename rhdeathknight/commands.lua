@@ -165,7 +165,7 @@ SetCommand("mount",
             return
         end
         --local mount = (IsFlyableArea() and not IsShiftKeyDown()) and "Крылатый скакун Черного Клинка" or "Конь смерти Акеруса"
-        local mount = IsBattleground() and  "Конь смерти Акеруса" or "Вороной грифон"
+        local mount = (IsShift() or IsBattleground()) and  "Конь смерти Акеруса" or "Вороной грифон"
         --if IsAltKeyDown() then mount = "Тундровый мамонт путешественника" end
         if UseMount(mount) then 
             tryMount = GetTime() 

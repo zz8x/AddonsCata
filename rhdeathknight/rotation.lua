@@ -55,7 +55,7 @@ function Idle()
 
     if IsAttack() and not IsValidTarget("target") and DoSpell("Зимний горн") then return end
 
-    TryTarget()
+    TryTarget(CanAOE)
 
     if not (IsValidTarget("target") and CanAttack("target") and (UnitAffectingCombat("target")  or IsAttack()))  then return end
 
@@ -73,31 +73,44 @@ function Idle()
         end
     end
 
-    local canMagic = true --CanMagicAttack("target")
+    local canMagic = CanMagicAttack("target")
     
     -- накладываем болезни
     if (0 == GetDotesTime("target")) and DoSpell("Вспышка болезни") then return end
     if not HasMyDebuff("Кровавая чума", 3, "target") and DoSpell("Удар чумы") then return end
     if not HasMyDebuff("Озноб", 3, "target") and DoSpell(CanAOE and "Воющий ветер" or "Ледяное прикосновение") then return end
     if not Dotes() and not IsAttack() then return end
+
     if CanAOE and IsValidTarget("focus") and not Dotes(3, "focus") and DoSpell("Мор") then return end
-    if InMelee() and canMagic and GetBuffStack("Титаническая мощь") > 4 and UseEquippedItem("Устройство Каз'горота") then return end
-    if InMelee() and canMagic and DoSpell("Ледяной столп") then return end
+    if InMelee() and canMagic and (InCombat(5) or IsCtr()) then
+        if GetBuffStack("Титаническая мощь") > 4 and UseEquippedItem("Устройство Каз'горота") then return end
+        if GetBuffStack("Чистая ярость") > 4 and UseEquippedItem("Ярость Кузни Гнева") then return end
+        if DoSpell("Ледяной столп") then return end
+    end
     if DoSpell("Рунический удар", "target", baseRP) then return end
     if UnitMana("player") > 60 and DoSpell(InMelee() and "Ледяной удар" or "Лик смерти") then return end
     if HasBuff("Машина для убийств") and DoSpell("Ледяной удар", "target", baseRP) then return end
-    if not HasMyDebuff("Некротический удар") and DoSpell("Некротический удар") then return end
-    if Dotes() and (UnitHealth100("player") < 85) and DoSpell("Удар смерти") then return end 
-    if DoSpell(CanAOE and "Воющий ветер" or "Ледяное прикосновение") then return end
-    if HasRunes(001, true) and DoSpell(HasMyDebuff("Некротический удар") and "Удар чумы" or "Некротический удар") then return end
-    if not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
-    if DoSpell("Зимний горн") then return end
+    
+    if not IsAttack() and Dotes() and (UnitHealth100("player") < 85) then
+        if DoSpell("Удар смерти") then return end 
+    else
+        if IsPvP() and not HasMyDebuff("Некротический удар") and DoSpell("Некротический удар") then return end
+        if canMagic then
+            if DoSpell(CanAOE and "Воющий ветер" or "Ледяное прикосновение") then return end
+            if HasRunes(001, true) and DoSpell((IsPvP() and not HasMyDebuff("Некротический удар", 2)) and "Некротический удар" or "Удар чумы") then return end
+            if not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
+        else
+           if Dotes() and DoSpell("Уничтожение") then return end
+        end
+    end
+    
+    if (UnitMana("player") < 100 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
+    
+    -- ресаем руну крови
+    if not HasRunes(100) and DoSpell("Кровоотвод") then return end
     -- ресаем все.
     if NoRunes() and DoSpell("Усиление рунического оружия") then return end
-    -- ресаем руну крови
-    --not HasRunes(100)
-    if NoRunes() and DoSpell("Кровоотвод") then return end
-
+    
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -123,12 +136,11 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 function TryHealing()
+    TryDeathPact()
     local h = UnitHealth100("player")
-    if h < 40 and UnitMana("player") >= 40 and HasSpell("Цапнуть") and DoSpell("Смертельный союз") then return end
     --if h < 80 and HasSpell("Захват рун") and DoSpell("Захват рун") then return end
     --if h < 80 and HasSpell("Кровь земли") and DoSpell("Кровь земли") then return end
     if HasBuff("Перерождение") and UnitHealth100("player") < 100 and DoSpell("Лик смерти", "player") then return end
-    
     if InCombatLockdown() then
         if h < 30 and not IsArena() and UseHealPotion() then return true end
         if (not IsPvP() or not HasClass(TARGETS, UndeadFearClass) or HasBuff("Антимагический панцирь")) and HasSpell("Перерождение") and IsReadySpell("Перерождение") and h < 60 and UnitMana("player") >= 40 and DoSpell("Перерождение") then 

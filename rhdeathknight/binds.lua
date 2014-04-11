@@ -128,35 +128,16 @@ local function UpdateDeathPact(event, ...)
 end
 AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateDeathPact)
 
-local pact = false
-function NeedDeathPact()
-    if pact and not IsReadySpell("Смертельный союз") then
-        chat("Сожрал пета!")
-        pact = false
-    end
-    if UnitHealth100(player) > 80 then pact = false end
-    if pact then return true end
-    if (InCombatLockdown() and UnitHealth100("player") < 60) and (IsReadySpell("Войско мертвых") or IsReadySpell("Воскрешение мертвых")) and IsReadySpell("Смертельный союз") and (GetTime() - DeathPact > 10) then return true end
-    return false
-end
-
 function TryDeathPact()
-    if InGCD() or UnitCastingInfo("player") ~= nil or UnitChannelInfo("player") ~= nil then return false end
-    if pact then 
-        if IsReadySpell("Смертельный союз") then
-            DoSpell("Смертельный союз")
-            return true
-        end
-        return false
+    -- вызываем пета
+    if InCombatLockdown() and UnitHealth100("player") < 60 and IsSpellNotUsed("Смертельный союз", 118) then
+        DoSpell("Воскрешение мертвых")
     end
-    if not NeedDeathPact() then return false end
-    if  (IsReadySpell("Войско мертвых") or IsReadySpell("Воскрешение мертвых")) and IsReadySpell("Смертельный союз") then
-        DoSpell(IsReadySpell("Воскрешение мертвых") and "Воскрешение мертвых" or "Войско мертвых")
-        chat("Вызвал пета!")
-        pact = true
-        return true
+
+    -- едим пета
+    if (not IsSpellNotUsed("Воскрешение мертвых", 20) or (not IsSpellNotUsed("Войско мертвых", 20) and UnitHealth100("player") < 70) ) and (GetTime() - DeathPact > 2) then 
+        DoSpell("Смертельный союз")
     end
-    return false
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -261,16 +242,10 @@ function DoSpell(spellName, target, baseRP)
     if not baseRP or IsAttack() then baseRP = 0 end
 
     local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(spellName)
-
-    if NeedDeathPact() then 
-        if name ~= "Смертельный союз" then 
-            if IsReadySpell("Смертельный союз") or (powerType == 6) then return false end
-        end
-        if IsReadySpell("Войско мертвых") and IsReadySpell("Смертельный союз") and name ~= "Войско мертвых" then return false end
-    end
-
     if (powerType == 6) then
-        if IsCtr() then return false end
+        if not IsSpellNotUsed("Воскрешение мертвых", 20) and IsSpellNotUsed("Смертельный союз", 20) then
+            baseRP = 40;
+        end
         if cost > 0 and UnitMana("player") - cost < baseRP then return false end
     end
 
