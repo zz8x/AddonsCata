@@ -75,7 +75,7 @@ function Idle()
 
 
 --~      Ротация для кошки 
-        if IsAOE() then
+        if not IsPvP() and IsAOE() then
             if UnitMana("player") < 35 and UnitMana("player") > 25 and not HasBuff("Берсерк") and DoSpell("Тигриное неистовство") then return end
             DoSpell("Размах(Облик кошки)")
             return
