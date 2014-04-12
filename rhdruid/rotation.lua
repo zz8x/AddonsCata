@@ -18,7 +18,7 @@ function Idle()
     local myHP = UnitHealth100("player")
     
  
-   
+  
     if HasBuff("Быстрота хищника") then
         if IsControlKeyDown() and HasDebuff("Смерч",1,"target") then DoSpell("Смерч") return end
         if myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
@@ -34,14 +34,14 @@ function Idle()
         if DoSpell("Оглушить") then return end
         if IsReadySpell("Оглушить") then return end
         RunMacroText("/startattack")
-            if myHP < 60 then DoSpell("Неистовое восстановление") return end
-            if myHP < 60 then DoSpell("Дубовая кожа") return end
+            if myHP < 60 and DoSpell("Неистовое восстановление") then return end
+            if myHP < 60 and DoSpell("Дубовая кожа") then return end
             if UnitMana("target") < 80 and DoSpell("Исступление") then return end
             if DoSpell("Увечье(Облик медведя)") then return end
             if DoSpell("Взбучка") then return end
             if DoSpell("Растерзать") then return end
     end
-
+  
     if HasBuff("Облик кошки") then
         if not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок(Облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
             UseMount("Облик медведя")
@@ -80,8 +80,8 @@ function Idle()
             DoSpell("Размах(Облик кошки)")
             return
         end
-        
-        if myHP < 80 then DoSpell("Дубовая кожа") return end
+       
+        if myHP < 80 and DoSpell("Дубовая кожа") then return end
 
         if UnitMana("player") < 30 and DoSpell("Тигриное неистовство") then return end
         
@@ -89,7 +89,7 @@ function Idle()
             if UnitMana("player") > 25 and UnitMana("player") < 85 and HasSpell("Берсерк") and DoSpell("Берсерк") then return end
         end
         
- 
+       
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and not IsStealthed() and not HasDebuff("Волшебный огонь", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
         
         if HasSpell("Увечье(Облик кошки)") and not HasMyDebuff("Увечье") then
@@ -104,7 +104,7 @@ function Idle()
         if HasBuff("Обращение в бегство") and RunMacroText("/cast Накинуться!") then return end
 
 
-        if HasBuff("Ясность мысли") and HasBuff("Разорвать") then
+        if not IsPvP() and HasBuff("Ясность мысли") and HasBuff("Разорвать") then
             if not IsBehind() then
                 if HasSpell("Увечье(Облик кошки)") then
                     if DoSpell("Увечье(Облик кошки)") then return end
@@ -185,6 +185,12 @@ function TryTarget()
             or (IsPvP() and not UnitIsPlayer("target")) -- не игрок в пвп
             )  then 
             if UnitExists("target") then RunMacroText("/cleartarget") end
+        end
+        if IsArena() then
+            if IsValidTarget("target") and (not UnitExists("focus") or IsOneUnit("target", "focus")) then
+                if IsOneUnit("target","arena1") then RunMacroText("/focus arena2") end
+                if IsOneUnit("target","arena2") then RunMacroText("/focus arena1") end
+            end
         end
     end
 end

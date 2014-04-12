@@ -79,14 +79,26 @@ SetCommand("mount",
    function() return HasBuff("Облик медведя") end
 )
 ------------------------------------------------------------------------------------------------------------------
- SetCommand("сyclone", 
-   function() return DoSpell("Смерч") end, 
-   function() return not IsSpellNotUsed("Смерч",1) end
+SetCommand("сyclone", 
+  function(target) 
+    UseSpell("Смерч", target)
+  end, 
+  function(target) 
+    if target == nil then target = "target" end
+    if (not InGCD() and not IsSpellNotUsed("Смерч",1)) or not CanMagicAttack(target) then return true end
+    return false 
+  end
 )
 ------------------------------------------------------------------------------------------------------------------
- SetCommand("roots", 
-   function() return DoSpell("Гнев деревьев") end, 
-   function() return not IsSpellNotUsed("Гнев деревьев",1) end
+SetCommand("roots", 
+  function(target) 
+    UseSpell("Гнев деревьев", target)
+  end, 
+  function(target) 
+    if target == nil then target = "target" end
+    if (not InGCD() and not IsSpellNotUsed("Гнев деревьев",1)) or not CanMagicAttack(target) then return true end
+    return false 
+  end
 )
 ------------------------------------------------------------------------------------------------------------------
  SetCommand("root", 
