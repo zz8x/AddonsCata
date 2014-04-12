@@ -33,17 +33,14 @@ function Idle()
         end
         if DoSpell("Оглушить") then return end
         if IsReadySpell("Оглушить") then return end
-    end
-
-    if HasBuff("Облик медведя") and IsValidTarget("target")  then
-            RunMacroText("/startattack")
+        RunMacroText("/startattack")
             if myHP < 60 then DoSpell("Неистовое восстановление") return end
             if myHP < 60 then DoSpell("Дубовая кожа") return end
             if UnitMana("target") < 80 and DoSpell("Исступление") then return end
             if DoSpell("Увечье(Облик медведя)") then return end
             if DoSpell("Взбучка") then return end
             if DoSpell("Растерзать") then return end
-        end
+    end
 
     if HasBuff("Облик кошки") then
         if not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок(Облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
@@ -84,7 +81,8 @@ function Idle()
             return
         end
         
-        
+        if myHP < 80 then DoSpell("Дубовая кожа") return end
+
         if UnitMana("player") < 30 and DoSpell("Тигриное неистовство") then return end
         
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and InMelee() then
@@ -147,7 +145,7 @@ function Idle()
         
     else
         if HasBuff("Облик медведя") and InCombatLockdown() then return end
-        if not HasBuff("Неистовое восстановление") and UseMount("Облик кошки") then return end
+        if not HasBuff("Неистовое восстановление") and ((HasBuff("дикой природы") or HasBuff("королей")) or InCombatLockdown()) and UseMount("Облик кошки") then return end
     end
 end
 
