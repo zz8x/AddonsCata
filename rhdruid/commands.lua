@@ -110,3 +110,14 @@ SetCommand("roots",
    function() return DoSpell("Калечение") end, 
    function() return HasDebuff("Калечение", 1, "target") end
 )
+------------------------------------------------------------------------------------------------------------------ 
+ SetCommand("heal", 
+  function(target) 
+    UseSpell("Целительное прикосновение", target)
+  end, 
+  function(target) 
+    if target == nil then target = "target" end
+    if (not InGCD() and not IsSpellNotUsed("Целительное прикосновение",1)) then return true end
+    return false 
+  end
+)
