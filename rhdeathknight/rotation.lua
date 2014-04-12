@@ -82,7 +82,7 @@ function Idle()
     if not Dotes() and not IsAttack() then return end
 
     if CanAOE and IsValidTarget("focus") and not Dotes(3, "focus") and DoSpell("Мор") then return end
-    if InMelee() and canMagic and (InCombat(5) or IsCtr()) then
+    if InMelee() and canMagic then
         if GetBuffStack("Титаническая мощь") > 4 and UseEquippedItem("Устройство Каз'горота") then return end
         if GetBuffStack("Чистая ярость") > 4 and UseEquippedItem("Ярость Кузни Гнева") then return end
         if DoSpell("Ледяной столп") then return end
