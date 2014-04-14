@@ -25,8 +25,8 @@ function Idle()
     end
     
     
-    if HasBuff("Облик медведя") and IsValidTarget("target")  then
-        if UnitMana("target") < 50 and DoSpell("Исступление") then return end
+    if HasBuff("Облик медведя") and IsValidTarget("target") then
+        if UnitMana("player") < 80 and DoSpell("Исступление") then return end
         if HasSpell("Звериный рывок(Облик медведя)") and InRange("Звериный рывок(Облик медведя)", "target") then 
             DoSpell("Звериный рывок(Облик медведя)")
             return
@@ -36,7 +36,6 @@ function Idle()
         RunMacroText("/startattack")
             if myHP < 60 and DoSpell("Неистовое восстановление") then return end
             if myHP < 60 and DoSpell("Дубовая кожа") then return end
-            if UnitMana("target") < 80 and DoSpell("Исступление") then return end
             if DoSpell("Увечье(Облик медведя)") then return end
             if DoSpell("Взбучка") then return end
             if DoSpell("Растерзать") then return end
@@ -56,8 +55,8 @@ function Idle()
     
         if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then return end
         
-        if IsAttack() and HasSpell("Звериный рывок(Облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок(Облик кошки)") then return end
-        
+        if IsAttack() and HasSpell("Звериный рывок(Облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок(Облик кошки)") and RunMacroText("/stopattack") then return end
+
         if IsStealthed() then 
             
             if IsBehind() then
@@ -83,6 +82,8 @@ function Idle()
        
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
 
+        if HasBuff("Обращение в бегство") and RunMacroText("/cast Накинуться!") then return end
+
         if UnitMana("player") < 30 and DoSpell("Тигриное неистовство") then return end
         
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and InMelee() then
@@ -100,8 +101,6 @@ function Idle()
             DoSpell("Глубокая рана") 
             return 
         end
-
-        if HasBuff("Обращение в бегство") and RunMacroText("/cast Накинуться!") then return end
 
 
         if not IsPvP() and HasBuff("Ясность мысли") and HasBuff("Разорвать") then
