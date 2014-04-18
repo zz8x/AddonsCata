@@ -24,6 +24,11 @@ function Idle()
         if myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
     
+    if CanInterrupt then
+        for i=1,#TARGETS do
+            TryInterrupt(TARGETS[i])
+        end
+    end
     
     if HasBuff("Облик медведя") and IsValidTarget("target") then
         if UnitMana("player") < 80 and DoSpell("Исступление") then return end
