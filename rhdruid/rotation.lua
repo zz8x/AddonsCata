@@ -58,9 +58,8 @@ function Idle()
         if IsAttack() and HasSpell("Звериный рывок(Облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок(Облик кошки)") and RunMacroText("/stopattack") then return end
 
         if IsStealthed() then 
-            
-            if IsBehind() then
                 if DoSpell("Наскок") then return end
+            if IsBehind() then
                 if DoSpell("Накинуться") then return end
             end
             return 
@@ -80,23 +79,27 @@ function Idle()
             return
         end
        
+        if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания беспощадного гладиатора") then return end
+        if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания беспощадного гладиатора") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
+
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
 
-        if HasBuff("Обращение в бегство") and RunMacroText("/cast Накинуться!") then return end
-
-        if UnitMana("player") < 30 and DoSpell("Тигриное неистовство") then return end
         
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and InMelee() then
             if UnitMana("player") > 25 and UnitMana("player") < 85 and HasSpell("Берсерк") and DoSpell("Берсерк") then return end
         end
         
-       
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and not IsStealthed() and not HasDebuff("Волшебный огонь", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
         
         if HasSpell("Увечье(Облик кошки)") and not HasMyDebuff("Увечье") then
                 DoSpell("Увечье(Облик кошки)") 
             return
         end
+
+        if UnitMana("player") < 40 and DoSpell("Тигриное неистовство") then return end
+
+        if HasBuff("Обращение в бегство") and RunMacroText("/cast Накинуться!") then return end
+
         if not HasDebuff("Глубокая рана") then 
             DoSpell("Глубокая рана") 
             return 
