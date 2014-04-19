@@ -20,8 +20,12 @@ function Idle()
  
   
     if HasBuff("Быстрота хищника") then
-        if IsControlKeyDown() and HasDebuff("Смерч",1,"target") then DoSpell("Смерч") return end
-        if myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
+        if IsControlKeyDown() then
+            if HasDebuff("Смерч",1,"target") then DoSpell("Смерч") return end
+        else
+            if CanHeal("Танак") and UnitHealth100("Танак") < 40 then DoSpell("Целительное прикосновение", "Танак") return end
+            if myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
+        end
     end
     
     if CanInterrupt then
