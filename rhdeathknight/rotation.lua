@@ -33,9 +33,6 @@ function Idle()
     end
     local baseRP = 20
     
-    -- призыв пета
-    --if not HasSpell("Цапнуть") and DoSpell("Воскрешение мертвых") then return end
-
     if advansedMod then
         if IsPvP() and HasClass(TARGETS, UndeadFearClass) and not HasBuff("Антимагический панцирь") and HasBuff("Перерождение") and not HasBuff("Перерождение", 8) then RunMacroText("/cancelaura Перерождение") end    
         
@@ -74,35 +71,51 @@ function Idle()
     end
 
     local canMagic = CanMagicAttack("target")
-    
+    local canMagicFocus = IsValidTarget("focus") and CanMagicAttack("focus")
+    local frostSpell = CanAOE and "Воющий ветер" or (IsPvP()  and "Ледяные оковы" or "Ледяное прикосновение")
     -- накладываем болезни
     if (0 == GetDotesTime("target")) and DoSpell("Вспышка болезни") then return end
+    if not HasMyDebuff("Озноб", 3, "target") and DoSpell(frostSpell) then return end
     if not HasMyDebuff("Кровавая чума", 3, "target") and DoSpell("Удар чумы") then return end
-    if not HasMyDebuff("Озноб", 3, "target") and DoSpell(CanAOE and "Воющий ветер" or "Ледяное прикосновение") then return end
-    if not Dotes() and not IsAttack() then return end
 
     if CanAOE and IsValidTarget("focus") and not Dotes(3, "focus") and DoSpell("Мор") then return end
-    if InMelee() and canMagic then
-        if GetBuffStack("Титаническая мощь") > 4 and UseEquippedItem("Устройство Каз'горота") then return end
-        if GetBuffStack("Чистая ярость") > 4 and UseEquippedItem("Ярость Кузни Гнева") then return end
+
+    if IsCtr() or (InMelee() and canMagic) then
+        UseEquippedItem("Устройство Каз'горота")
+        --UseEquippedItem("Ярость Кузни Гнева")
+        UseEquippedItem("Жетон победы беспощадного гладиатора")
         if DoSpell("Ледяной столп") then return end
     end
+
     if DoSpell("Рунический удар", "target", baseRP) then return end
-    if UnitMana("player") > 60 and DoSpell(InMelee() and "Ледяной удар" or "Лик смерти") then return end
-    if HasBuff("Машина для убийств") and DoSpell("Ледяной удар", "target", baseRP) then return end
-    
-    if not IsAttack() and Dotes() and (UnitHealth100("player") < 85) then
-        if DoSpell("Удар смерти") then return end 
-    else
-        if IsPvP() and not HasMyDebuff("Некротический удар") and DoSpell("Некротический удар") then return end
-        if canMagic then
-            if DoSpell(CanAOE and "Воющий ветер" or "Ледяное прикосновение") then return end
-            if HasRunes(001, true) and DoSpell((IsPvP() and not HasMyDebuff("Некротический удар", 2)) and "Некротический удар" or "Удар чумы") then return end
-            if not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
+    if DoSpell("Рунический удар", "focus", baseRP) then return end
+
+    if UnitMana("player") > 60 then
+        if canMagic and DoSpell(InMelee() and "Ледяной удар" or "Лик смерти") then return end
+        if canMagicFocus and DoSpell(InMelee("focus") and "Ледяной удар" or "Лик смерти", "focus") then return end
+    end
+
+    if HasBuff("Машина для убийств") then
+        if canMagic or canMagicFocus then
+            if canMagic and DoSpell("Ледяной удар", "target", baseRP) then return end
+            if canMagicFocus and HasBuff("Машина для убийств") and DoSpell("Ледяной удар", "focus", baseRP) then return end
         else
-           if Dotes() and DoSpell("Уничтожение") then return end
+            if Dotes() and DoSpell("Уничтожение") then return end
         end
     end
+    
+    if not IsAttack() and Dotes() and (UnitHealth100("player") < 85) and DoSpell("Удар смерти") then return end 
+
+    if IsAttack() and IsPvP() and DoSpell("Некротический удар") then return end
+
+    if canMagic and DoSpell(frostSpell) then return end
+    if canMagicFocus and DoSpell(frostSpell, "focus") then return end
+
+    if HasRunes(001, true) and DoSpell(IsPvP() and "Некротический удар" or "Удар чумы") then return end
+
+    if canMagic and not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
+    if canMagicFocus and not InMelee("focus") and DoSpell("Лик смерти", "focus", baseRP) then return end
+
     
     if (UnitMana("player") < 100 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
     
