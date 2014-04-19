@@ -106,12 +106,10 @@ function Idle()
     
     if not IsAttack() and Dotes() and (UnitHealth100("player") < 85) and DoSpell("Удар смерти") then return end 
 
-    if IsAttack() and IsPvP() and DoSpell("Некротический удар") then return end
-
     if canMagic and DoSpell(frostSpell) then return end
     if canMagicFocus and DoSpell(frostSpell, "focus") then return end
 
-    if HasRunes(001, true) and DoSpell(IsPvP() and "Некротический удар" or "Удар чумы") then return end
+    if HasRunes(002, true) and DoSpell(IsPvP() and "Некротический удар" or "Удар чумы") then return end
 
     if canMagic and not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
     if canMagicFocus and not InMelee("focus") and DoSpell("Лик смерти", "focus", baseRP) then return end
