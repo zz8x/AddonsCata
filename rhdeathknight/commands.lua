@@ -62,18 +62,11 @@ local morTime = 0
 SetCommand("mor", 
     function() 
         if not HasRunes(100) then DoSpell("Кровоотвод") end
-        if DoSpell("Мор") then 
-            morTime = GetTime()
-            return 
-        end
+        return DoSpell("Мор")
     end, 
     function() 
         if not IsValidTarget("target") or not InMelee() or not (HasMyDebuff("Озноб") or HasMyDebuff("Кровавая чума")) then return true end
-        if GetTime() - morTime < 0.1 then
-            morTime = 0
-            return true
-        end
-        return false  
+        return not IsSpellNotUsed("Мор", 1)  
     end
 )
 ------------------------------------------------------------------------------------------------------------------
@@ -102,46 +95,30 @@ SetCommand("silence",
 
   
 ------------------------------------------------------------------------------------------------------------------
-local stopTime = 0
 local stopImmune = {"Длань свободы", "Отражение заклинания"}
 SetCommand("stop", 
     function(target) 
         if target == nil then target = "target" end
-        if InGCD() and IsPlayerCasting() then return end
-        if HasDebuff("Ледяные оковы",7,target) then return end
-        if DoSpell("Ледяные оковы", target) then 
-            stopTime = GetTime()
-            return 
-        end
+        if HasDebuff("Ледяные оковы",6,target)  or DoSpell("Ледяные оковы", target) then return true end
     end, 
     function(target) 
         if target == nil then target = "target" end
-        if not CanAttack(target) or HasBuff(stopImmune, 0.1, target) then return true end
-        if GetTime() - stopTime < 0.1 then
-            stopTime = 0
-            return true
-        end
+        if not CanAttack(target) or HasBuff(stopImmune, 0.1, target) or HasDebuff("Ледяные оковы", 6 ,target) then return true end
         return false  
     end
 )
 ------------------------------------------------------------------------------------------------------------------
 -- Death Grip
-local dgTime = 0
 SetCommand("dg", 
     function(target) 
         if target == nil then target = "target" end
         if DoSpell("Хватка смерти", target) then 
-            dgTime = GetTime()
-            return 
+            return true
         end
     end, 
     function(target) 
         if target == nil then target = "target" end
         if not CanAttack(target)  or HasBuff("Отражение заклинания", 0.1, target) or not IsReadySpell("Хватка смерти") then return true end
-        if GetTime() - dgTime < 0.1 then
-            dgTime = 0
-            return true
-        end
         return false  
     end
 )

@@ -6,7 +6,7 @@ local Commands = {}
 -- метод для задания команды, которая имеет приоритет на ротацией
 -- SetCommand(string 'произвольное имя', function(...) команда, bool function(...) проверка, что все выполнилось, или выполнение невозможно)
 function SetCommand(name, applyFunc, checkFunc)
-    Commands[name] = {Timer = 0, Apply = applyFunc, Check = checkFunc, Params == null}
+    Commands[name] = {Last = 0, Timer = 0, Apply = applyFunc, Check = checkFunc, Params == null}
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -44,7 +44,9 @@ function UpdateCommands()
                 if Commands[cmd].Check(unpack(Commands[cmd].Params)) then 
                    Commands[cmd].Timer = 0
                 else
-                    Commands[cmd].Apply(unpack(Commands[cmd].Params))
+                   if GetTime() - Commands[cmd].Last > 0.2 and Commands[cmd].Apply(unpack(Commands[cmd].Params)) then
+                        Commands[cmd].Last = GetTime()
+                   end
                 end
             else
                 Commands[cmd].Timer = 0
