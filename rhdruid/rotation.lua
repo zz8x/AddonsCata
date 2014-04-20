@@ -18,8 +18,8 @@ function Idle()
     local myHP = UnitHealth100("player")
   
     if HasBuff("Быстрота хищника") then
-        if CanHeal("Танак") and UnitHealth100("Танак") < 40 then DoSpell("Целительное прикосновение", "Танак") return end
-        if myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
+        if not HasBuff("Облик медведя") and CanHeal("Танак") and UnitHealth100("Танак") < 40 then DoSpell("Целительное прикосновение", "Танак") return end
+        if not HasBuff("Облик медведя") and myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
     
     if IsSpellNotUsed("Умиротворение", 5) then
