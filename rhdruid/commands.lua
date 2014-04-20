@@ -139,3 +139,11 @@ SetCommand("roots",
     return false 
   end
 )
+------------------------------------------------------------------------------------------------------------------ 
+ SetCommand("ms", 
+  function()
+    if HasBuff("Облик медведя") and DoSpell("Тревожный рев(Облик медведя)") then return end
+    if HasBuff("Облик кошки") and DoSpell("Тревожный рев(Облик кошки)") then return end
+  end, 
+  function() return HasBuff("Тревожный рев") end
+)
