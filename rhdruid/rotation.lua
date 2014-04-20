@@ -22,9 +22,10 @@ function Idle()
         if myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
     
-    
-    if InRage("target") and DoSpell("Умиротворение", "target") then return end
-    if InRage("focus") and DoSpell("Умиротворение", "focus") then return end
+    if IsSpellNotUsed("Умиротворение", 2) then
+        if InRage("target") and DoSpell("Умиротворение", "target") then return end
+        if InRage("focus") and DoSpell("Умиротворение", "focus") then return end
+    end
 
     if CanInterrupt then
         for i=1,#TARGETS do
