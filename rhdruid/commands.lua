@@ -99,13 +99,22 @@ SetCommand("сyclone",
   end
 )
 ------------------------------------------------------------------------------------------------------------------
+local rtsTime = 0
 SetCommand("roots", 
-  function(target) 
-    DoSpell("Гнев деревьев", target)
+  function(target)
+    if rtsTime ~= 0 and GetTime() - rtsTime < 0.2 then return end
+    if DoSpell("Гнев деревьев", target) then
+      rtsTime = GetTime()
+      return
+    end 
   end, 
   function(target) 
     if target == nil then target = "target" end
     if (not InGCD() and not IsSpellNotUsed("Гнев деревьев",1)) or not CanMagicAttack(target) then return true end
+    if GetTime() - rtsTime < 0.2 then
+      rtsTime = 0
+      return true
+      end
     return false 
   end
 )
