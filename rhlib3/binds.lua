@@ -80,7 +80,7 @@ local function UpdateIdle()
     if GetTime() - StartTime < 2 then return end
     
     if IsBattleground() and UnitIsDead("player") and not UnitIsGhost("player") then
-        Notify("Выходим из тела!")
+        --Notify("Выходим из тела!")
         RunMacroText("/run RepopMe()")
     end
 
@@ -128,7 +128,7 @@ AttachUpdate(UpdateIdle, -1000)
 ------------------------------------------------------------------------------------------------------------------
 local function BgConfirmReadyCheck()
     if IsBattleground() then
-        Notify("Подтверждаем готовность!")
+        --Notify("Подтверждаем готовность!")
         ConfirmReadyCheck(1)
     end
 end

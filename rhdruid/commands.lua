@@ -82,16 +82,17 @@ SetCommand("mount",
 local clnTime = 0
 SetCommand("сyclone", 
   function(target) 
+    if clnTime ~= 0 and GetTime() - clnTime < 0.2 then return end
     if DoSpell("Смерч", target) then
-      stopTime = GetTime()
+      clnTime = GetTime()
       return
     end
   end, 
   function(target) 
     if target == nil then target = "target" end
     if (not InGCD() and not IsSpellNotUsed("Смерч",1)) or not CanMagicAttack(target) then return true end
-    if GetTime() - clnTime < 0.5 then
-      stopTime = 0
+    if GetTime() - clnTime < 0.2 then
+      clnTime = 0
       return true
       end
     return false 
