@@ -94,7 +94,7 @@ function TryInterrupt(target)
         end
     end
     
-    if CanAttack(target) and (channel or t < 0.8) and (UnitIsPlayer(target) or not InParty()) and DoSpell("Хватка смерти", target) then 
+    if not InMelee() and CanAttack(target) and (channel or t < 0.8) and (UnitIsPlayer(target) or not InParty()) and DoSpell("Хватка смерти", target) then 
         echo("Хватка смерти"..m)
         interruptTime = GetTime() + 2
         return true 

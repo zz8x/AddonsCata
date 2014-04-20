@@ -151,8 +151,8 @@ SetCommand("dg",
 local tryMount = 0
 SetCommand("mount", 
     function() 
-        if (IsLeftControlKeyDown() or IsSwimming()) 
-            and not HasBuff("Льдистый путь", 1, "player") and DoSpell("Льдистый путь") then 
+        if (IsCtr() or IsSwimming()) 
+            and DoSpell("Льдистый путь") then 
             tryMount = GetTime()
             return
         end
@@ -166,7 +166,7 @@ SetCommand("mount",
         end
         --local mount = (IsFlyableArea() and not IsShiftKeyDown()) and "Крылатый скакун Черного Клинка" or "Конь смерти Акеруса"
         local mount = (IsShift() or IsBattleground() or IsArena()) and  "Конь смерти Акеруса" or "Вороной грифон"
-        --if IsAltKeyDown() then mount = "Тундровый мамонт путешественника" end
+        --if IsAlt() then mount = "Тундровый мамонт путешественника" end
         if UseMount(mount) then 
             tryMount = GetTime() 
             return

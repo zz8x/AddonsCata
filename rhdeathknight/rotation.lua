@@ -81,7 +81,7 @@ function Idle()
     if CanAOE and IsValidTarget("focus") and not Dotes(3, "focus") and DoSpell("Мор") then return end
 
     if IsCtr() or (InMelee() and canMagic) then
-        UseEquippedItem("Устройство Каз'горота")
+        if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end
         --UseEquippedItem("Ярость Кузни Гнева")
         UseEquippedItem("Жетон победы беспощадного гладиатора")
         if DoSpell("Ледяной столп") then return end

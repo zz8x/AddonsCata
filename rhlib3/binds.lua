@@ -67,11 +67,6 @@ end
 local targetWeights = {}
 local function compareTargets(t1,t2) return targetWeights[t1] < targetWeights[t2] end
 local function UpdateIdle()
-    -- if UnitIsAFK("player") then
-    --     chat("You are AFK");
-    --     RunMacroText("/run JumpOrAscendStart()  AscendStop()")
-    -- end
-    
 
     if (IsAttack() and Paused) then
         echo("Авто ротация: ON",true)
@@ -84,6 +79,11 @@ local function UpdateIdle()
     
     if GetTime() - StartTime < 2 then return end
     
+    if IsBattleground() and UnitIsDead("player") and not UnitIsGhost("player") then
+        Notify("Выходим из тела!")
+        RunMacroText("/run RepopMe()")
+    end
+
     if UnitIsDeadOrGhost("player") or UnitIsCharmed("player") 
         or not UnitPlayerControlled("player") then return end
     if UpdateInterval > 0 then    
@@ -125,6 +125,14 @@ local function UpdateIdle()
 end
 AttachUpdate(UpdateIdle, -1000)
 
+------------------------------------------------------------------------------------------------------------------
+local function BgConfirmReadyCheck()
+    if IsBattleground() then
+        Notify("Подтверждаем готовность!")
+        ConfirmReadyCheck(1)
+    end
+end
+AttachEvent("READY_CHECK", BgConfirmReadyCheck)
 ------------------------------------------------------------------------------------------------------------------
 --Arena Raid Icons
 local unitCD = {}
@@ -251,9 +259,9 @@ AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateSpellAlert)
 ------------------------------------------------------------------------------------------------------------------
 -- Автоматическая продажа хлама и починка
 local function SellGrayAndRepair()
-    SellGray();
-    RepairAllItems(1); -- сперва пробуем за счет ги банка
-    RepairAllItems();
+    SellGray()
+    RepairAllItems(1) -- сперва пробуем за счет ги банка
+    RepairAllItems()
 end
 AttachEvent('MERCHANT_SHOW', SellGrayAndRepair)
 
