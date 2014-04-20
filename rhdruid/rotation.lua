@@ -1,6 +1,7 @@
 ﻿-- Druid Rotation Helper by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
 local peaceBuff = {"Пища", "Питье", "Походный облик", "Облик стремительной птицы", "Водный облик"}
+local fixRageTime = 0
 function Idle()
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
@@ -22,9 +23,10 @@ function Idle()
         if not HasBuff("Облик медведя") and myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
     
-    if IsSpellNotUsed("Умиротворение", 5) then
+    if GetTime() - fixRageTime > 5 then
         if InRage("target") and DoSpell("Умиротворение", "target") then return end
         if InRage("focus") and DoSpell("Умиротворение", "focus") then return end
+        fixRageTime = GetTime()
     end
 
     if CanInterrupt then
