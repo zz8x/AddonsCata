@@ -79,20 +79,28 @@ SetCommand("mount",
    function() return HasBuff("Облик медведя") end
 )
 ------------------------------------------------------------------------------------------------------------------
+local clnTime = 0
 SetCommand("сyclone", 
   function(target) 
-    UseSpell("Смерч", target)
+    if DoSpell("Смерч", target) then
+      stopTime = GetTime()
+      return
+    end
   end, 
   function(target) 
     if target == nil then target = "target" end
     if (not InGCD() and not IsSpellNotUsed("Смерч",1)) or not CanMagicAttack(target) then return true end
+    if GetTime() - clnTime < 0.5 then
+      stopTime = 0
+      return true
+      end
     return false 
   end
 )
 ------------------------------------------------------------------------------------------------------------------
 SetCommand("roots", 
   function(target) 
-    UseSpell("Гнев деревьев", target)
+    DoSpell("Гнев деревьев", target)
   end, 
   function(target) 
     if target == nil then target = "target" end
@@ -113,7 +121,7 @@ SetCommand("roots",
 ------------------------------------------------------------------------------------------------------------------ 
  SetCommand("heal", 
   function(target) 
-    UseSpell("Целительное прикосновение", target)
+    DoSpell("Целительное прикосновение", target)
   end, 
   function(target) 
     if target == nil then target = "target" end
