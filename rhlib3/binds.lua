@@ -219,7 +219,7 @@ AttachUpdate(UpdateFallingFix)]]
 
 ------------------------------------------------------------------------------------------------------------------
 -- нас сапнул рога
---[[function UpdateSapped(event, ...)
+function UpdateSapped(event, ...)
     local timestamp, type, hideCaster,                                                                      
       sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,   
       spellId, spellName, spellSchool,                                                                     
@@ -232,7 +232,7 @@ AttachUpdate(UpdateFallingFix)]]
 		Notify("Словил сап от роги: "..(sourceName or "(unknown)"))
 	end
 end
-AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateSapped)]]
+AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateSapped)
 ------------------------------------------------------------------------------------------------------------------
 -- Alert опасных спелов
 local checkedTargets = {"target", "focus", "arena1", "arena2", "mouseover"}

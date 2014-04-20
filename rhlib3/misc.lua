@@ -168,7 +168,7 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 -- Стандартная карта мира принимает более лучший вид(Не разворачивается на весь экран)
-local BigMap = function()
+--[[local BigMap = function()
      WorldMapFrame:SetParent(UIParent)
      WorldMapFrame:EnableMouse(false)
      WorldMapFrame:EnableKeyboard(false)
@@ -182,41 +182,8 @@ local BigMap = function()
 end
 hooksecurefunc("WorldMap_ToggleSizeUp", BigMap)
 hooksecurefunc("WorldMapFrame_SetFullMapView", BigMap)
-BigMap()
-------------------------------------------------------------------------------------------------------------------
--- Изменяем размер Бафов\Дебафов на целе и фокусе
-hooksecurefunc("TargetFrame_UpdateAuraPositions", function(self, auraName, numAuras, numOppositeAuras,largeAuraList, updateFunc, maxRowWidth, offsetX)
-    local AURA_OFFSET_Y = 3   --размер ОФФ аур (Накидка и т.д)
-    local LARGE_AURA_SIZE = 33 -- размер ВАШИХ баффов/дебаффов.
-    local SMALL_AURA_SIZE = 20 -- размер чужих баффов/дебаффов.
-    local size
-    local offsetY = AURA_OFFSET_Y
-    local rowWidth = 0
-    local firstBuffOnRow = 1
-    for i=1, numAuras do
-     if ( largeAuraList[i] ) then
-       size = LARGE_AURA_SIZE
-       offsetY = AURA_OFFSET_Y + AURA_OFFSET_Y
-     else
-       size = SMALL_AURA_SIZE
-     end
-     if ( i == 1 ) then
-       rowWidth = size
-       self.auraRows = self.auraRows + 1
-     else
-       rowWidth = rowWidth + size + offsetX
-     end
-     if ( rowWidth > maxRowWidth ) then
-       updateFunc(self, auraName, i, numOppositeAuras, firstBuffOnRow, size, offsetX, offsetY)
-       rowWidth = size
-       self.auraRows = self.auraRows + 1
-       firstBuffOnRow = i
-       offsetY = AURA_OFFSET_Y
-     else
-       updateFunc(self, auraName, i, numOppositeAuras, i - 1, size, offsetX, offsetY)
-     end
-    end
-    end)
+BigMap()]]
+
 ------------------------------------------------------------------------------------------------------------------
 -- Полоски со здоровьем теперь не зеленого цвета а в цвет класса (Довольно приятно)
 local UnitIsPlayer, UnitIsConnected, UnitClass, RAID_CLASS_COLORS =
