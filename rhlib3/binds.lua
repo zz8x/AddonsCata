@@ -126,13 +126,13 @@ end
 AttachUpdate(UpdateIdle, -1000)
 
 ------------------------------------------------------------------------------------------------------------------
-local function BgConfirmReadyCheck()
+--[[local function BgConfirmReadyCheck()
     if IsBattleground() then
         --Notify("Подтверждаем готовность!")
         ConfirmReadyCheck(1)
     end
 end
-AttachEvent("READY_CHECK", BgConfirmReadyCheck)
+AttachEvent("READY_CHECK", BgConfirmReadyCheck)]]
 ------------------------------------------------------------------------------------------------------------------
 --Arena Raid Icons
 local unitCD = {}
