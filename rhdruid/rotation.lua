@@ -23,7 +23,7 @@ function Idle()
         if not HasBuff("Облик медведя") and myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
     
-    if GetTime() - fixRageTime > 5 then
+    if not HasBuff("Облик медведя") and GetTime() - fixRageTime > 5 then
         if InRage("target") and DoSpell("Умиротворение", "target") then return end
         if InRage("focus") and DoSpell("Умиротворение", "focus") then return end
         fixRageTime = GetTime()
