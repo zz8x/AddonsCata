@@ -10,7 +10,7 @@ function Idle()
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
     -- чтоб контроли не сбивать
-    if not CanControl("target") then RunMacroText("/stopattack") end
+    --if not CanControl("target") then RunMacroText("/stopattack") end
     
 	if not (IsAttack() or InCombatLockdown()) then return end
 	TryTarget()
@@ -20,7 +20,7 @@ function Idle()
   
     if HasBuff("Быстрота хищника") then
         if not HasBuff("Облик медведя") and CanHeal("Танак") and UnitHealth100("Танак") < 40 then DoSpell("Целительное прикосновение", "Танак") return end
-        if not HasBuff("Облик медведя") and myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
+        if not HasBuff("Облик медведя") and myHP < 70 then DoSpell("Целительное прикосновение", "player") return end
     end
     
     if not HasBuff("Облик медведя") and GetTime() - fixRageTime > 5 then
@@ -92,6 +92,7 @@ function Idle()
         if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания беспощадного гладиатора") then return end
         if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания беспощадного гладиатора") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
 
+        if myHP < 50 and DoSpell("Инстинкты выживания") then return end
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
 
         
@@ -174,7 +175,7 @@ function TryTarget()
         for i = 1, #TARGET do
             local t = TARGET[i]
             if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t))  then 
-                RunMacroText("/startattack " .. target) 
+                RunMacroText("/startattack [@" .. target .. "]") 
                 break
             end
         end
@@ -192,7 +193,7 @@ function TryTarget()
         if not IsAttack()  -- если в авторежиме
             and (
             not IsValidTarget("target")  -- вообще не цель
-            or not ActualDistance("target")  -- далековато
+            or (not IsArena() and not ActualDistance("target"))  -- далековато
             or (not IsPvP() and not UnitAffectingCombat("target")) -- моб не в бою
             or (IsPvP() and not UnitIsPlayer("target")) -- не игрок в пвп
             )  then 
