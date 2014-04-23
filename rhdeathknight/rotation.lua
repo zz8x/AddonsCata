@@ -59,7 +59,7 @@ function Idle()
     RunMacroText("/startattack")
     -- войти в бой
 
-    if IsPvP() and UnitIsPlayer("target") and not InCombatLockdown() and not InMelee() and IsReadySpell("Темная власть") then DoSpell("Темная власть", "target") end
+    --if IsPvP() and UnitIsPlayer("target") and not InCombatLockdown() and not InMelee() and IsReadySpell("Темная власть") then DoSpell("Темная власть", "target") end
 
     if IsMouse3() and TryTaunt("mouseover") then return end
 
@@ -72,52 +72,70 @@ function Idle()
 
     local canMagic = CanMagicAttack("target")
     local canMagicFocus = IsValidTarget("focus") and CanMagicAttack("focus")
-    local frostSpell = CanAOE and "Воющий ветер" or (IsPvP()  and "Ледяные оковы" or "Ледяное прикосновение")
-    -- накладываем болезни
-    if (0 == GetDotesTime("target")) and DoSpell("Вспышка болезни") then return end
-    if not HasMyDebuff("Озноб", 3, "target") and DoSpell(frostSpell) then return end
-    if not HasMyDebuff("Кровавая чума", 3, "target") and DoSpell("Удар чумы") then return end
 
-    if CanAOE and IsValidTarget("focus") and not Dotes(3, "focus") and DoSpell("Мор") then return end
+    local frostSpell = CanAOE and "Воющий ветер" or "Ледяное прикосновение"
 
-    if IsCtr() or (InMelee() and canMagic) then
-        if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end
-        --UseEquippedItem("Ярость Кузни Гнева")
+    if advansedMod and IsCtr() or InMelee() then
         UseEquippedItem("Жетон победы беспощадного гладиатора")
         if DoSpell("Ледяной столп") then return end
     end
 
-    if DoSpell("Рунический удар", "target", baseRP) then return end
-    if DoSpell("Рунический удар", "focus", baseRP) then return end
-
-    if UnitMana("player") > 60 then
-        if canMagic and DoSpell(InMelee() and "Ледяной удар" or "Лик смерти") then return end
-        if canMagicFocus and DoSpell(InMelee("focus") and "Ледяной удар" or "Лик смерти", "focus") then return end
-    end
-
+    -- мега прок
     if HasBuff("Машина для убийств") then
         if canMagic or canMagicFocus then
-            if canMagic and DoSpell("Ледяной удар", "target", baseRP) then return end
-            if canMagicFocus and HasBuff("Машина для убийств") and DoSpell("Ледяной удар", "focus", baseRP) then return end
+            if canMagic then
+                if DoSpell("Ледяной удар", "target") then return end
+            else
+                if canMagicFocus and DoSpell("Ледяной удар", "focus") then return end
+            end
+            if InMelee() and UnitMana("player") > 31 then return end
         else
             if Dotes() and DoSpell("Уничтожение") then return end
         end
     end
-    if IsPvP() and not HasDebuff("Некротический удар") and DoSpell("Некротический удар") then return end
+
     if Dotes() and (UnitHealth100("player") < (IsAttack() and 35 or 85)) and DoSpell("Удар смерти") then return end 
-    if canMagic and DoSpell(frostSpell) then return end
-    if canMagicFocus and DoSpell(frostSpell, "focus") then return end
-    if HasRunes(002, true) and DoSpell(IsPvP() and "Некротический удар" or "Удар чумы") then return end
 
-    if canMagic and not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
-    if canMagicFocus and not InMelee("focus") and DoSpell("Лик смерти", "focus", baseRP) then return end
+    if not canMagic and advansedMod and InMelee() and DoSpell("Рунический удар") then return end
 
-    if (UnitMana("player") < 100 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
-    
+    -- чтоб зря не пропадало
+    if UnitMana("player") > 80 then
+        if canMagic then
+            if DoSpell(InMelee() and "Ледяной удар" or "Лик смерти") then return end
+        else
+            if canMagicFocus and DoSpell(InMelee("focus") and "Ледяной удар" or "Лик смерти", "focus") then return end
+        end
+    end
+
     -- ресаем руну крови
     if not HasRunes(100) and DoSpell("Кровоотвод") then return end
     -- ресаем все.
-    if NoRunes() and DoSpell("Усиление рунического оружия") then return end
+    if not HasRunes(010) and DoSpell("Усиление рунического оружия") then return end
+
+    -- разносим болезни на всех
+    if CanAOE and Dotes() and IsValidTarget("focus") and not Dotes(1, "focus") and DoSpell("Мор") then return end
+
+    -- накладываем болезни
+    if (0 == GetDotesTime("target")) and DoSpell("Вспышка болезни") then return end
+    
+    if not HasMyDebuff("Кровавая чума", 3, "target") and DoSpell("Удар чумы") then return end
+
+    -- собственно ротация
+    if canMagic then
+        if DoSpell(frostSpell) then return end
+    else
+        if canMagicFocus and DoSpell(frostSpell, "focus") then return end
+    end
+
+    if HasRunes(002, true) and DoSpell(IsPvP() and "Некротический удар" or "Удар чумы") then return end
+
+    if canMagic then
+     if not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
+    else
+        if canMagicFocus and not InMelee("focus") and DoSpell("Лик смерти", "focus", baseRP) then return end
+    end
+
+    if (UnitMana("player") < 80 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
     
 end
 
@@ -289,13 +307,9 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function HasRunes(runes, strong, time)
     local r = floor(runes / 100)
-    local g = floor((runes - r * 100) / 10)
-    local b = floor(runes - r * 100 - g * 10)
+    local b = floor((runes - r * 100) / 10)
+    local g = floor(runes - r * 100 - b * 10)
     local a = 0
-    
-    local m = false
-    if r < 1 then m = true end
-   
     for i = 1, 6 do
         if IsRuneReady(i, time) then
             local t = select(1,GetRuneType(i))
