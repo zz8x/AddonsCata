@@ -176,10 +176,9 @@ function UpdateAutoFreedom(event, ...)
         return
     end 
     debuff = HasDebuff(ControlList, 2, "player")
-    if debuff and (not tContains(exceptionControlList, debuff) or IsAttack()) then 
-        local forceMode = tContains(exceptionControlList, debuff) and IsAttack() and "force!" or ""
-        print("freedom", debuff, forceMode)
-        DoCommand("freedom") 
+    if debuff and (not tContains(exceptionControlList, debuff)) then 
+        print("freedom", debuff)
+        DoCommand("freedom")
         freedomTime = GetTime()
         return
     end 
