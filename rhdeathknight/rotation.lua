@@ -103,7 +103,7 @@ function Idle()
             if Dotes() and DoSpell("Уничтожение") then return end
         end
     end
-    if IsPvP() and not HasDefuff("Некротический удар") and DoSpell("Некротический удар") then return end
+    if IsPvP() and not HasDebuff("Некротический удар") and DoSpell("Некротический удар") then return end
     if Dotes() and (UnitHealth100("player") < (IsAttack() and 35 or 85)) and DoSpell("Удар смерти") then return end 
     if canMagic and DoSpell(frostSpell) then return end
     if canMagicFocus and DoSpell(frostSpell, "focus") then return end
