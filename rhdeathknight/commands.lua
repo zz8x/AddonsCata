@@ -1,38 +1,5 @@
 -- DK Rotation Helper by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
-local freedomItem = nil
-local freedomSpell = "Каждый за себя"
-SetCommand("freedom", 
-    function() 
-        if HasSpell(freedomSpell) then
-            DoSpell(freedomSpell)
-            return
-        end
-        UseEquippedItem(freedomItem) 
-    end, 
-    function() 
-        if IsPlayerCasting() then return true end
-        if freedomItem == nil then
-           freedomItem = (UnitFactionGroup("player") == "Horde" and "Медальон Орды" or "Медальон Альянса")
-        end
-        if HasSpell(freedomSpell) and (not InGCD() and not IsReadySpell(freedomSpell)) then return true else return false end
-        return not IsEquippedItem(freedomItem) or (not InGCD() and not IsReadyItem(freedomItem)) 
-    end
-)
-
-------------------------------------------------------------------------------------------------------------------
-
-SetCommand("lich", 
-    function() 
-        if DoSpell("Перерождение") then
-            echo("Перерождение!",1)
-        end
-    end, 
-    function() 
-        return not HasSpell("Перерождение") or  HasBuff("Перерождение", 1, "player") or not IsSpellNotUsed("Перерождение", 1) 
-    end
-)
-------------------------------------------------------------------------------------------------------------------
 -- // /run if IsReadySpell("s") and СanMagicAttack("target") then DoCommand("spell", "s", "target") end
 SetCommand("spell", 
     function(spell, target) 
@@ -79,7 +46,10 @@ SetCommand("silence",
         end
     end, 
     function(target) 
-        if not CanMagicAttack(target) or HasBuff("Мастер аур", 0.1, target) then return true end
+        if not CanMagicAttack(target) or HasBuff("Мастер аур", 0.1, target) then 
+            chat('silence: !CanMagicAttack')
+            return true 
+        end
         local spell = "Удушение"
         if not InRange(spell, target) then
             chat(spell .. " - неверная дистанция!")
@@ -92,18 +62,30 @@ SetCommand("silence",
         return false
     end
 )
-
   
 ------------------------------------------------------------------------------------------------------------------
 local stopImmune = {"Длань свободы", "Отражение заклинания"}
 SetCommand("stop", 
     function(target) 
         if target == nil then target = "target" end
-        if HasDebuff("Ледяные оковы",6,target)  or DoSpell("Ледяные оковы", target) then return true end
+        if HasDebuff("Ледяные оковы",5,target)  or DoSpell("Ледяные оковы", target) then return true end
     end, 
     function(target) 
         if target == nil then target = "target" end
-        if not CanAttack(target) or HasBuff(stopImmune, 0.1, target) or HasDebuff("Ледяные оковы", 6 ,target) then return true end
+        if not CanAttack(target) then 
+            chat('stop: !CanAttack') 
+            return true 
+        end
+        local immune = HasBuff(stopImmune, 0.1, target)
+        if immune then 
+            chat('stop: ' .. immune) 
+            return true  
+        end
+        local  debuffTime = GetDebuffTime("Ледяные оковы" ,target)
+        if debuffTime > 5 then 
+            chat('stop: ' .. debuffTime) 
+            return true 
+        end
         return false  
     end
 )
@@ -112,9 +94,7 @@ SetCommand("stop",
 SetCommand("dg", 
     function(target) 
         if target == nil then target = "target" end
-        if DoSpell("Хватка смерти", target) then 
-            return true
-        end
+        return DoSpell("Хватка смерти", target) 
     end, 
     function(target) 
         if target == nil then target = "target" end
@@ -131,22 +111,22 @@ SetCommand("mount",
         if (IsCtr() or IsSwimming()) 
             and DoSpell("Льдистый путь") then 
             tryMount = GetTime()
-            return
+            return true
         end
         if IsEquippedItemType("Удочка") and DoSpell("Рыбная ловля") then
             tryMount = GetTime()
-            return
+            return true
         end
         if InGCD() or InCombatLockdown() or IsMounted() or CanExitVehicle() or IsPlayerCasting() or not IsOutdoors() or not PlayerInPlace() then
             tryMount = GetTime() 
-            return
+            return true
         end
         --local mount = (IsFlyableArea() and not IsShiftKeyDown()) and "Крылатый скакун Черного Клинка" or "Конь смерти Акеруса"
         local mount = (IsShift() or IsBattleground() or IsArena()) and  "Конь смерти Акеруса" or "Вороной грифон"
         --if IsAlt() then mount = "Тундровый мамонт путешественника" end
         if UseMount(mount) then 
             tryMount = GetTime() 
-            return
+            return true
         end
     end, 
     function() 

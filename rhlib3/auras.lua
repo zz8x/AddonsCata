@@ -74,8 +74,8 @@ function GetDebuffTime(aura, target)
     if target == nil then target = "player" end
     local name, _, _, count, _, _, Expires  = UnitDebuff(target, aura) 
     if not name then return 0 end
-    if expirationTime == 0 then return 10 end
-    local left =  expirationTime - GetTime()
+    if Expires == 0 then return 10 end
+    local left =  Expires - GetTime()
     if left < 0 then left = 0 end
     return left
 end

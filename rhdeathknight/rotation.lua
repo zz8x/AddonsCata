@@ -31,8 +31,7 @@ function Idle()
             TryInterrupt(TARGETS[i])
         end
     end
-    local baseRP = 20
-    
+        
     if advansedMod then
         if IsPvP() and HasClass(TARGETS, UndeadFearClass) and not HasBuff("Антимагический панцирь") and HasBuff("Перерождение") and not HasBuff("Перерождение", 8) then RunMacroText("/cancelaura Перерождение") end    
         
@@ -50,16 +49,16 @@ function Idle()
     
     if TryProtect() then return end
 
-    if IsAttack() and not IsValidTarget("target") and DoSpell("Зимний горн") then return end
+    if IsAttack() and not IsValidTarget("target") then 
+        if DoSpell("Зимний горн") then return end
+        if HasSpell("Костяной щит") and not HasBuff("Костяной щит") and DoSpell("Костяной щит") then return end
+    end
 
     TryTarget(CanAOE)
 
     if not (IsValidTarget("target") and CanAttack("target") and (UnitAffectingCombat("target")  or IsAttack()))  then return end
 
     RunMacroText("/startattack")
-    -- войти в бой
-
-    --if IsPvP() and UnitIsPlayer("target") and not InCombatLockdown() and not InMelee() and IsReadySpell("Темная власть") then DoSpell("Темная власть", "target") end
 
     if IsMouse3() and TryTaunt("mouseover") then return end
 
@@ -70,12 +69,74 @@ function Idle()
         end
     end
 
+    if HasSpell("Воющий ветер") then
+        frostRotation()
+    end
+
+    if HasSpell("Танцующее руническое оружие") then
+        bloodRotation()
+    end
+end
+
+------------------------------------------------------------------------------------------------------------------
+function bloodRotation()
+    local canMagic = CanMagicAttack("target")
+    local canMagicFocus = IsValidTarget("focus") and CanMagicAttack("focus")
+    local rp = UnitMana("player")
+
+    -- войти в бой
+    if IsPvP() and UnitIsPlayer("target") and not InCombatLockdown() and not InMelee() and IsReadySpell("Темная власть") then DoSpell("Темная власть", "target") end
+
+     -- разносим болезни на всех
+    if IsAOE() and DoSpell("Мор") then return end
+    
+    if IsCtr() or (IsPvP() and InMelee()) then
+        UseEquippedItem("Жетон победы беспощадного гладиатора")
+        if DoSpell("Танцующее руническое оружие") then return end
+    end
+
+    if DoSpell("Рунический удар", "target", 90) then return end
+
+    if canMagic then
+        if DoSpell("Лик смерти", "target", 80) then return end
+    else
+        if canMagicFocus and DoSpell("Лик смерти", "focus", 80) then return end
+    end
+
+    if rp > 120 then return end
+    if (rp < 20 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
+
+    -- ресаем руну крови
+    if not HasRunes(100) and DoSpell("Кровоотвод") then return end
+    -- ресаем все.
+    if not HasRunes(111) and DoSpell("Усиление рунического оружия") then return end
+
+    if not HasBuff("Костяной щит") and DoSpell("Костяной щит") then return end
+
+    -- накладываем болезни
+    if not Dotes(3) and DoSpell("Вспышка болезни") then return end    
+    if not HasMyDebuff("Кровавая чума", 3, "target") and DoSpell("Удар чумы") then return end
+    if not HasMyDebuff("Озноб", 3, "target") and DoSpell(IsPvP() and "Ледяные оковы" or "Ледяное прикосновение") then return end
+
+    -- собственно ротация
+
+    if IsPvP() and not HasDebuff("Некротический удар") and DoSpell("Некротический удар") then return end
+    if Dotes() and DoSpell("Удар смерти") then return end
+    if DoSpell("Удар в сердце") then return end
+
+    if (UnitMana("player") < 80 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
+    if IsAttack() and not InMelee() and DoSpell(IsPvP() and "Ледяные оковы" or "Ледяное прикосновение") then return end
+end
+
+------------------------------------------------------------------------------------------------------------------
+function frostRotation()
+    local baseRP = 20
     local canMagic = CanMagicAttack("target")
     local canMagicFocus = IsValidTarget("focus") and CanMagicAttack("focus")
 
     local frostSpell = CanAOE and "Воющий ветер" or "Ледяное прикосновение"
 
-    if advansedMod and IsCtr() or InMelee() then
+    if IsCtr() or (IsPvP() and InMelee()) then
         UseEquippedItem("Жетон победы беспощадного гладиатора")
         if DoSpell("Ледяной столп") then return end
     end
@@ -96,7 +157,7 @@ function Idle()
 
     if Dotes() and (UnitHealth100("player") < (IsAttack() and 35 or 85)) and DoSpell("Удар смерти") then return end 
 
-    if not canMagic and advansedMod and InMelee() and DoSpell("Рунический удар") then return end
+    if not canMagic and InMelee() and DoSpell("Рунический удар") then return end
 
     -- чтоб зря не пропадало
     if UnitMana("player") > 80 then
@@ -116,7 +177,8 @@ function Idle()
     if CanAOE and Dotes() and IsValidTarget("focus") and not Dotes(1, "focus") and DoSpell("Мор") then return end
 
     -- накладываем болезни
-    if (0 == GetDotesTime("target")) and DoSpell("Вспышка болезни") then return end
+    if not Dotes(2) and DoSpell("Вспышка болезни") then return end 
+    --if (0 == GetDotesTime("target")) and DoSpell("Вспышка болезни") then return end
     
     if not HasMyDebuff("Кровавая чума", 3, "target") and DoSpell("Удар чумы") then return end
 
@@ -164,7 +226,8 @@ end
 function TryHealing()
     TryDeathPact()
     local h = UnitHealth100("player")
-    --if h < 80 and HasSpell("Захват рун") and DoSpell("Захват рун") then return end
+    if h < 55 and HasSpell("Кровь вампира") and DoSpell("Кровь вампира") then return end
+    if h < 80 and HasSpell("Захват рун") and DoSpell("Захват рун") then return end
     --if h < 80 and HasSpell("Кровь земли") and DoSpell("Кровь земли") then return end
     if HasBuff("Перерождение") and UnitHealth100("player") < 100 and DoSpell("Лик смерти", "player") then return end
     if InCombatLockdown() then
@@ -302,6 +365,7 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 function GetDotesTime(target)
+    if target == nil then target = "target" end
     return min(GetMyDebuffTime("Озноб", target),GetMyDebuffTime("Кровавая чума", target))
 end
 ------------------------------------------------------------------------------------------------------------------

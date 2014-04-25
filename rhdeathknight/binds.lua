@@ -19,7 +19,7 @@ end
 function IsAOE()
    if not CanAOE then return false end
    if IsShift() then return true end
-   return (IsValidTarget("target") and IsValidTarget("focus") and not IsOneUnit("target", "focus") and Dotes(7) and Dotes(7, "focus"))
+   return false --(IsValidTarget("target") and IsValidTarget("focus") and not IsOneUnit("target", "focus") and Dotes(7) and Dotes(7, "focus"))
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ local lichList = {
 "Ментальный крик"
 }
 
-    
+-- снимается уроном
 local exceptionControlList = { -- > 4
 "Ошеломление", -- 20s
 "Покаяние", 
@@ -160,27 +160,33 @@ local exceptionControlList = { -- > 4
 
 local freedomTime = 0
 function UpdateAutoFreedom(event, ...)
-    if GetTime() - freedomTime < 1.5 then return end
+    -- не слишком часто
+    if GetTime() - freedomTime < 0.5 then return end
+    freedomTime = GetTime()
+    -- фиры
     local debuff = HasDebuff(lichList, 2, "player")
-    if debuff then 
+    if debuff and (GetDebuffTime(debuff, "player") >= 4) then 
+        Notify('lich: ' .. debuff)
         if HasSpell("Перерождение") and IsReadySpell("Перерождение") then
-            print("lich", debuff)
-            DoCommand("lich") 
+            if DoSpell("Перерождение") then
+                print("lich", debuff)
+            end
         else
             if not HasBuff("Перерождение") then  
-                print("lich->freedom", debuff)
-                DoCommand("freedom") 
+                if DoSpell("Каждый за себя") then
+                    print("lich->Каждый за себя", debuff)
+                end
             end
         end
-        freedomTime = GetTime()
         return
     end 
+    -- остальные контроли
     debuff = HasDebuff(ControlList, 2, "player")
-    if debuff and (not tContains(exceptionControlList, debuff)) then 
-        print("freedom", debuff)
-        DoCommand("freedom")
-        freedomTime = GetTime()
-        return
+    if debuff and (GetDebuffTime(debuff, "player") >= 4) and (not tContains(exceptionControlList, debuff)) then 
+        Notify('lich: ' .. debuff)
+        if DoSpell("Каждый за себя") then
+            print("freedom", debuff)
+        end
     end 
 end
 AttachUpdate(UpdateAutoFreedom, -1)
