@@ -7,15 +7,30 @@ function SellGray()
       for s=1, GetContainerNumSlots(b) do          
         local n=GetContainerItemLink(b,s)
         if n then
-            if string.find(n, "ff9d9d9d") or (IsTrash and IsTrash(n)) then                                 
+            if string.find(n, "ff9d9d9d") or (IsGray and IsGray(n)) then                                 
               UseContainerItem(b,s)                   
             end
         end
                                                
       end                                          
-    end                                            
+    end  
 end
 
+------------------------------------------------------------------------------------------------------------------
+function DelGray()
+    ClearCursor()
+    for b=0,4 do                                   
+      for s=1, GetContainerNumSlots(b) do          
+        local n=GetContainerItemLink(b,s)
+        if n then
+            if string.find(n, "ff9d9d9d") or (IsTrash and IsTrash(n)) then                                 
+              PickupContainerItem(b,s)
+              DeleteCursorItem() 
+            end
+        end
+      end                                          
+    end                                            
+end
 ------------------------------------------------------------------------------------------------------------------
 function buy(name,q) 
     local c = 0
@@ -191,9 +206,9 @@ UnitIsPlayer, UnitIsConnected, UnitClass, RAID_CLASS_COLORS
 local _, class, c
 local function colour(statusbar, unit)
 -- только для игроков
---if UnitIsPlayer(unit) and UnitIsConnected(unit) and unit == statusbar.unit and UnitClass(unit) then
+if UnitIsPlayer(unit) and UnitIsConnected(unit) and unit == statusbar.unit and UnitClass(unit) then
 -- для всех
-if unit and unit == statusbar.unit and UnitClass(unit) then
+--if unit and unit == statusbar.unit and UnitClass(unit) then
 _, class = UnitClass(unit)
 c = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class]
 statusbar:SetStatusBarColor(c.r, c.g, c.b)
@@ -218,16 +233,15 @@ FCF_SavePositionAndDimensions(_G[format("ChatFrame%d", i)]) end
 -- Возможность отдалять камеру намного дальше чем возможно стандартными настройками игры
 AttachEvent("PLAYER_ENTERING_WORLD", function()
   SetCVar("cameraDistanceMax", 50)
-  SetCVar("cameraDistanceMaxFactor", 3.4)
+  SetCVar("cameraDistanceMaxFactor", 5)
 end)
 ------------------------------------------------------------------------------------------------------------------
 -- Миникарта (С миникарты убрано лишее, теперь маштаб регулируется колесиком мышки)
-MinimapBorderTop:Hide()
+--MinimapBorderTop:Hide()
 MiniMapWorldMapButton:Hide() -- Скрытие значка Мировой карты Установите 
-MinimapZoneText:SetPoint("TOPLEFT","MinimapZoneTextButton","TOPLEFT", 8, 0) -- Координата центрального текста карты(Пс. Названия Зоны где вы находитесь)
+--MinimapZoneText:SetPoint("TOPLEFT","MinimapZoneTextButton","TOPLEFT", 8, 0) -- Координата центрального текста карты(Пс. Названия Зоны где вы находитесь)
 MinimapZoomIn:Hide() -- Скрытие кнопок +\-
 MinimapZoomOut:Hide()
-Minimap:EnableMouseWheel(true)
 Minimap:EnableMouseWheel(true)
 Minimap:SetScript('OnMouseWheel', function(self, delta)
         if delta > 0 then

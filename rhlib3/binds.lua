@@ -260,11 +260,14 @@ AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateSpellAlert)
 -- Автоматическая продажа хлама и починка
 local function SellGrayAndRepair()
     SellGray()
+    DelGray()
     RepairAllItems(1) -- сперва пробуем за счет ги банка
     RepairAllItems()
 end
 AttachEvent('MERCHANT_SHOW', SellGrayAndRepair)
-
+------------------------------------------------------------------------------------------------------------------
+-- Автоматическoe удаление хлама
+AttachEvent('MERCHANT_CLOSED', DelGray)
 ------------------------------------------------------------------------------------------------------------------
 -- Запоминаем вредоносные спелы которые нужно кастить (нужно для сбивания кастов, например тотемом заземления)
 if HarmfulCastingSpell == nil then HarmfulCastingSpell = {} end

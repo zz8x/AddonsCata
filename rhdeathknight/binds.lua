@@ -19,7 +19,7 @@ end
 function IsAOE()
    if not CanAOE then return false end
    if IsShift() then return true end
-   return false --(IsValidTarget("target") and IsValidTarget("focus") and not IsOneUnit("target", "focus") and Dotes(7) and Dotes(7, "focus"))
+   return (IsValidTarget("target") and IsValidTarget("focus") and not IsOneUnit("target", "focus") and Dotes(7) and Dotes(7, "focus"))
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -258,13 +258,39 @@ function DoSpell(spellName, target, baseRP)
     return UseSpell(spellName, target)
 end
 ------------------------------------------------------------------------------------------------------------------
+if GrayList == nil then GrayList = {} end
 if TrashList == nil then TrashList = {} end
-function IsTrash(n) --n - itemlink
+
+function IsGray(n) --n - itemlink
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(n)
-    if tContains(TrashList, itemName) then return true end
+    if tContains(GrayList, itemName) then return true end
     if itemRarity == 2 and (itemType == "Оружие" or itemType == "Доспехи") then
       return true
     end
+    return false
+end
+
+
+function grayToggle()
+    local itemName, ItemLink = GameTooltip:GetItem()
+    if nil == itemName then return end
+    if tContains(GrayList, itemName) then 
+        for i=1, #GrayList do
+            if GrayList[i] ==  itemName then 
+                tremove(GrayList, i)
+                chat(itemName .. " НЕ ПРОДАВАТЬ! ")
+            end
+        end            
+    else
+        chat(itemName .. " ПРОДАВАТЬ! ")
+        tinsert(GrayList, itemName)
+    end
+end
+------------------------------------------------------------------------------------------------------------------
+
+function IsTrash(n) --n - itemlink
+    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(n)
+    if tContains(TrashList, itemName) then return true end
     return false
 end
 
@@ -276,11 +302,11 @@ function trashToggle()
         for i=1, #TrashList do
             if TrashList[i] ==  itemName then 
                 tremove(TrashList, i)
-                chat(itemName .. " это НЕ Хлам! ")
+                chat(itemName .. " НЕ УДАЛЯТЬ! ")
             end
         end            
     else
-        chat(itemName .. " это Хлам! ")
+        chat(itemName .. " УДАЛЯТЬ! ")
         tinsert(TrashList, itemName)
     end
 end
