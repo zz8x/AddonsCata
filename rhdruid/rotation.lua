@@ -2,6 +2,7 @@
 ------------------------------------------------------------------------------------------------------------------
 local peaceBuff = {"Пища", "Питье", "Походный облик", "Облик стремительной птицы", "Водный облик"}
 local fixRageTime = 0
+local steathClass = {"ROGUE", "DRUID"}
 function Idle()
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
@@ -17,10 +18,11 @@ function Idle()
     TryBuffs()
 
     local myHP = UnitHealth100("player")
+
   
     if HasBuff("Быстрота хищника") then
-        if not HasBuff("Облик медведя") and CanHeal("Танак") and UnitHealth100("Танак") < 40 then DoSpell("Целительное прикосновение", "Танак") return end
-        if not HasBuff("Облик медведя") and myHP < 70 then DoSpell("Целительное прикосновение", "player") return end
+        --if not HasBuff("Облик медведя") and CanHeal("Танак") and UnitHealth100("Танак") < 40 then DoSpell("Целительное прикосновение", "Танак") return end
+        if not HasBuff("Облик медведя") and myHP < 60 then DoSpell("Целительное прикосновение", "player") return end
     end
     
     if not HasBuff("Облик медведя") and GetTime() - fixRageTime > 5 then
@@ -37,7 +39,7 @@ function Idle()
     
     if HasBuff("Облик медведя") and IsValidTarget("target") then
         if UnitMana("player") < 80 and DoSpell("Исступление") then return end
-        if HasSpell("Звериный рывок(Облик медведя)") and InRange("Звериный рывок(Облик медведя)", "target") then 
+        if HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and InRange("Звериный рывок(Облик медведя)", "target") then 
             DoSpell("Звериный рывок(Облик медведя)")
             return
         end
@@ -47,12 +49,13 @@ function Idle()
             if myHP < 60 and DoSpell("Неистовое восстановление") then return end
             if myHP < 60 and DoSpell("Дубовая кожа") then return end
             if DoSpell("Увечье(Облик медведя)") then return end
+            if IsShiftKeyDown() == 1 and DoSpell("Размах(Облик медведя)") then return end
             if DoSpell("Взбучка") then return end
             if DoSpell("Растерзать") then return end
     end
   
     if HasBuff("Облик кошки") then
-        if not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок(Облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
+        if InCombatLockdown() and not HasBuff("Крадущийся зверь") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик медведя)", "target") and GetSpellCooldownLeft("Звериный рывок(Облик кошки)") > 2 and GetSpellCooldownLeft("Звериный рывок(Облик медведя)") == 0 then
             UseMount("Облик медведя")
             return
         end
@@ -75,7 +78,12 @@ function Idle()
             return 
         end
        
-        
+    if IsPvP() and IsReadySpell("Волшебный огонь (облик зверя)") then
+        for i = 1, #ITARGETS do
+            local t = ITARGETS[i]
+            if UnitIsPlayer(t) and tContains(steathClass, GetClass(t)) and not HasDebuff("Волшебный огонь", 1, t) and DoSpell("Волшебный огонь (облик зверя)", t) then return end
+        end
+    end
         
         if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик кошки)", "target") and DoSpell("Звериный рывок(Облик кошки)") then return end
                 
@@ -83,11 +91,7 @@ function Idle()
 
 
 --~      Ротация для кошки 
-        if not IsPvP() and IsAOE() then
-            if UnitMana("player") < 35 and UnitMana("player") > 25 and not HasBuff("Берсерк") and DoSpell("Тигриное неистовство") then return end
-            DoSpell("Размах(Облик кошки)")
-            return
-        end
+        if IsShiftKeyDown() == 1 and HasBuff("Облик кошки") and DoSpell("Размах(Облик кошки)") then return end
        
         if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания беспощадного гладиатора") then return end
         if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания беспощадного гладиатора") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
@@ -95,7 +99,6 @@ function Idle()
         if myHP < 50 and DoSpell("Инстинкты выживания") then return end
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
 
-        
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and InMelee() then
             if UnitMana("player") > 25 and UnitMana("player") < 85 and HasSpell("Берсерк") and DoSpell("Берсерк") then return end
         end
@@ -105,6 +108,16 @@ function Idle()
         if HasSpell("Увечье(Облик кошки)") and not HasMyDebuff("Увечье") then
                 DoSpell("Увечье(Облик кошки)") 
             return
+        end
+
+        local CP = GetComboPoints("player", "target")
+
+        if (CP == 5) then
+            if UnitMana("player") < 40 and DoSpell("Тигриное неистовство") then return end
+            if HasDebuff("Разорвать", 5) and DoSpell("Свирепый укус") then return end
+            if not HasDebuff("Разорвать", 0.8) and DoSpell("Разорвать") then return end
+            --if UnitMana("player") < 40 and HasDebuff("Разорвать", 6) and DoSpell("Свирепый укус") then return end
+            if InGCD() or UnitMana("player") < 40 then return end
         end
 
         if UnitMana("player") < 40 and DoSpell("Тигриное неистовство") then return end
@@ -129,22 +142,6 @@ function Idle()
             end
         end
           
-
-        local CP = GetComboPoints("player", "target")
-
-        --[[if (CP > 3) and not HasBuff("Дикий рев", 3) and DoSpell("Дикий рев") then return end
-        if (CP > 0) and not HasBuff("Дикий рев") then 
-            DoSpell("Дикий рев")
-            return 
-        end]]
-        if (CP == 5) then
-            if UnitMana("player") < 40 and DoSpell("Тигриное неистовство") then return end
-            if HasDebuff("Разорвать", 5) and DoSpell("Свирепый укус") then return end
-            if not HasDebuff("Разорвать", 0.8) and DoSpell("Разорвать") then return end
-            --if UnitMana("player") < 40 and HasDebuff("Разорвать", 6) and DoSpell("Свирепый укус") then return end
-            if InGCD() or UnitMana("player") < 40 then return end
-        end
-      
       
         if not IsBehind() then
             if HasSpell("Увечье(Облик кошки)") then
@@ -174,7 +171,7 @@ function TryTarget()
         if UnitExists("target") then RunMacroText("/cleartarget") end
         for i = 1, #TARGET do
             local t = TARGET[i]
-            if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t))  then 
+            if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t)) and not IsStealthed() then 
                 RunMacroText("/startattack [@" .. target .. "]") 
                 break
             end
