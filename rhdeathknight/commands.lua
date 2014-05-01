@@ -105,24 +105,67 @@ SetCommand("dg",
 
 
 ------------------------------------------------------------------------------------------------------------------
+local stunTime = 0
+SetCommand("stun", 
+    function(target) 
+        if not IsReadySpell("Отгрызть") then return end
+        if target == nil then target = "target" end
+        RunMacroText("/petattack "..target)
+        if DoSpell("Отгрызть", target) then 
+            stunTime = GetTime()
+            return true
+        end
+        DoSpell("Прыжок", target)
+    end, 
+    function(target) 
+        if target == nil then target = "target" end
+        if not HasSpell("Отгрызть") then chat('stun: !HasSpell') return true end
+        if not IsReadySpell("Отгрызть") then chat('stun: !IsReady') return true end
+        if not CanAttack(target)  then  chat('stun: !CanAttack') return true end
+        if GetTime() - stunTime < 0.1 then
+            stunTime = 0
+            chat("stun!")
+            return true
+        end
+        if not CanControl(target) then  chat('stun: !CanControl') return true end
+        return false  
+    end
+)
+------------------------------------------------------------------------------------------------------------------
 local tryMount = 0
 SetCommand("mount", 
     function() 
-        if (IsCtr() or IsSwimming()) 
-            and DoSpell("Льдистый путь") then 
-            tryMount = GetTime()
-            return true
-        end
-        if IsEquippedItemType("Удочка") and DoSpell("Рыбная ловля") then
-            tryMount = GetTime()
-            return true
+        if not IsArena() then
+            -- ускорение
+            if IsAlt() and not PlayerInPlace() and UseSlot(6) then
+                chat("Ускорители")
+                tryMount = GetTime()
+                return true
+            end
+            -- парашут
+            if GetFalingTime() > 1 and UseSlot(15) then
+                chat("Парашют")
+                tryMount = GetTime()
+                return true
+            end
+            -- хождение по воде
+            if (IsCtr() or IsSwimming()) 
+                and DoSpell("Льдистый путь") then 
+                tryMount = GetTime()
+                return true
+            end
+            -- рыбная ловля
+            if IsEquippedItemType("Удочка") and DoSpell("Рыбная ловля") then
+                tryMount = GetTime()
+                return true
+            end
         end
         if InGCD() or InCombatLockdown() or IsMounted() or CanExitVehicle() or IsPlayerCasting() or not IsOutdoors() or not PlayerInPlace() then
             tryMount = GetTime() 
             return true
         end
         --local mount = (IsFlyableArea() and not IsShiftKeyDown()) and "Крылатый скакун Черного Клинка" or "Конь смерти Акеруса"
-        local mount = (IsShift() or IsBattleground() or IsArena()) and  "Конь смерти Акеруса" or "Вороной грифон"
+        local mount = (IsShift() or IsBattleground() or IsArena()) and  "Конь смерти Акеруса" or "Ветролет" --"Вороной грифон"
         if IsAlt() then mount = "Тундровый мамонт путешественника" end
         if UseMount(mount) then 
             tryMount = GetTime() 

@@ -126,7 +126,6 @@ function IsReadySpell(name)
     local left = GetSpellCooldownLeft(name)
     if left > LagTime then return false end
     local spellName, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(name)
-    if cost and cost > 0 and not(powerType == -2 and UnitHealth("player") > cost*2 or UnitPower("player", powerType) >= cost) then return false end
     return IsSpellNotUsed(name, 0.5)
 end
 
@@ -245,7 +244,6 @@ local function UpdateTargetPosition(event, ...)
       sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,   
       spellId, spellName, spellSchool,                                                                     
       amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ...
-
     if sourceGUID == UnitGUID("player") and (type:match("^SPELL_CAST") and spellId and spellName)  then
         local err = amount
         local cast = getCastInfo(spellName)

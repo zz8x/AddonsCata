@@ -182,8 +182,27 @@ function sContains(str, sub)
 end
 
 ------------------------------------------------------------------------------------------------------------------
+function IsMouse3()
+    return  IsMouseButtonDown(3) == 1
+end
+
+------------------------------------------------------------------------------------------------------------------
+function IsCtr()
+    return  (IsControlKeyDown() == 1 and not GetCurrentKeyBoardFocus())
+end
+
+------------------------------------------------------------------------------------------------------------------
+function IsAlt()
+    return  (IsAltKeyDown() == 1 and not GetCurrentKeyBoardFocus())
+end
+
+------------------------------------------------------------------------------------------------------------------
+function IsShift()
+    return  (IsShiftKeyDown() == 1 and not GetCurrentKeyBoardFocus())
+end
+------------------------------------------------------------------------------------------------------------------
 -- Стандартная карта мира принимает более лучший вид(Не разворачивается на весь экран)
---[[local BigMap = function()
+local BigMap = function()
      WorldMapFrame:SetParent(UIParent)
      WorldMapFrame:EnableMouse(false)
      WorldMapFrame:EnableKeyboard(false)
@@ -197,32 +216,26 @@ end
 end
 hooksecurefunc("WorldMap_ToggleSizeUp", BigMap)
 hooksecurefunc("WorldMapFrame_SetFullMapView", BigMap)
-BigMap()]]
+BigMap()
 
 ------------------------------------------------------------------------------------------------------------------
 -- Полоски со здоровьем теперь не зеленого цвета а в цвет класса (Довольно приятно)
-local UnitIsPlayer, UnitIsConnected, UnitClass, RAID_CLASS_COLORS =
-UnitIsPlayer, UnitIsConnected, UnitClass, RAID_CLASS_COLORS
+
 local _, class, c
 local function colour(statusbar, unit)
--- только для игроков
-if UnitIsPlayer(unit) and UnitIsConnected(unit) and unit == statusbar.unit and UnitClass(unit) then
--- для всех
---if unit and unit == statusbar.unit and UnitClass(unit) then
-_, class = UnitClass(unit)
-c = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class]
-statusbar:SetStatusBarColor(c.r, c.g, c.b)
-end
+  if UnitIsPlayer(unit) and UnitIsConnected(unit) and unit == statusbar.unit and UnitClass(unit) then
+    _, class = UnitClass(unit)
+    c = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[class] or RAID_CLASS_COLORS[class]
+    statusbar:SetStatusBarColor(c.r, c.g, c.b)
+  end
 end
 hooksecurefunc("UnitFrameHealthBar_Update", colour)
-hooksecurefunc("HealthBar_OnValueChanged", function(self)
-colour(self, self.unit)
-end)
+hooksecurefunc("HealthBar_OnValueChanged", function(self) colour(self, self.unit) end)
 local sb = _G.GameTooltipStatusBar
 local addon = CreateFrame("Frame", "StatusColour")
 addon:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 addon:SetScript("OnEvent", function()
-colour(sb, "mouseover")
+  colour(sb, "mouseover")
 end)
 ------------------------------------------------------------------------------------------------------------------
 -- Снимаем все ограничения с Чата. Возможность переместить в самый угол экрана

@@ -202,21 +202,21 @@ function NotInCombat(t)
     return not InCombatLockdown() and endCombatTime and GetTime() - endCombatTime > t
 end
 ------------------------------------------------------------------------------------------------------------------
--- Лайфхак, чтоб не разбиться об воду при падении с высоты (защита от ДК с повышенным чувством юмора)
---[[local FallingTime
-local function UpdateFallingFix()
+local FallingTime
+function GetFalingTime()
+    if IsFalling() and FallingTime then return GetTime() - FallingTime end
+    return 0
+end
+
+local function UpdateFallingTime()
     if IsFalling() then
         if FallingTime == nil then FallingTime = GetTime() end
-        if FallingTime and (GetTime() - FallingTime > 1) then
-            if HasBuff("Хождение по воде") then RunMacroText("/cancelaura Хождение по воде") end
-            if HasBuff("Льдистый путь") then RunMacroText("/cancelaura Льдистый путь") end
-        end
     else
         if FallingTime ~= nil then FallingTime = nil end
     end
 end
-AttachUpdate(UpdateFallingFix)]]
-
+--FALLING
+AttachUpdate(UpdateFallingTime)
 ------------------------------------------------------------------------------------------------------------------
 -- нас сапнул рога
 function UpdateSapped(event, ...)

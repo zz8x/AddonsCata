@@ -33,26 +33,6 @@ function InterruptToggle()
         echo("Interrupt: OFF",true)
     end 
 end
-
-------------------------------------------------------------------------------------------------------------------
-function IsMouse3()
-    return  IsMouseButtonDown(3) == 1
-end
-
-------------------------------------------------------------------------------------------------------------------
-function IsCtr()
-    return  (IsControlKeyDown() == 1 and not GetCurrentKeyBoardFocus())
-end
-
-------------------------------------------------------------------------------------------------------------------
-function IsAlt()
-    return  (IsAltKeyDown() == 1 and not GetCurrentKeyBoardFocus())
-end
-
-------------------------------------------------------------------------------------------------------------------
-function IsShift()
-    return  (IsShiftKeyDown() == 1 and not GetCurrentKeyBoardFocus())
-end
 ------------------------------------------------------------------------------------------------------------------
 
 local nointerruptBuffs = {"Мастер аур"}
@@ -106,6 +86,16 @@ function TryInterrupt(target)
         return true 
     end
 
+    if HasSpell("Отгрызть") and IsReadySpell("Отгрызть") and CanAttack(target) and (channel or t < 0.8) then 
+        RunMacroText("/cast [@" ..target.."] Прыжок")
+        RunMacroText("/cast [@" ..target.."] Отгрызть")
+        if not IsReadySpell("Отгрызть") then
+            echo("Отгрызть"..m)
+            interruptTime = GetTime() + 4
+            return false 
+        end
+    end
+
     if IsPvP() and IsHarmfulSpell(spell) and IsOneUnit("player", target .. "-target") and DoSpell("Антимагический панцирь") then 
         echo("Антимагический панцирь"..m)
         interruptTime = GetTime() + 5
@@ -130,12 +120,12 @@ AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateDeathPact)
 
 function TryDeathPact()
     -- вызываем пета
-    if InCombatLockdown() and UnitHealth100("player") < 60 and IsSpellNotUsed("Смертельный союз", 118) then
+    if not HasSpell("Отгрызть") and InCombatLockdown() and UnitHealth100("player") < 40 and IsSpellNotUsed("Смертельный союз", 118) then
         DoSpell("Воскрешение мертвых")
     end
 
     -- едим пета
-    if (not IsSpellNotUsed("Воскрешение мертвых", 20) or (not IsSpellNotUsed("Войско мертвых", 20) and UnitHealth100("player") < 70) ) and (GetTime() - DeathPact > 2) then 
+    if (not IsSpellNotUsed("Воскрешение мертвых", 20) or not IsSpellNotUsed("Войско мертвых", 20) or HasSpell("Отгрызть")) and (UnitHealth100("player") < 60) and (GetTime() - DeathPact > 2) then 
         DoSpell("Смертельный союз")
     end
 end
@@ -222,6 +212,7 @@ local spellRunes = {
     ["Зона антимагии"] = 001,
     ["Удушение"] = 100,
     ["Удар в сердце"] = 100,
+    ["Темное превращение"] = 001
 }
 
 local spellCD = {}
