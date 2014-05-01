@@ -233,6 +233,7 @@ function DoSpell(spellName, target, baseRP)
         return IsReadySpell(spellName)
     end
     runes = spellRunes[spellName]
+    if (spellName == "Воющий ветер" or spellName == "Ледяное прикосновение") and HasBuff("Морозная дымка") then runes = 0 end
     if runes ~= nil and not HasRunes(runes) then return false end
 
     if not baseRP or IsAttack() then baseRP = 0 end
