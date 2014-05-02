@@ -21,13 +21,11 @@ function Idle()
             useBers = false
         end
 
-        if not useBers and InCombatLockdown() and IsCtr() then
+        if not useBers and InCombatLockdown() and (IsCtr() or IsArena()) then
             chat("Подключаем бурсты по кд")
             useBers = true;
         end
     end
-
-
 
     if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
 
@@ -47,11 +45,6 @@ function Idle()
         end
     end
         
-     -- призыв пета (анхолик)
-    if HasSpell("Призыв горгульи") and not HasSpell("Цапнуть") and DoSpell("Воскрешение мертвых") then 
-        return true 
-    end
-
     if advansedMod then
         if IsPvP() and HasClass(TARGETS, UndeadFearClass) and not HasBuff("Антимагический панцирь") and HasBuff("Перерождение") and not HasBuff("Перерождение", 8) then RunMacroText("/cancelaura Перерождение") end    
         
@@ -88,13 +81,13 @@ function Idle()
             if UnitAffectingCombat(t) and TryTaunt(t) then return end
         end
     end
-    if HasSpell("Призыв горгульи") then
+    --[[if HasSpell("Призыв горгульи") then
         if advansedMod and HasSpell("Отгрызть") then
             petRotation()
         end
         unholyRotation()
         return
-    end
+    end]]
     if HasSpell("Воющий ветер") then
         frostRotation()
         return
@@ -104,84 +97,6 @@ function Idle()
         bloodRotation()
         return
     end
-end
-
-------------------------------------------------------------------------------------------------------------------
-local totems = { "Тотем оков земли", "Тотем прилива маны", "Тотем заземления", "Тотем очищения", "Тотем источника маны VIII" }
-function petRotation()
-    if UnitExists("mouseover") and tContains(totems, UnitName("mouseover"))  then
-        RunMacroText("/petattack mouseover")
-    end
-    if not IsValidTarget("pet-target") or IsAttack() then
-        RunMacroText("/petattack " .. ((IsValidTarget("focus") and IsAltKeyDown() == 1) and "[@focus]" or "[@target]"))
-    end
-    local mana = UnitMana("pet")
-    if mana >= (IsAttack() and 40 or 70) then RunMacroText("/cast [@pet-target] Цапнуть") end
-end
-
-------------------------------------------------------------------------------------------------------------------
-function unholyRotation()
-    
-    local canMagic = CanMagicAttack("target")
-    -- войти в бой
-    if IsPvP() and UnitIsPlayer("target") and not UnitAffectingCombat("target") and not InMelee() and IsReadySpell("Темная власть") then DoSpell("Темная власть", "target") end
-     -- разносим болезни на всех
-    if CanAOE and Dotes() and IsValidTarget("focus") and not Dotes(1, "focus") and DoSpell("Мор") then return end
-     -- разносим болезни на всех
-    if IsShift() and DoSpell("Вскипание крови") then return end
-
-    local baseRP = (HasSpell("Призыв горгульи") and IsReadySpell("Призыв горгульи")) and 60 or 40
-
-    if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end
-
-    if useBers then
-        UseSlot(10)
-        UseEquippedItem("Жетон победы беспощадного гладиатора")
-        if IsCtr() then UseEquippedItem("Устройство Каз'горота") end
-        if DoSpell("Нечестивое бешенство") then return end
-        -- гарга по контролу
-        if UnitMana("player") >= 60 and IsReadySpell("Призыв горгульи") then
-            if advansedMod then
-                RunMacroText("/cleartarget")
-                RunMacroText("/targetlasttarget")
-            end
-            chat("Призываем гаргу")
-            if DoSpell("Призыв горгульи") then return end
-        end
-    end
-    if HasSpell("Цапнуть") and GetBuffStack("Вливание тьмы", "pet") > 4 and DoSpell("Темное превращение") then return end
-    if HasBuff("Неумолимый рок") then
-        if canMagic then
-            if DoSpell("Лик смерти") then return end
-        else
-            if CanHeal("pet") and UnitHealth100("pet") < 100 and DoSpell("Лик смерти", "pet") then return end
-        end
-    end
-    if UnitMana("player") > 80 then
-        if canMagic then
-            if DoSpell("Лик смерти") then return end
-        else
-            DoSpell("Рунический удар") 
-        end
-    end
-    if (UnitMana("player") < 20 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
-    -- ресаем руну крови
-    if not HasRunes(100) and DoSpell("Кровоотвод") then return end
-    -- ресаем все.
-    if not HasRunes(111) and DoSpell("Усиление рунического оружия") then return end
-     -- накладываем болезни
-    local frostSpell = (IsPvP() and not HasDebuff("Ледяные оковы", 5) and "Ледяные оковы" or "Ледяное прикосновение")
-    if InCombatLockdown() and useBers and not Dotes(3) and DoSpell("Вспышка болезни") then return end    
-    if IsPvP() and (not HasMyDebuff("Кровавая чума", 3) or not HasDebuff("Осквернение")) and DoSpell("Удар чумы") then return end
-    if not HasMyDebuff("Озноб", 3) and DoSpell(frostSpell) then return end
-    if Dotes(1) and HasRunes(010, true) and DoSpell("Удар разложения") then return end  
-    -- собственно ротация
-    if Dotes() and UnitHealth100("player") > 75 and DoSpell("Удар смерти") then return end 
-    if IsPvP() and (HasRunes(001, true) or (UnitHealth100("target") < 45 and not IsAttack())) and DoSpell("Некротический удар") then return end
-    if Dotes() and DoSpell("Удар Плети") then return end
-    if HasRunes(100, true) and DoSpell("Кровавый удар") then return end
-    if not InMelee() and DoSpell(frostSpell) then return end
-    if (UnitMana("player") < 120 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
 end
 ------------------------------------------------------------------------------------------------------------------
 function bloodRotation()
@@ -250,13 +165,16 @@ function frostRotation()
     -- ресаем все.
     if not HasRunes(010) and DoSpell("Усиление рунического оружия") then return end
     -- мега прок
-    if HasBuff("Морозная дымка") and DoSpell(frostSpell) then return end
+    --if HasBuff("Морозная дымка") and DoSpell(frostSpell) then return end
     if HasBuff("Машина для убийств") then
-        if canMagic and UnitMana("player") > 90 and  DoSpell("Ледяной удар") then return end
-        if Dotes() and DoSpell("Уничтожение") then return end
-        
+        if canMagic then
+            if DoSpell("Ледяной удар") then return end
+            if InMelee() and UnitMana("player") > 40 then return end
+        else
+            if Dotes() and DoSpell("Уничтожение") then return end
+        end
     end
-    if not canMagic and DoSpell("Рунический удар") then return end
+    if advansedMod and not canMagic and DoSpell("Рунический удар") then return end
     -- чтоб зря не пропадало
     if canMagic and UnitMana("player") > 75 and DoSpell(InMelee() and "Ледяной удар" or "Лик смерти") then return end     
     -- разносим болезни на всех
@@ -265,11 +183,9 @@ function frostRotation()
     if InCombatLockdown() and useBers and not Dotes(2) and DoSpell("Вспышка болезни") then return end 
     if not HasMyDebuff("Кровавая чума", 3, "target") and DoSpell("Удар чумы") then return end
     if not HasMyDebuff("Озноб", 3, "target") and DoSpell(frostSpell) then return end
-    if IsPvP() and (not HasMyDebuff("Кровавая чума", 3) or not HasDebuff("Осквернение")) and DoSpell("Удар чумы") then return end
-    if IsPvP() and (HasRunes(001, true) or (UnitHealth100("target") < 45 and not IsAttack())) and DoSpell("Некротический удар") then return end
-    if IsShift() and DoSpell("Воющий ветер") then return end
-    if Dotes() and DoSpell(UnitHealth100("player") > (IsAttack() and 45 or 75) and "Уничтожение" or "Удар смерти") then return end 
+    if Dotes() and UnitHealth100("player") < (IsAttack() and 45 or 75) and DoSpell("Удар смерти") then return end 
     -- собственно ротация
+    if HasRunes(002, true) and DoSpell(IsPvP() and HasDebuff("Осквернение") and "Некротический удар" or "Удар чумы") then return end
     if canMagic and DoSpell(frostSpell) then return end
     if canMagic and not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
     if (UnitMana("player") < 120 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end

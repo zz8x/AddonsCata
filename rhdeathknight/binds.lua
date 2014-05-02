@@ -86,16 +86,6 @@ function TryInterrupt(target)
         return true 
     end
 
-    if HasSpell("Отгрызть") and IsReadySpell("Отгрызть") and CanAttack(target) and (channel or t < 0.8) then 
-        RunMacroText("/cast [@" ..target.."] Прыжок")
-        RunMacroText("/cast [@" ..target.."] Отгрызть")
-        if not IsReadySpell("Отгрызть") then
-            echo("Отгрызть"..m)
-            interruptTime = GetTime() + 4
-            return false 
-        end
-    end
-
     if IsPvP() and IsHarmfulSpell(spell) and IsOneUnit("player", target .. "-target") and DoSpell("Антимагический панцирь") then 
         echo("Антимагический панцирь"..m)
         interruptTime = GetTime() + 5
@@ -120,7 +110,7 @@ AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateDeathPact)
 
 function TryDeathPact()
     -- вызываем пета
-    if not HasSpell("Отгрызть") and InCombatLockdown() and UnitHealth100("player") < 40 and IsSpellNotUsed("Смертельный союз", 118) then
+    if not HasSpell("Отгрызть") and InCombatLockdown() and UnitHealth100("player") < 50 and IsSpellNotUsed("Смертельный союз", 118) then
         DoSpell("Воскрешение мертвых")
     end
 
@@ -233,7 +223,7 @@ function DoSpell(spellName, target, baseRP)
         return IsReadySpell(spellName)
     end
     runes = spellRunes[spellName]
-    if (spellName == "Воющий ветер" or spellName == "Ледяное прикосновение") and HasBuff("Морозная дымка") then runes = 0 end
+    --if (spellName == "Воющий ветер" or spellName == "Ледяное прикосновение") and HasBuff("Морозная дымка") then runes = 0 end
     if runes ~= nil and not HasRunes(runes) then return false end
 
     if not baseRP or IsAttack() then baseRP = 0 end
