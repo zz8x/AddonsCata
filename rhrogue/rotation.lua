@@ -140,7 +140,7 @@ function Rotation()
     end]]
    
     local CP = GetComboPoints("player", "target")
-    if (CP < 3) and not HasBuff("Заживление ран", 1) then DoSpell("Заживление ран") return end   
+    if (CP == 2) and not HasBuff("Заживление ран", 1) then DoSpell("Заживление ран") return end   
     if (CP == 5) then
         if UnitHealth100("player") < 60 and DoSpell("Заживление ран") then return end
         --if not HasBuff("Мясорубка", 1) and DoSpell("Мясорубка") then return end
