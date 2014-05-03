@@ -115,9 +115,8 @@ function Idle()
         if (CP == 5) then
             if UnitMana("player") < 40 and DoSpell("Тигриное неистовство") then return end
             if HasDebuff("Разорвать", 5) and DoSpell("Свирепый укус") then return end
-            if not HasDebuff("Разорвать", 0.8) and DoSpell("Разорвать") then return end
-            --if UnitMana("player") < 40 and HasDebuff("Разорвать", 6) and DoSpell("Свирепый укус") then return end
-            if InGCD() or UnitMana("player") < 40 then return end
+            if not HasDebuff("Разорвать", 1) and DoSpell("Разорвать") then return end
+            if InGCD() or UnitMana("player") < 25 then return end
         end
 
         if UnitMana("player") < 40 and DoSpell("Тигриное неистовство") then return end

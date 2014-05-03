@@ -121,7 +121,6 @@ function Rotation()
     
             
     RunMacroText("/startattack")
-    if InMelee() and UseEquippedItem("Сердце зла") then return end
     if InMelee() and UseEquippedItem("Душевная тоска") then return end
     --[[if InGroup() then
         if TryEach(TARGETS, function(t) 
@@ -141,16 +140,18 @@ function Rotation()
     end]]
    
     local CP = GetComboPoints("player", "target")
-        
+    if (CP < 3) and not HasBuff("Заживление ран", 1) then DoSpell("Заживление ран") return end   
     if (CP == 5) then
         if UnitHealth100("player") < 60 and DoSpell("Заживление ран") then return end
-        if not HasBuff("Мясорубка", 1) and DoSpell("Мясорубка") then return end
+        --if not HasBuff("Мясорубка", 1) and DoSpell("Мясорубка") then return end
+        if GetDebuffStack("Смертельный яд") == 5 and DoSpell("Отравление") then return end
         if DoSpell("Потрошение") then return end
         --if InGCD() or UnitMana("player") < 35 then return end
         return
     end
-    if not IsBehind() and DoSpell("Парализующий удар") then return end
+    --if not IsBehind() and DoSpell("Парализующий удар") then return end
+    if not HasDebuff("Кровоизлияние", 1) and DoSpell("Кровоизлияние") then return end
+    if UnitMana("player") > 40 and IsBehind() and DoSpell("Удар в спину") then return end
     if DoSpell("Кровоизлияние") then return end
-    if DoSpell(IsBehind() and "Удар в спину" or "Коварный удар" ) then return end
     if IsAttack() and UnitAffectingCombat("target") and PlayerInPlace() and DoSpell("Бросок") then return end
 end
