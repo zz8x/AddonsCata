@@ -145,7 +145,7 @@ function UpdateAutoFreedom(event, ...)
     freedomTime = GetTime()
     -- фиры
     local debuff = HasDebuff(lichList, 2, "player")
-    if debuff and (GetDebuffTime(debuff, "player") >= 4) then 
+    if debuff and (GetDebuffTime(debuff, "player") > 3) then 
         Notify('lich: ' .. debuff)
         if HasSpell("Перерождение") and IsReadySpell("Перерождение") then
             if DoSpell("Перерождение") then
@@ -162,7 +162,7 @@ function UpdateAutoFreedom(event, ...)
     end 
     -- остальные контроли
     debuff = HasDebuff(ControlList, 2, "player")
-    if debuff and (GetDebuffTime(debuff, "player") >= 4) and (not tContains(exceptionControlList, debuff)) then 
+    if debuff and (GetDebuffTime(debuff, "player") > 3) and (not tContains(exceptionControlList, debuff)) then 
         Notify('lich: ' .. debuff)
         if DoSpell("Каждый за себя") then
             print("freedom", debuff)

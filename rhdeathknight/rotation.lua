@@ -112,18 +112,19 @@ function bloodRotation()
     if IsShift() and DoSpell("Вскипание крови") then return end
 
     if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end
+    if GetBuffStack("Чистая ярость") > 4 and UseEquippedItem("Ярость Кузни Гнева") then return end
     if useBers then
         UseSlot(10)
         UseEquippedItem("Жетон победы беспощадного гладиатора")
         if DoSpell("Танцующее руническое оружие") then return end
     end
 
-    if DoSpell("Рунический удар", "target", 80) then return end
+    if DoSpell("Рунический удар", "target", 75) then return end
 
     if canMagic then
-        if DoSpell("Лик смерти", "target", 80) then return end
+        if DoSpell("Лик смерти", "target", 85) then return end
     else
-        if canMagicFocus and DoSpell("Лик смерти", "focus", 80) then return end
+        if canMagicFocus and DoSpell("Лик смерти", "focus", 85) then return end
     end
 
     if (rp < 20 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
@@ -338,10 +339,10 @@ function TryProtect()
 
             end
         end
-        if defPhys then 
+        if defPhys and UnitHealth100("player") < 60 then 
             DoSpell("Незыблемость льда")
         end
-        if defMagic then 
+        if defMagic and UnitHealth100("player") < 60 then 
             if DoSpell("Антимагический панцирь") then return true end
         end
     end
