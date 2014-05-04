@@ -101,7 +101,7 @@ end
 local meleeSpells = {
     DRUID = "Цапнуть",        
     DEATHKNIGHT = "Удар чумы", 
-    PALADIN = "Щит праведности",
+    PALADIN = "Удар воина Света",
     SHAMAN = "Удар бури",
     WARRIOR = "Кровопускание",
     ROGUE = "Коварный удар"

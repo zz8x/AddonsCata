@@ -12,6 +12,8 @@ function Idle()
     if not CanControl("target") then RunMacroText("/stopattack") end
 	if IsAttack() or InCombatLockdown() then
         TryTarget()
+        TryBuff()
+        TrySave()
         Rotation()
         return
     end
@@ -100,6 +102,32 @@ function Rotation()
             TryInterrupt(TARGETS[i])
         end
     end
-
     -- Ротация
+    if IsCtr() and DoSpell("Гнев карателя") then return end
+    if IsCtr() and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
+    if IsCtr() and DoSpell("Защитник древних королей") then return end
+    if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end   
+    if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and not HasBuff("Дознание", 2) and DoSpell("Дознание") then return end
+    if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Вердикт храмовника") then return end
+    if InMelee() and DoSpell("Удар воина Света") then return end
+    if HasBuff("Искусство войны") and DoSpell("Экзорцизм") then return end
+    if DoSpell("Молот гнева") then return end
+    if DoSpell("Правосудие") then return end
+    if InMelee() and DoSpell("Гнев небес") then return end
+end
+
+------------------------------------------------------------------------------------------------------------------
+
+function TryBuff()
+    if not HasBuff("печать") and DoSpell("Печать правды") then return end
+    if not InCombatLockdown() and not HasBuff("Благословение могущества") and DoSpell("Благословение могущества", "player") then return end
+end
+
+------------------------------------------------------------------------------------------------------------------
+
+function TrySave()
+    local h = UnitHealth100("player")
+    if h < 80 and DoSpell("Божественная защита") then return true end
+    if h < 60 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", "player") then return true end
+    if h < 10 and  DoSpell("Божественная щит") then return true end
 end

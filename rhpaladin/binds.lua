@@ -40,11 +40,11 @@ function TryInterrupt(target)
     m = " -> " .. spell .. " ("..target..")"
 
     if not notinterrupt and not HasBuff(nointerruptBuffs, 0.1, target) then 
-        --[[if (channel or t < 0.8) and InMelee(target) and DoSpell("Пинок", target) then 
+        if (channel or t < 0.8) and InMelee(target) and DoSpell("Укор", target) then 
             echo("Пинок"..m)
             interruptTime = GetTime() + 2
             return true 
-        end]]
+        end
     end
 
 end
