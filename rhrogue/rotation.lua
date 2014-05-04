@@ -9,7 +9,10 @@ function Idle()
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
     -- чтоб контроли не сбивать
-    if not CanControl("target") then RunMacroText("/stopattack") end
+    if HasDebuff(ControlList, 0.01, "target") then 
+        RunMacroText("/stopattack") 
+        if not IsAttack() then return end
+    end
 	if IsAttack() or InCombatLockdown() then
         TryTarget()
         Rotation()
@@ -97,11 +100,12 @@ function Rotation()
     end
 
     local hp = UnitHealth100("player")
-    if hp < 40 and UseItem("Зелье разбойника") then return end
+    if not IsArena() and hp < 40 and UseItem("Зелье разбойника") then return end
     if InCombatLockdown() and (IsOneUnit("player", "target-target") or IsOneUnit("player", "focus-target")) then
         if hp < 50 and DoSpell("Ускользание") then return end
-        if hp < 60 and InMelee() and DoSpell("Ложный выпад") then return end
-        if hp < 70 and InMelee() and DoSpell("Боевая готовность") then return end
+        if hp < 60 and InMelee() and DoSpell("Дымовая шашка") then return end
+        if hp < 70 and InMelee() and DoSpell("Ложный выпад") then return end
+        if hp < 75 and InMelee() and DoSpell("Боевая готовность") then return end
     end
 
     if CanInterrupt then
@@ -112,50 +116,34 @@ function Rotation()
 
     if IsAttack() and not IsStealthed() and not InCombatLockdown() and DoSpell("Незаметность") then return end
     
-    if not InMelee() then
+    if not InMelee() and not InCombatLockdown() then
         if DoSpell("Заживление ран") then return end
     end
 
 
 
     if IsStealthed() and IsAttack()  then 
-        DoSpell("Умысел")
+        if IsValidTarget("target") then DoSpell("Умысел") end
         if DoSpell("Внезапный удар") then return end
        --if IsAttack() and DoSpell("Гаррота") then return end
     end
     
-    if IsAttack() and not InMelee() and DoSpell("Шаг сквозь тень") then return end
+    --if IsAttack() and not InMelee() and DoSpell("Шаг сквозь тень") then return end
 
-
-    
     --if IsAttack() and DoSpell(InRange("Ошеломление") and IsReadySpell("Ошеломление") and "Ошеломление" or "Шаг сквозь тень") then return end
     
     if IsStealthed()  then 
+        RunMacroText("/stopattack")
         return 
     end
 
     --RunMacroText("/startattack [nostealth]")
-    --if InMelee() and UseEquippedItem("Душевная тоска") then return end
-    --[[if InGroup() then
-        if TryEach(TARGETS, function(t) 
-            if tContains({"worldboss", "rareelite", "elite"}, UnitClassification(t)) then 
-            local isTanking, state, scaledPercent, rawPercent, threatValue = UnitDetailedThreatSituation("player", t)
-                if not isTanking and state == 1 and DoSpell("Попятиться", t) then
-                     print("Попятиться!!")
-                    return true
-                end
-            end
-        end) then return end
-    end]]
-    --[[if IsAOE() then
-        if UnitMana("player") < 35 and UnitMana("player") > 25 and not HasBuff("Берсерк") and DoSpell("Тигриное неистовство") then return end
-        DoSpell("Размах (кошка)")
-        return
-    end]]
-   
+    
     local CP = GetComboPoints("player", "target")
+    if CP == 0 and DoSpell("Смена приоритетов") then return end
     if (CP == 2) and not HasBuff("Заживление ран", 1) then DoSpell("Заживление ран") return end   
     if (CP == 5) then
+        if IsPvP() and CanControl("target") and DoSpell("Удар по почкам")  then return end
         if UnitHealth100("player") < 60 and DoSpell("Заживление ран") then return end
         --if not HasBuff("Мясорубка", 1) and DoSpell("Мясорубка") then return end
         if GetDebuffStack("Смертельный яд") == 5 and DoSpell("Отравление") then return end
@@ -163,9 +151,27 @@ function Rotation()
         --if InGCD() or UnitMana("player") < 35 then return end
         return
     end
-    --if not IsBehind() and DoSpell("Парализующий удар") then return end
-    if not HasDebuff("Кровоизлияние", 1) and DoSpell("Кровоизлияние") then return end
-    if IsBehind() and DoSpell("Удар в спину") then return end
-    if DoSpell("Кровоизлияние") then return end
-    if IsAttack() and UnitAffectingCombat("target") and PlayerInPlace() and DoSpell("Бросок") then return end
+    if IsCtr() then
+        DoSpell("Танец теней")
+    end
+    if HasBuff("Танец теней") then
+        DoSpell("Умысел")
+        if IsPvP() and CanControl() and DoSpell("Подлый трюк") then return end
+        if DoSpell("Внезапный удар") then return end
+    else
+        if not HasDebuff("Кровоизлияние", 1) and DoSpell("Кровоизлияние") then return end
+        if IsBehind() and HasBuff("Заживление ран") then
+            if DoSpell("Удар в спину") then return end
+        else
+            if IsPvP() and CanControl("target") and DoSpell("Парализующий удар")  then return end
+            if DoSpell("Кровоизлияние") then return end
+        end
+    end
+
+
+   
+    if IsAttack() and IsStealthed() and PlayerInPlace() then
+        if CP > 2 and DoSpell("Смертельный бросок") then return end
+        if DoSpell("Бросок") then return end
+    end
 end

@@ -23,7 +23,9 @@ ControlList = { -- > 4
 "Пронзительный вой", -- 6s
 "Головокружение", -- 6s
 "Ошеломление", -- 20s
-"Соблазн"
+"Соблазн",
+"Подлый трюк",
+"Парализующий удар"
 }
 
 ------------------------------------------------------------------------------------------------------------------
@@ -32,7 +34,7 @@ local imperviousList = {"Вихрь клинков", "Зверь внутри", 
 function CanControl(target)
     if nil == target then target = "target" end 
     return CanMagicAttack(target) and not HasBuff(imperviousList, 0.1, target) 
-        and not HasDebuff(ControlList, 3, target)
+        and not HasDebuff(ControlList, 0.1, target)
 end
 
 ------------------------------------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@
 ## DefaultState: Disabled
 ## Interface: 40300
 ## Dependencies: rhlib3
-## SavedVariables: CanInterrupt, AutoAOE
+## SavedVariablesPerCharacter: CanInterrupt, AutoAOE
 rotation.lua
 commands.lua
 binds.lua
