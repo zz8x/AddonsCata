@@ -87,7 +87,7 @@ function Idle()
         
         if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик кошки)", "target") and DoSpell("Звериный рывок(Облик кошки)") then return end
                 
-        --RunMacroText("/startattack")
+        --RunMacroText("/startattack [nostealth]")
 
 
 --~      Ротация для кошки 
@@ -171,7 +171,7 @@ function TryTarget()
         for i = 1, #TARGET do
             local t = TARGET[i]
             if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t)) and not IsStealthed() then 
-                RunMacroText("/startattack [@" .. target .. "]") 
+                RunMacroText("/startattack [@" .. target .. "][nostealth]") 
                 break
             end
         end

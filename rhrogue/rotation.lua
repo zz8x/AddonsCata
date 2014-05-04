@@ -30,7 +30,7 @@ function TryTarget(useFocus)
         for i = 1, #TARGET do
             local t = TARGET[i]
             if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t))  then 
-                RunMacroText("/startattack [@" .. target .. "]") 
+                RunMacroText("/startattack [@" .. target .. "][nostealth]") 
                 break
             end
         end
@@ -96,6 +96,14 @@ function Rotation()
         if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff) or not InCombatLockdown() or IsPlayerCasting() then return end
     end
 
+    local hp = UnitHealth100("player")
+    if hp < 40 and UseItem("Зелье разбойника") then return end
+    if InCombatLockdown() and (IsOneUnit("player", "target-target") or IsOneUnit("player", "focus-target")) then
+        if hp < 50 and DoSpell("Ускользание") then return end
+        if hp < 60 and InMelee() and DoSpell("Ложный выпад") then return end
+        if hp < 70 and InMelee() and DoSpell("Боевая готовность") then return end
+    end
+
     if CanInterrupt then
         for i=1,#TARGETS do
             TryInterrupt(TARGETS[i])
@@ -104,24 +112,30 @@ function Rotation()
 
     if IsAttack() and not IsStealthed() and not InCombatLockdown() and DoSpell("Незаметность") then return end
     
-    if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then 
+    if not InMelee() then
         if DoSpell("Заживление ран") then return end
-        return 
     end
+
+
 
     if IsStealthed() and IsAttack()  then 
         DoSpell("Умысел")
         if DoSpell("Внезапный удар") then return end
        --if IsAttack() and DoSpell("Гаррота") then return end
-        return 
     end
-   
+    
+    if IsAttack() and not InMelee() and DoSpell("Шаг сквозь тень") then return end
+
+
     
     --if IsAttack() and DoSpell(InRange("Ошеломление") and IsReadySpell("Ошеломление") and "Ошеломление" or "Шаг сквозь тень") then return end
     
-            
-    RunMacroText("/startattack")
-    if InMelee() and UseEquippedItem("Душевная тоска") then return end
+    if IsStealthed()  then 
+        return 
+    end
+
+    --RunMacroText("/startattack [nostealth]")
+    --if InMelee() and UseEquippedItem("Душевная тоска") then return end
     --[[if InGroup() then
         if TryEach(TARGETS, function(t) 
             if tContains({"worldboss", "rareelite", "elite"}, UnitClassification(t)) then 
@@ -151,7 +165,7 @@ function Rotation()
     end
     --if not IsBehind() and DoSpell("Парализующий удар") then return end
     if not HasDebuff("Кровоизлияние", 1) and DoSpell("Кровоизлияние") then return end
-    if UnitMana("player") > 40 and IsBehind() and DoSpell("Удар в спину") then return end
+    if IsBehind() and DoSpell("Удар в спину") then return end
     if DoSpell("Кровоизлияние") then return end
     if IsAttack() and UnitAffectingCombat("target") and PlayerInPlace() and DoSpell("Бросок") then return end
 end

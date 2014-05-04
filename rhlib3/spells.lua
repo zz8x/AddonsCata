@@ -150,7 +150,6 @@ function UseMount(mountName)
     RunMacroText("/use "..mountName)
     return true
 end
-
 ------------------------------------------------------------------------------------------------------------------
 function InRange(spell, target) 
     if target == nil then target = "target" end
