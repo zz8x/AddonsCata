@@ -4,8 +4,8 @@
 !.gitignore
 !/rhlib3/
 !/rhrogue/
+!/rhpaladin/
 !/rhdruid/
 !/rhdeathknight/
 
-/addons.sublime-project
 /addons.sublime-workspace

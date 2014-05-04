@@ -1,9 +1,9 @@
-﻿-- Rogue Rotation Helper by Timofeev Alexey
+﻿-- Paladin Rotation Helper by Timofeev Alexey
 -- Binding
-BINDING_HEADER_RRH = "Rogue Rotation Helper"
-BINDING_NAME_RRH_INTERRUPT = "Вкл/Выкл сбивание кастов"
-BINDING_NAME_RRH_AUTO_AOE = "Авто AOE"
-print("|cff0055ffRotation Helper|r|cffffe00a > |r|cffffff20Rogue|r loaded")
+BINDING_HEADER_PRH = "Paladin Rotation Helper"
+BINDING_NAME_PRH_INTERRUPT = "Вкл/Выкл сбивание кастов"
+BINDING_NAME_PRH_AUTO_AOE = "Авто AOE"
+print("|cff0055ffRotation Helper|r|cffffe00a > |r|cffff4080Paladin|r loaded")
 ------------------------------------------------------------------------------------------------------------------
 if CanInterrupt == nil then CanInterrupt = true end
 
@@ -14,23 +14,6 @@ function UseInterrupt()
     else
         echo("Interrupt: OFF",true)
     end 
-end
-------------------------------------------------------------------------------------------------------------------
-if AutoAOE == nil then AutoAOE = true end
-
-function AutoAOEToggle()
-    AutoAOE = not AutoAOE
-    if AutoAOE then
-        echo("Авто АОЕ: ON",true)
-    else
-        echo("Авто АОЕ: OFF",true)
-    end 
-end
-
-function IsAOE()
-   if not CanAOE then return false end
-   if IsShift() then return true end
-   return (IsValidTarget("target") and IsValidTarget("focus") and not IsOneUnit("target", "focus") and InMelee("target") and InMelee("focus"))
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -57,37 +40,15 @@ function TryInterrupt(target)
     m = " -> " .. spell .. " ("..target..")"
 
     if not notinterrupt and not HasBuff(nointerruptBuffs, 0.1, target) then 
-        if (channel or t < 0.8) and InMelee(target) and DoSpell("Пинок", target) then 
+        --[[if (channel or t < 0.8) and InMelee(target) and DoSpell("Пинок", target) then 
             echo("Пинок"..m)
-            interruptTime = GetTime() + 4
-            return true 
-        end
-        --[[if (not channel and t < 1.8) and DoSpell("Удушение", target) then 
-            echo("Удушение"..m)
             interruptTime = GetTime() + 2
             return true 
         end]]
     end
 
 end
-------------------------------------------------------------------------------------------------------------------
-local exceptionControlList = { -- > 4
-"Ошеломление", -- 20s
-"Покаяние", 
-}
-local freedomTime = 0
-function UpdateAutoFreedom(event, ...)
-    if GetTime() - freedomTime < 1.5 then return end
-    debuff = HasDebuff(ControlList, 2, "player")
-    if debuff and (not tContains(exceptionControlList, debuff) or IsAttack()) then 
-        local forceMode = tContains(exceptionControlList, debuff) and IsAttack() and "force!" or ""
-        print("freedom", debuff, forceMode)
-        DoCommand("freedom") 
-        freedomTime = GetTime()
-        return
-    end 
-end
-AttachUpdate(UpdateAutoFreedom, -1)
+
 ------------------------------------------------------------------------------------------------------------------
 function DoSpell(spell, target, mana)
     return UseSpell(spell, target, mana)

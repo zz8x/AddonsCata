@@ -1,0 +1,25 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": "rhlib3"
+		},
+		{
+		  "follow_symlinks": true,
+			"path": "rhrogue"
+		},
+		{
+		  "follow_symlinks": true,
+			"path": "rhpaladin"
+		},
+		{
+		  "follow_symlinks": true,
+			"path": "rhdruid"
+		},
+		{
+		  "follow_symlinks": true,
+			"path": "rhdeathknight"
+		}
+	]
+}
