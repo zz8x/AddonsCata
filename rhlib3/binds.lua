@@ -126,14 +126,6 @@ end
 AttachUpdate(UpdateIdle, -1000)
 
 ------------------------------------------------------------------------------------------------------------------
---[[local function BgConfirmReadyCheck()
-    if IsBattleground() then
-        --Notify("Подтверждаем готовность!")
-        ConfirmReadyCheck(1)
-    end
-end
-AttachEvent("READY_CHECK", BgConfirmReadyCheck)]]
-------------------------------------------------------------------------------------------------------------------
 --Arena Raid Icons
 local unitCD = {}
 local raidIconsByClass = {WARRIOR=8,DEATHKNIGHT=7,PALADIN=3,PRIEST=5,SHAMAN=6,DRUID=2,ROGUE=1,MAGE=8,WARLOCK=3,HUNTER=4}

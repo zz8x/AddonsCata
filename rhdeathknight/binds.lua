@@ -132,12 +132,6 @@ local lichList = {
 "Ментальный крик"
 }
 
--- снимается уроном
-local exceptionControlList = { -- > 4
-"Ошеломление", -- 20s
-"Покаяние", 
-}
-
 local freedomTime = 0
 function UpdateAutoFreedom(event, ...)
     -- не слишком часто
@@ -162,7 +156,7 @@ function UpdateAutoFreedom(event, ...)
     end 
     -- остальные контроли
     debuff = HasDebuff(ControlList, 2, "player")
-    if debuff and (GetDebuffTime(debuff, "player") > 3) and (not tContains(exceptionControlList, debuff)) then 
+    if debuff and (GetDebuffTime(debuff, "player") > 3) and (not tContains(SappedList, debuff)) then 
         Notify('lich: ' .. debuff)
         if DoSpell("Каждый за себя") then
             print("freedom", debuff)

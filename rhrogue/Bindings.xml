@@ -2,7 +2,4 @@
   <Binding name="RRH_INTERRUPT" description="Use cast interrupt" header="RRH">
     UseInterrupt();
   </Binding>
-  <Binding name="RRH_AUTO_AOE" description="Use Auto AOE" header="RRH">
-    AutoAOEToggle();
-  </Binding>
 </Bindings>

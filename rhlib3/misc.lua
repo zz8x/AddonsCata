@@ -33,9 +33,10 @@ function DelGray()
 end
 ------------------------------------------------------------------------------------------------------------------
 function buy(name,q) 
+    if q < 1 then return end
     local c = 0
-    for i=0,3 do 
-        local numberOfFreeSlots = GetContainerNumFreeSlots(i);
+    for bag=0, NUM_BAG_SLOTS do 
+        local numberOfFreeSlots = GetContainerNumFreeSlots(bag);
         if numberOfFreeSlots then c = c + numberOfFreeSlots end
     end
     if c < 1 then return end
@@ -45,6 +46,7 @@ function buy(name,q)
             local s = c*GetMerchantItemMaxStack(i) 
             if q > s then q = s end
             BuyMerchantItem(i,q)
+            break
         end 
     end
 end
@@ -52,8 +54,8 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function sell(name) 
     if not name then name = "" end
-    for bag = 0,4,1 do 
-        for slot = 1, GetContainerNumSlots(bag), 1 do 
+    for bag = 0,NUM_BAG_SLOTS do 
+        for slot = 1, GetContainerNumSlots(bag) do 
             local item = GetContainerItemLink(bag,slot)
             if item and string.find(item,name) then 
                 UseContainerItem(bag,slot) 
@@ -62,6 +64,19 @@ function sell(name)
     end
 end
 
+------------------------------------------------------------------------------------------------------------------
+function countItem(name)
+    local count = 0
+    for bag=0,NUM_BAG_SLOTS do
+        for slot=1,GetContainerNumSlots(bag) do
+            local item = GetContainerItemLink(bag,slot)
+            if item and string.find(item,name) then 
+                count=count+(select(2,GetContainerItemInfo(bag,slot)))
+            end
+        end
+    end
+    return count
+end
 ------------------------------------------------------------------------------------------------------------------
 function switchTargetAndFocus()
   if UnitExists("target") and not UnitExists("focus") then 
@@ -263,3 +278,34 @@ Minimap:SetScript('OnMouseWheel', function(self, delta)
                 Minimap_ZoomOut()
         end
 end)
+
+------------------------------------------------------------------------------------------------------------------
+local waitTable = {};
+local waitFrame = nil;
+
+local function waitUpdate(self,elapse)
+  local count = #waitTable;
+  local i = 1;
+  while(i<=count) do
+    local waitRecord = tremove(waitTable,i);
+    local d = tremove(waitRecord,1);
+    local f = tremove(waitRecord,1);
+    local p = tremove(waitRecord,1);
+    if(d>elapse) then
+      tinsert(waitTable,i,{d-elapse,f,p});
+      i = i + 1;
+    else
+      count = count - 1;
+      f(unpack(p));
+    end
+  end
+end
+AttachUpdate(waitUpdate)
+
+function setTimeout(delay, func, ...)
+  if(type(delay)~="number" or type(func)~="function") then
+    return false;
+  end
+  tinsert(waitTable,{delay,func,{...}});
+  return true;
+end

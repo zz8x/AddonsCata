@@ -15,23 +15,6 @@ function UseInterrupt()
         echo("Interrupt: OFF",true)
     end 
 end
-------------------------------------------------------------------------------------------------------------------
-if AutoAOE == nil then AutoAOE = true end
-
-function AutoAOEToggle()
-    AutoAOE = not AutoAOE
-    if AutoAOE then
-        echo("Авто АОЕ: ON",true)
-    else
-        echo("Авто АОЕ: OFF",true)
-    end 
-end
-
-function IsAOE()
-   if not CanAOE then return false end
-   if IsShift() then return true end
-   return (IsValidTarget("target") and IsValidTarget("focus") and not IsOneUnit("target", "focus") and InMelee("target") and InMelee("focus"))
-end
 
 ------------------------------------------------------------------------------------------------------------------
 local nointerruptBuffs = {"Мастер аур"}
@@ -62,29 +45,23 @@ function TryInterrupt(target)
             interruptTime = GetTime() + 4
             return true 
         end
-        --[[if (not channel and t < 1.8) and DoSpell("Удушение", target) then 
-            echo("Удушение"..m)
-            interruptTime = GetTime() + 2
-            return true 
-        end]]
     end
 
 end
 ------------------------------------------------------------------------------------------------------------------
-local exceptionControlList = { -- > 4
-"Ошеломление", -- 20s
-"Покаяние", 
-}
 local freedomTime = 0
 function UpdateAutoFreedom(event, ...)
-    if GetTime() - freedomTime < 1.5 then return end
+    -- не слишком часто
+    if GetTime() - freedomTime < 0.5 then return end
+    freedomTime = GetTime()
+    -- контроли
     debuff = HasDebuff(ControlList, 2, "player")
-    if debuff and (not tContains(exceptionControlList, debuff) or IsAttack()) then 
-        local forceMode = tContains(exceptionControlList, debuff) and IsAttack() and "force!" or ""
-        print("freedom", debuff, forceMode)
-        DoCommand("freedom") 
-        freedomTime = GetTime()
-        return
+    -- не сапы и больше 3 сек
+    if debuff and (GetDebuffTime(debuff, "player") > 3) and (not tContains(SappedList, debuff)) then
+        Notify('lich: ' .. debuff)
+        if DoSpell("Каждый за себя") then
+            print("freedom", debuff)
+        end
     end 
 end
 AttachUpdate(UpdateAutoFreedom, -1)
@@ -145,3 +122,78 @@ function trashToggle()
         tinsert(TrashList, itemName)
     end
 end
+
+------------------------------------------------------------------------------------------------------------------
+-- Автоматическая покупка предметов
+local function autoBuy(name, count)
+    local c = count - countItem(name)
+    if c > 0 then buy(name, c) end
+end
+
+local function UpdateItems(name)
+    autoBuy("Дурманящий яд", 20)
+    autoBuy("Смертельный яд", 20)
+    autoBuy("Нейтрализующий яд", 20)
+    autoBuy("Калечащий яд", 20)
+    autoBuy("Пшеничный рогалик с маслом", 20)
+end
+AttachEvent('MERCHANT_SHOW', UpdateItems)
+------------------------------------------------------------------------------------------------------------------
+local autoLootTimer = 0
+
+local function TemporaryAutoLoot(t)
+    if not t then t = 3 end
+    if autoLootTimer == 0 then
+        chat("Автолут ON")
+        RunMacroText("/console autoLootDefault 1")
+    end
+    autoLootTimer = GetTime() + t
+end
+
+local function UpdateAutoLootTimer()
+    if autoLootTimer ~= 0 and GetTime() > autoLootTimer then
+        chat("Автолут OFF")
+        RunMacroText("/console autoLootDefault 0")
+        autoLootTimer = 0
+    end
+end
+AttachUpdate(UpdateAutoLootTimer) 
+
+------------------------------------------------------------------------------------------------------------------
+local lootList = {}
+local function tryLootFromList()
+    if #lootList < 1 then return end
+    TemporaryAutoLoot(2)
+    RunMacroText("/use ".. lootList[1])
+    tremove(lootList, 1)
+    setTimeout(0.5, tryLootFromList)
+end
+
+function openContainers(name)
+    if #lootList > 0 then return end
+    for bag=0,NUM_BAG_SLOTS do
+        for slot=1,GetContainerNumSlots(bag) do
+            local item = GetContainerItemLink(bag,slot)
+            if item then 
+                local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType,
+                        itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(item)
+                if sContains(itemName, "ларец") or sContains(itemName, "сейф") then
+                    RunMacroText("/use  Взлом замка")
+                    RunMacroText("/use "..bag .." " .. slot)
+                    tinsert(lootList, bag .." " .. slot)
+                end 
+            end
+        end
+    end
+    tryLootFromList()
+end
+------------------------------------------------------------------------------------------------------------------
+function gopStop()
+    RunMacroText("/stopmacro [nostealth]")
+    RunMacroText("/cleartarget")
+    RunMacroText("/targetenemy")
+    RunMacroText("/stopmacro [noexists]")
+    TemporaryAutoLoot(2)
+    RunMacroText("/cast Обшаривание карманов")
+end
+------------------------------------------------------------------------------------------------------------------

@@ -58,11 +58,11 @@ local function OnUpdate(frame, elapsed)
         if UpdateInterval == 0 then
             -- выполняем только самое важное
             if upd.weight < 0 then 
-                upd.func() 
+                upd.func(frame, elapsed) 
             end
         else
             -- выполняем все что есть
-            upd.func()
+            upd.func(frame, elapsed)
         end
     end
 end
