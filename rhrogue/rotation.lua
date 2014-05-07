@@ -62,7 +62,7 @@ function Idle()
         if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff) or IsPlayerCasting() then return end
     end
     if IsAlt() and IsValidTarget("mouseover") and CanControl("mouseover") and DoSpell(UnitAffectingCombat("mouseover") and "Ослепление" or "Ошеломление", "mouseover") then return end
-    if (IsPvP() or IsValidTarget("target") or IsAttack()) and not IsStealthed() and not InCombatLockdown() and DoSpell("Незаметность") then return end
+    if (IsValidTarget("target") or IsAttack()) and not IsStealthed() and not InCombatLockdown() and DoSpell("Незаметность") then return end
 
     local hp = UnitHealth100("player")
     if not IsArena() and hp < 40 and UseItem("Зелье разбойника") then return end
