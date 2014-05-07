@@ -117,16 +117,17 @@ function Idle()
     if (CP == 2) and not HasBuff("Заживление ран", 1) then DoSpell("Заживление ран") return end   
     if (CP == 5) then
         if IsPvP() and CanControl("target") and DoSpell("Удар по почкам")  then return end
-        if UnitHealth100("player") < 60 and DoSpell("Заживление ран") then return end
-        --if not UnitIsPlayer("target") and UnitHealthMax("target") > 200000 then end
-        --if not HasBuff("Мясорубка", 1) and DoSpell("Мясорубка") then return end
-        --if not HasDebuff("Рваная рана") and DoSpell("Рваная рана") then return end
+        if UnitHealth100("player") < (HasBuff("Заживление ран", 5) and 60 or 75) and DoSpell("Заживление ран") then return end
+        --if not UnitIsPlayer("target") and UnitHealthMax("target") > 300000 and UnitHealth100("target") > 40 and not HasBuff("Мясорубка", 1) and DoSpell("Мясорубка") then return end
+        --if UnitHealth100("target") > 50 and not HasDebuff("Рваная рана") and DoSpell("Рваная рана") then return end
         --if GetDebuffStack("Смертельный яд") == 5 and DoSpell("Отравление") then return end
         if DoSpell("Потрошение") then return end
         if not InGCD() and UnitMana("player") < 35 then return end
         return
     end
     
+    if IsShift() and (IsAttack() or not IsStealthed()) and DoSpell("аое") then return end
+
     if IsCtr() then
         if UnitIsPlayer("target") then DoSpell("Долой оружие") end
         if not HasBuff("Танец теней") and  UnitMana("player") < 100 then return end
