@@ -23,3 +23,54 @@ SetCommand("spell",
         return false
     end
 )
+------------------------------------------------------------------------------------------------------------------
+local tryMount = 0
+SetCommand("mount", 
+    function() 
+        --[[if not IsArena() then
+            -- ускорение
+            if IsAlt() and not PlayerInPlace() and UseSlot(6) then
+                chat("Ускорители")
+                tryMount = GetTime()
+                return true
+            end
+            -- парашут
+            if GetFalingTime() > 1 and UseSlot(15) then
+                chat("Парашют")
+                tryMount = GetTime()
+                return true
+            end
+            -- хождение по воде
+            if (IsCtr() or IsSwimming()) 
+                and DoSpell("Льдистый путь") then 
+                tryMount = GetTime()
+                return true
+            end
+            -- рыбная ловля
+            if IsEquippedItemType("Удочка") and DoSpell("Рыбная ловля") then
+                tryMount = GetTime()
+                return true
+            end
+        end]]
+        if InGCD() or InCombatLockdown() or IsMounted() or CanExitVehicle() or IsPlayerCasting() or not IsOutdoors() or not PlayerInPlace() then
+            tryMount = GetTime() 
+            return true
+        end
+        local mount = (IsShift() or IsBattleground() or IsArena()) and  "Призыв боевого коня" or "Вороной грифон" 
+        if IsAlt() then mount = "Тундровый мамонт путешественника" end
+        if UseMount(mount) then 
+            tryMount = GetTime() 
+            return true
+        end
+    end, 
+    function() 
+
+        if tryMount > 0 and GetTime() - tryMount > 0.01 then
+            tryMount = 0    
+            return  true
+        end
+
+        return false 
+    end
+)
+ ------------------------------------------------------------------------------------------------------------------

@@ -140,8 +140,7 @@ end
 AttachEvent('MERCHANT_SHOW', UpdateItems)
 ------------------------------------------------------------------------------------------------------------------
 local autoLootTimer = 0
-
-local function TemporaryAutoLoot(t)
+function TemporaryAutoLoot(t)
     if not t then t = 3 end
     if autoLootTimer == 0 then
         chat("Автолут ON")
@@ -149,7 +148,6 @@ local function TemporaryAutoLoot(t)
     end
     autoLootTimer = GetTime() + t
 end
-
 local function UpdateAutoLootTimer()
     if autoLootTimer ~= 0 and GetTime() > autoLootTimer then
         chat("Автолут OFF")

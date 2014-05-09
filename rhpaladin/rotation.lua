@@ -2,6 +2,7 @@
 ------------------------------------------------------------------------------------------------------------------
 local peaceBuff = {"Пища", "Питье"}
 function Idle()
+    if TryAura() then return end
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
         if IsMounted() then Dismount() return end 
@@ -9,7 +10,10 @@ function Idle()
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
     -- чтоб контроли не сбивать
-    if not CanControl("target") then RunMacroText("/stopattack") end
+    if HasDebuff(SappedList, 0.01, "target") and not IsAttack() then 
+        RunMacroText("/stopattack") 
+        return
+    end
 	if IsAttack() or InCombatLockdown() then
         TryTarget()
         TryBuff()
@@ -32,7 +36,8 @@ function TryTarget(useFocus)
         for i = 1, #TARGET do
             local t = TARGET[i]
             if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t))  then 
-                RunMacroText("/startattack [@" .. target .. "][nostealth]") 
+                RunMacroText("/target [@" .. target .. "]") 
+                --RunMacroText("/startattack [@" .. target .. "][nostealth]") 
                 break
             end
         end
@@ -41,12 +46,8 @@ function TryTarget(useFocus)
     if not IsValidTarget("target") then
         -- если что-то не то есть в цели
         if UnitExists("target") then RunMacroText("/cleartarget") end
-
-        if IsPvP() then
-            RunMacroText("/targetenemyplayer [nodead]")
-        else
-            RunMacroText("/targetenemy [nodead]")
-        end
+        RunMacroText("/targetenemy" .. (IsPvP() and "player" or "") .." [nodead]")
+        --RunMacroText("/startattack [nostealth]")
         if not IsAttack()  -- если в авторежиме
             and (
             not IsValidTarget("target")  -- вообще не цель
@@ -84,15 +85,29 @@ function TryTarget(useFocus)
 end
 
 ------------------------------------------------------------------------------------------------------------------
+function TryAura()
+    if IsMounted() then
+        if not HasBuff("Аура воина Света") then return DoSpell("Аура воина Света") end
+        return false
+    end
+    if InCombatLockdown() or IsAttack() then
+        if not HasBuff("Аура") or HasBuff("Аура воина Света") then 
+            if not HasBuff("Аура сопротивления") then return DoSpell("Аура сопротивления") end
+            if not HasBuff("Аура благочестия") then return DoSpell("Аура благочестия") end
+            if not HasBuff("Аура воздаяния") then return DoSpell("Аура воздаяния") end
+            if not HasBuff("Аура сосредоточенности") then return DoSpell("Аура сосредоточенности") end
+        end
+    end
+    return false
+end
+------------------------------------------------------------------------------------------------------------------
 
 function Rotation()
-    if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
 
     if IsAttack() then
         if HasBuff("Парашют") then RunMacroText("/cancelaura Парашют") return end
         if CanExitVehicle() then VehicleExit() return end
         if IsMounted() then Dismount() return end 
-
     else
         if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff) or not InCombatLockdown() or IsPlayerCasting() then return end
     end
@@ -102,6 +117,11 @@ function Rotation()
             TryInterrupt(TARGETS[i])
         end
     end
+
+    if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
+
+    if not IsValidTarget("target") then return end
+    RunMacroText("/startattack [nostealth]")
     -- Ротация
     if IsCtr() and DoSpell("Гнев карателя") then return end
     if IsCtr() and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
@@ -127,7 +147,8 @@ end
 
 function TrySave()
     local h = UnitHealth100("player")
+    if h < 95 and DoSpell("Кровь земли") then return true end
     if h < 80 and DoSpell("Божественная защита") then return true end
     if h < 60 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", "player") then return true end
-    if h < 10 and  DoSpell("Божественная щит") then return true end
+    if h < 10 and  DoSpell("Божественный щит") then return true end
 end

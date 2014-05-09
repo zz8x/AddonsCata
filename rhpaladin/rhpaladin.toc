@@ -4,7 +4,7 @@
 ## DefaultState: Disabled
 ## Interface: 40300
 ## Dependencies: rhlib3
-## SavedVariablesPerCharacter: CanInterrupt, AutoAOE
+## SavedVariablesPerCharacter: CanInterrupt, AutoAOE, TrashList, GrayList
 rotation.lua
 commands.lua
 binds.lua

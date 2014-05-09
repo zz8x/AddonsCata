@@ -2,4 +2,7 @@
   <Binding name="PRH_INTERRUPT" description="Use cast interrupt" header="PRH">
     UseInterrupt();
   </Binding>
+  <Binding name="PRH_AUTO_AOE" description="Use Auto AOE" header="PRH">
+    AutoAOEToggle();
+  </Binding>
 </Bindings>
