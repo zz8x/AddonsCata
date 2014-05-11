@@ -45,6 +45,22 @@ SetCommand("spell",
     end
 )
 ------------------------------------------------------------------------------------------------------------------
+function TryAura()
+    if IsMounted() then
+        if not HasBuff("Аура воина Света") then return DoSpell("Аура воина Света") end
+        return false
+    end
+    if IsAttack() then
+        if not HasBuff("Аура") or HasBuff("Аура воина Света") then 
+            if not HasBuff("Аура сопротивления") then return DoSpell("Аура сопротивления") end
+            if not HasBuff("Аура благочестия") then return DoSpell("Аура благочестия") end
+            if not HasBuff("Аура воздаяния") then return DoSpell("Аура воздаяния") end
+            if not HasBuff("Аура сосредоточенности") then return DoSpell("Аура сосредоточенности") end
+        end
+    end
+    return false
+end
+------------------------------------------------------------------------------------------------------------------
 local tryMount = 0
 SetCommand("mount", 
     function() 
@@ -90,7 +106,6 @@ SetCommand("mount",
             tryMount = 0    
             return  true
         end
-
         return false 
     end
 )

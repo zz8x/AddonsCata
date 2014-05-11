@@ -299,7 +299,8 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function UnitHealth100(target)
     if target == nil then target = "player" end
-    return UnitHealth(target) * 100 / UnitHealthMax(target)
+    --return UnitHealth(target) * 100 / UnitHealthMax(target)
+    return UnitHP(target) * 100 / UnitHealthMax(target)
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -319,7 +320,7 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 function UnitHP(t)
-  local incomingheals = UnitGetIncomingHeals(t)
+  local incomingheals = UnitGetIncomingHeals(t) or 0
   local hp = UnitHealth(t) + incomingheals
   if hp > UnitHealthMax(t) then hp = UnitHealthMax(t) end
   return hp

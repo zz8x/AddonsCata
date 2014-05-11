@@ -63,7 +63,37 @@ function TryInterrupt(target)
     end
 
 end
-
+------------------------------------------------------------------------------------------------------------------
+local freedomTime = 0
+function UpdateAutoFreedom(event, ...)
+    -- не слишком часто
+    if GetTime() - freedomTime < 0.5 then return end
+    freedomTime = GetTime()
+    -- контроли
+    debuff = HasDebuff(ControlList, 2, "player")
+    -- не сапы и больше 3 сек
+    if debuff and (GetDebuffTime(debuff, "player") > 2) and (IsCtr() or not tContains(SappedList, debuff)) then
+        if DoSpell("Каждый за себя") then
+            chat('freedom: ' .. debuff)
+        end
+    end 
+end
+AttachUpdate(UpdateAutoFreedom, -1)
+------------------------------------------------------------------------------------------------------------------
+local dispelSpell = "Очищение"
+local dispelTypes = {"Poison", "Disease"}
+function TryDispel(unit)
+    if not IsReadySpell(dispelSpell) or InGCD() or not CanHeal(unit) or HasDebuff("Нестабильное колдовство", 0.1, unit) then return false end
+    for i = 1, 40 do
+        if not ret then
+            local name, _, _, _, debuffType, duration, expirationTime   = UnitDebuff(unit, i,true) 
+            if name and (expirationTime - GetTime() >= 3 or expirationTime == 0) and tContains(dispelTypes, debuffType) then
+                return DoSpell(dispelSpell, unit)
+            end
+        end
+    end
+    return false
+end
 ------------------------------------------------------------------------------------------------------------------
 function DoSpell(spell, target, mana)
     return UseSpell(spell, target, mana)

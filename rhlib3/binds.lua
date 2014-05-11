@@ -58,10 +58,11 @@ local friendTargets = {}
 local function compareUnits(u1,u2) return unitWeights[u1] < unitWeights[u2] end
 local function getTargetWeight(t)
     local w = friendTargets[UnitGUID(t)] or 0
-    if IsOneUnit("focus", t) then w = 3 end
-    if IsOneUnit("target", t) then w = 4 end
-    if IsOneUnit("mouseover", t) then w = 5 end
-    w = w + (1 - UnitHealth100(t) / 100) 
+    if InMelee(t) then w = 3 end
+    if IsOneUnit("focus", t) then w = 3.1 end
+    if IsOneUnit("target", t) then w = 3.2 end
+    if IsOneUnit("mouseover", t) then w = 3.3 end
+    w = w + 3 * (1 - UnitHealth100(t) / 100) 
     return w
 end
 local targetWeights = {}
