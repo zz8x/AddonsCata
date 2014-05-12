@@ -20,16 +20,18 @@ function Idle()
     local myHP = UnitHealth100("player")
 
   
-    if HasBuff("Быстрота хищника") then
+    if IsCtr() and HasBuff("Быстрота хищника") then
         --if not HasBuff("Облик медведя") and CanHeal("Танак") and UnitHealth100("Танак") < 40 then DoSpell("Целительное прикосновение", "Танак") return end
-        if not HasBuff("Облик медведя") and myHP < 60 then DoSpell("Целительное прикосновение", "player") return end
+        if not HasBuff("Облик медведя") and myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
+
+    if IsCtr() and GetBuffStack("Жизнецвет", "player") < 3 and DoSpell("Жизнецвет", "player") then return end
     
-    if not HasBuff("Облик медведя") and GetTime() - fixRageTime > 5 then
+    --[[if not HasBuff("Облик медведя") and GetTime() - fixRageTime > 5 then
         if InRage("target") and DoSpell("Умиротворение", "target") then return end
         if InRage("focus") and DoSpell("Умиротворение", "focus") then return end
         fixRageTime = GetTime()
-    end
+    end]]
 
     if CanInterrupt then
         for i=1,#TARGETS do
@@ -91,7 +93,7 @@ function Idle()
 
 
 --~      Ротация для кошки 
-        if IsShiftKeyDown() == 1 and HasBuff("Облик кошки") and DoSpell("Размах(Облик кошки)") then return end
+        if IsShift() and HasBuff("Облик кошки") and DoSpell("Размах(Облик кошки)") then return end
        
         if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания беспощадного гладиатора") then return end
         if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания беспощадного гладиатора") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
