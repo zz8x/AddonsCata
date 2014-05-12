@@ -131,6 +131,7 @@ end
 
 function IsTrash(n) --n - itemlink
     local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(n)
+    if sContains(itemName, "Эскиз:") then return true end
     if tContains(TrashList, itemName) then return true end
     return false
 end

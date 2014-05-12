@@ -14,13 +14,31 @@ function Idle()
         RunMacroText("/stopattack") 
         return
     end
+
 	if IsAttack() or InCombatLockdown() then
-        TryTarget()
-        TryBuff()
-        TrySave()
+        if TryBuff() then return end
+        if DispelParty() then return end
+        if TrySave() then return end
+        TryTarget()        
         Rotation()
         return
     end
+end
+
+------------------------------------------------------------------------------------------------------------------
+local function IsFinishHim(target) 
+    return CanAttack(target) and UnitHealth100(target) < 35 
+end
+------------------------------------------------------------------------------------------------------------------
+function DispelParty()
+     -- Диспел пати арены/друзей
+    if not IsFinishHim("target") and UnitMana100("player") > 20 and IsReadySpell("Очищение") and IsSpellNotUsed("Очищение", 10) then
+        for i = 1, #IUNITS do
+            local u = IUNITS[i]
+            if CanHeal(u) and TryDispel(u) then return true end
+        end
+    end
+    return false
 end
 ------------------------------------------------------------------------------------------------------------------
 function ActualDistance(target)
@@ -85,7 +103,12 @@ function TryTarget(useFocus)
 end
 
 ------------------------------------------------------------------------------------------------------------------
+local toggleAuraTime = 0
 function TryAura()
+    local t = GetTime()
+    if t - toggleAuraTime < 15 then return false end
+    toggleAuraTime = t
+    
     if IsMounted() then
         if not HasBuff("Аура воина Света") then return DoSpell("Аура воина Света") end
         return false
@@ -99,10 +122,6 @@ function TryAura()
         end
     end
     return false
-end
-------------------------------------------------------------------------------------------------------------------
-local function IsFinishHim(target) 
-    return CanAttack(target) and UnitHealth100(target) < 35 
 end
 ------------------------------------------------------------------------------------------------------------------
 
@@ -184,22 +203,14 @@ function Rotation()
     if canMagic and InMelee() and DoSpell("Гнев небес") then return end
 
     if UnitHealth100("player") > 80 and UnitMana100("player") < 50 and DoSpell("Святая клятва") then return end
-
-    -- Диспел пати арены/друзей по redDispelList
-    if not IsFinishHim("target") and UnitMana100("player") > 20 and IsReadySpell("Очищение") and IsSpellNotUsed("Очищение", 10) then
-        for i = 1, #IUNITS do
-            local u = IUNITS[i]
-            if CanHeal(u) and TryDispel(u) then return end
-        end
-    end
-
 end
 
 ------------------------------------------------------------------------------------------------------------------
 
 function TryBuff()
-    if not HasBuff("печать") and DoSpell("Печать правды") then return end
-    if not InCombatLockdown() and not HasBuff("Благословение могущества") and DoSpell("Благословение могущества", "player") then return end
+    if not HasBuff("печать") and DoSpell("Печать правды") then return true end
+    if not InCombatLockdown() and not HasBuff("Благословение могущества") and DoSpell("Благословение могущества", "player") then return true end
+    return false
 end
 
 ------------------------------------------------------------------------------------------------------------------
