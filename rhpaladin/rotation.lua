@@ -106,13 +106,12 @@ end
 local toggleAuraTime = 0
 function TryAura()
     local t = GetTime()
-    if t - toggleAuraTime < 15 then return false end
-    toggleAuraTime = t
-    
     if IsMounted() then
         if not HasBuff("Аура воина Света") then return DoSpell("Аура воина Света") end
+        toggleAuraTime = t
         return false
     end
+    if t - toggleAuraTime < 10 then return false end
     if not IsAttack() then
         if not HasBuff("Аура") or HasMyBuff("Аура воина Света") then 
             if not HasBuff("Аура сопротивления") then return DoSpell("Аура сопротивления") end
@@ -120,6 +119,7 @@ function TryAura()
             if not HasBuff("Аура воздаяния") then return DoSpell("Аура воздаяния") end
             if not HasBuff("Аура сосредоточенности") then return DoSpell("Аура сосредоточенности") end
         end
+        toggleAuraTime = t
     end
     return false
 end
@@ -129,6 +129,29 @@ local zonalRoot =  {
     "Ледяная ловушка",
     "Оковы земли",
     "Осквернение"
+}
+
+local rootDispelList = {
+    "Ледяной шок", 
+    "Оковы земли", 
+    "Заморозка",
+    "Удар грома",
+    "Ледяная стрела", 
+    "Ночной кошмар",
+    "Ледяные оковы",
+    "Обморожение",
+    "Кольцо льда",
+    "Стрела ледяного огня",
+    "Холод",
+    "Окоченение",
+    "Конус холода",
+    "Разрушенная преграда",
+    "Замедление",
+    "Удержание",
+    "Гнев деревьев",
+    "Обездвиживающее поле",
+    "Леденящий взгляд",
+    "Хватка земли"
 }
 
 function Rotation()
@@ -148,8 +171,9 @@ function Rotation()
     end
 
     if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
+    if not IsPvP() and HasBuff("Праведное неистовство") then RunMacroText("/cancelaura Праведное неистовство") end
 
-    local speed = GetUnitSpeed("Player")
+    
 
     if (UnitMana100("player") < 30 or UnitHealth100("player") < 40) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
     if (UnitMana100("player") > 60 and UnitHealth100("player") > 50) then RunMacroText("/cancelaura Печать прозрения") end
@@ -167,8 +191,8 @@ function Rotation()
     RunMacroText("/startattack [nostealth]")
 
     if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
-
-    if speed > 0 and speed < 7 and not IsFalling() and not InMelee("target") and not IsFinishHim("target") then
+    local speed = GetUnitSpeed("Player")
+    if ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
         if DoSpell("Длань свободы", "player") then return end
         if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 4)  and DoSpell("Очищение", "player") then return end
     end
@@ -208,6 +232,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 
 function TryBuff()
+    --if IsPvP() and not HasDebuff("Праведное неистовство") and DoSpell("Праведное неистовство") then return end
     if not HasBuff("печать") and DoSpell("Печать правды") then return true end
     if not InCombatLockdown() and not HasBuff("Благословение могущества") and DoSpell("Благословение могущества", "player") then return true end
     return false
@@ -222,23 +247,21 @@ function TrySave()
     end
 
     local h = UnitHealth100("player")
+    
+
+    if h < 15 and  DoSpell("Божественный щит") then return true end
+    if h < 45 and (UnitPower("player", 9) > 0)  and DoSpell("Торжество", "player") then return true end
+    if h < 65 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", "player") then return true end
+    if h < 85 and DoSpell("Божественная защита") then return true end
     if h < 95 and DoSpell("Кровь земли") then return true end
-    if h < 80 and DoSpell("Божественная защита") then return true end
-    if h < 60 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", "player") then return true end
-    if h < 40 and (UnitPower("player", 9) > 0)  and DoSpell("Торжество", "player") then return true end
-    if h < 10 and  DoSpell("Божественный щит") then return true end
 
     local members, membersHP = GetHealingMembers(IsArena() and IUNITS or healList)
     local u = members[1]
     local h = membersHP[u]
-
     if not UnitIsPet(u) then
         if IsBattleground() and h < 20 and DoSpell("Возложение рук",u) then return end
-
         if h < 40 and (UnitPower("player", 9) > 0 or HasBuff("Божественный замысел")) and DoSpell("Торжество", u) then return true end
-
-        if not  IsAttack() and not IsFinishHim("target") and PlayerInPlace() and h < 60 and HasBuff("Священная война") and DoSpell("Свет небес", u) then return true end
-
+        if not IsAttack() and not IsFinishHim("target") and PlayerInPlace() and h < 60 and HasBuff("Священная война") and DoSpell("Свет небес", u) then return true end
     end
     return false
 

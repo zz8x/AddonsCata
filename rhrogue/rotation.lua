@@ -129,9 +129,8 @@ function Idle()
     if IsShift() and (IsAttack() or not IsStealthed()) and DoSpell("аое") then return end
 
     if IsCtr() then
-        if UnitIsPlayer("target") then DoSpell("Долой оружие") end
-        Do
-        if not HasBuff("Танец теней") and  UnitMana("player") < 80 then return end
+        if UnitIsPlayer("target") then DoSpell("Долой оружие", "target") end
+        if not HasBuff("Танец теней") and UnitMana("player") < 60 then return end
         DoSpell("Танец теней")
     end
 

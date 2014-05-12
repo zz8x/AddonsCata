@@ -24,6 +24,21 @@ SetCommand("spell",
     end
 )
 ------------------------------------------------------------------------------------------------------------------
+SetCommand("control", 
+    function(spell, target) 
+        if target == nil then target = "target" end
+        return DoSpell(spell, target)
+    end, 
+    function(spell, target) 
+        if target == nil then target = "target" end
+        if HasDebuff(spell, 0.1, target) then chat(spell..':OK!') return true end
+        if not CanControl(target) then chat(spell..':!control') return true end
+        if not InGCD() and not IsReadySpell(spell) then chat(spell..':!Ready') return true end
+        if not CanMagicAttack(target)  then  chat(spell..':!Magic') return true end
+        return false  
+    end
+)
+------------------------------------------------------------------------------------------------------------------
 local tryMount = 0
 SetCommand("mount", 
     function() 

@@ -72,7 +72,7 @@ function UpdateAutoFreedom(event, ...)
     -- контроли
     debuff = HasDebuff(ControlList, 2, "player")
     -- не сапы и больше 3 сек
-    if debuff and (GetDebuffTime(debuff, "player") > 2) and (IsCtr() or not tContains(SappedList, debuff)) then
+    if debuff and (IsCtr() or (GetDebuffTime(debuff, "player") > 2 and not tContains(SappedList, debuff))) then
         if DoSpell("Каждый за себя") then
             chat('freedom: ' .. debuff)
         end
@@ -95,7 +95,13 @@ function TryDispel(unit)
     return false
 end
 ------------------------------------------------------------------------------------------------------------------
+local forbearanceSpells = {"Божественный щит", "Возложение рук", "Длань защиты"}
+------------------------------------------------------------------------------------------------------------------
 function DoSpell(spell, target, mana)
+    if tContains(forbearanceSpells, spellName) then
+        if target == nil then target = "player" end
+        if HasDebuff("Воздержанность", 0.01, target) then return false end
+    end
     return UseSpell(spell, target, mana)
 end
 ------------------------------------------------------------------------------------------------------------------

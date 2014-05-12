@@ -115,7 +115,8 @@ function bloodRotation()
     if GetBuffStack("Чистая ярость") > 4 and UseEquippedItem("Ярость Кузни Гнева") then return end
     if useBers then
         UseSlot(10)
-        UseEquippedItem("Жетон победы беспощадного гладиатора")
+        UseEquippedItem("Жетон победы гладиатора Катаклизма")
+        --UseEquippedItem("Жетон победы беспощадного гладиатора")
         if DoSpell("Танцующее руническое оружие") then return end
     end
 
@@ -158,7 +159,8 @@ function frostRotation()
     if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end
     if useBers then
         UseSlot(10)
-        UseEquippedItem("Жетон победы беспощадного гладиатора")
+        UseEquippedItem("Жетон победы гладиатора Катаклизма")
+        --UseEquippedItem("Жетон победы беспощадного гладиатора")
         if DoSpell("Ледяной столп") then return end
     end
     -- ресаем руну крови
