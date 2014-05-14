@@ -28,6 +28,7 @@ function Idle()
         if not HasBuff("Облик медведя") and myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
 
+    if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
     if IsCtr() and GetBuffStack("Жизнецвет", "player") < 3 and DoSpell("Жизнецвет", "player") then return end
     
     --[[if not HasBuff("Облик медведя") and GetTime() - fixRageTime > 5 then
@@ -101,15 +102,16 @@ function Idle()
 --~      Ротация для кошки 
         if IsShift() and HasBuff("Облик кошки") and DoSpell("Размах(Облик кошки)") then return end
        
-        if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания беспощадного гладиатора") then return end
-        if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания беспощадного гладиатора") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
+        if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания гладиатора Катаклизма") then return end
+        if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания гладиатора Катаклизма") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
 
         if myHP < 50 and DoSpell("Инстинкты выживания") then return end
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
 
-        if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and InMelee() then
+        if IsAlt() and DoSpell("Берсерк") then return end
+        --[[if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and InMelee() then
             if UnitMana("player") > 25 and UnitMana("player") < 85 and HasSpell("Берсерк") and DoSpell("Берсерк") then return end
-        end
+        end]]
         
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and not IsStealthed() and not HasDebuff("Волшебный огонь", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
         
