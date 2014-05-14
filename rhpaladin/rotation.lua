@@ -209,6 +209,7 @@ function Rotation()
     if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end  
 
     if IsCtr() then 
+        if UseItem("Зелье из крови голема") then return end
         if DoSpell("Гнев карателя") then return end
         if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
         if DoSpell("Защитник древних королей") then return end
