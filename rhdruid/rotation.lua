@@ -11,7 +11,10 @@ function Idle()
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
     -- чтоб контроли не сбивать
-    --if not CanControl("target") then RunMacroText("/stopattack") end
+    if HasDebuff(SappedList, 0.01, "target") and not IsAttack() then 
+        RunMacroText("/stopattack") 
+        return
+    end
     
 	if not (IsAttack() or InCombatLockdown()) then return end
 	TryTarget()
@@ -38,7 +41,10 @@ function Idle()
             TryInterrupt(TARGETS[i])
         end
     end
-    
+
+    if not CanAttack("target") then return end
+    RunMacroText("/startattack [nostealth]")
+
     if HasBuff("Облик медведя") and IsValidTarget("target") then
         if UnitMana("player") < 80 and DoSpell("Исступление") then return end
         if HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and InRange("Звериный рывок(Облик медведя)", "target") then 

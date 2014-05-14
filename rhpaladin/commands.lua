@@ -1,5 +1,20 @@
 ﻿-- Paladin Rotation Helper by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
+local teammate = "Смерчебот"
+function DoHelpCommand(cmd, param)
+     local target = "player"
+     if IsAlt() then target = teammate end
+     if not CanHeal(target) then chat('!help ' .. target) return end
+     DoCommand(cmd, param, target)
+end
+------------------------------------------------------------------------------------------------------------------
+function DoAttackCommand(cmd, param)
+     local target = "target"
+     if IsAlt() then target = "focus" end
+     if not CanAttack(target) then chat('!Attack ' .. target) return end
+     DoCommand(cmd, param, target)
+end
+------------------------------------------------------------------------------------------------------------------
 -- // /run if IsReadySpell("s") and СanMagicAttack("target") then DoCommand("spell", "s", "target") end
 SetCommand("spell", 
     function(spell, target) 
