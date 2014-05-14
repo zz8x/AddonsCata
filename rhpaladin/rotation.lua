@@ -251,8 +251,9 @@ end
 local healList = {"player", "Смерчебот", "Ириха", "Омниссия"}
 function TrySave()
     if not IsArena() and InCombatLockdown() then
+        if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
         if UnitHealth100("player") < 35 and UseHealPotion() then return true end
-        if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны") then return true end
+        if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
 
     local h = UnitHealth100("player")
