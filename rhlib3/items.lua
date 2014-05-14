@@ -71,9 +71,6 @@ function UseItem(itemName, count)
     if IsPlayerCasting() then return false end
     if not IsEquippedItem(itemName) and not IsUsableItem(itemName) then return false end
     if not IsReadyItem(itemName) then return false end
-    if Debug then
-        print(itemName)
-    end
     if not count then count = 1 end
     for i = 1, count do
         RunMacroText("/use " .. itemName)
@@ -83,8 +80,14 @@ function UseItem(itemName, count)
             --TurnOrActionStart()  TurnOrActionStop()
             break 
         end
+        if not IsReadyItem(itemName) then 
+            if Debug then
+                print(itemName)
+            end
+            return true
+        end
     end
-    return not IsReadyItem(itemName)
+    return false
 end
 
 ------------------------------------------------------------------------------------------------------------------
