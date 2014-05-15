@@ -2,6 +2,16 @@
 ------------------------------------------------------------------------------------------------------------------
 --UIParentLoadAddOn("Blizzard_DebugTools");
 --DevTools_Dump(n)
+------------------------------------------------------------------------------------------------------------------
+function RegBG()
+    RunMacroText([[
+/click PVPMicroButton
+/click PVPHonorFrameBgButton3
+/script JoinBattlefield(1, InGroup())
+      ]])
+end
+
+------------------------------------------------------------------------------------------------------------------
 function SellGray()
     for b=0,4 do                                   
       for s=1, GetContainerNumSlots(b) do          
