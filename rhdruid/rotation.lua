@@ -1,5 +1,17 @@
 ﻿-- Druid Rotation Helper by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
+function EsliNelziaMochit()
+    -- не бьем в имун
+    if not CanControl("target")  then return true end
+    -- чтоб контроли не сбивать
+    if (not CanAttack("target") and HasDebuff(SappedList, 0.01, "target")) and not IsAttack() then 
+        RunMacroText("/stopattack") 
+        return true
+    end
+    RunMacroText("/startattack [nostealth]")
+    return false
+end
+------------------------------------------------------------------------------------------------------------------
 local peaceBuff = {"Пища", "Питье", "Походный облик", "Облик стремительной птицы", "Водный облик"}
 local fixRageTime = 0
 local steathClass = {"ROGUE", "DRUID"}
@@ -10,11 +22,6 @@ function Idle()
     end
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
-    -- чтоб контроли не сбивать
-    if HasDebuff(SappedList, 0.01, "target") and not IsAttack() then 
-        RunMacroText("/stopattack") 
-        return
-    end
     
 	if not (IsAttack() or InCombatLockdown()) then return end
 	TryTarget()
@@ -43,15 +50,15 @@ function Idle()
         end
     end
 
-    if not CanAttack("target") then return end
-    RunMacroText("/startattack [nostealth]")
 
     if HasBuff("Облик медведя") and IsValidTarget("target") then
         if UnitMana("player") < 80 and DoSpell("Исступление") then return end
+        if EsliNelziaMochit() then return end
         if HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and InRange("Звериный рывок(Облик медведя)", "target") then 
             DoSpell("Звериный рывок(Облик медведя)")
             return
         end
+
         if DoSpell("Оглушить") then return end
         if IsReadySpell("Оглушить") then return end
         RunMacroText("/startattack")
@@ -78,7 +85,7 @@ function Idle()
         if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then return end
         
         if IsAttack() and HasSpell("Звериный рывок(Облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок(Облик кошки)") and RunMacroText("/stopattack") then return end
-
+        if EsliNelziaMochit() then return end
         if IsStealthed() then 
                 if DoSpell("Наскок") then return end
             if IsBehind() then
@@ -87,12 +94,12 @@ function Idle()
             return 
         end
        
-    if IsPvP() and IsReadySpell("Волшебный огонь (облик зверя)") then
-        for i = 1, #ITARGETS do
-            local t = ITARGETS[i]
-            if UnitIsPlayer(t) and tContains(steathClass, GetClass(t)) and not HasDebuff("Волшебный огонь", 1, t) and DoSpell("Волшебный огонь (облик зверя)", t) then return end
+        if IsPvP() and IsReadySpell("Волшебный огонь (облик зверя)") then
+            for i = 1, #ITARGETS do
+                local t = ITARGETS[i]
+                if UnitIsPlayer(t) and tContains(steathClass, GetClass(t)) and not HasDebuff("Волшебный огонь", 1, t) and DoSpell("Волшебный огонь (облик зверя)", t) then return end
+            end
         end
-    end
         
         if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик кошки)", "target") and DoSpell("Звериный рывок(Облик кошки)") then return end
                 
@@ -102,13 +109,13 @@ function Idle()
 --~      Ротация для кошки 
         if IsShift() and HasBuff("Облик кошки") and DoSpell("Размах(Облик кошки)") then return end
        
-        if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания гладиатора Катаклизма") then return end
+        --if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания гладиатора Катаклизма") then return end
         if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания гладиатора Катаклизма") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
 
         if myHP < 50 and DoSpell("Инстинкты выживания") then return end
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
 
-        if IsAlt() and DoSpell("Берсерк") then return end
+        --if IsAlt() and DoSpell("Берсерк") then return end
         --[[if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and InMelee() then
             if UnitMana("player") > 25 and UnitMana("player") < 85 and HasSpell("Берсерк") and DoSpell("Берсерк") then return end
         end]]
