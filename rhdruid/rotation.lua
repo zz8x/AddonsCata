@@ -12,6 +12,22 @@ function EsliNelziaMochit()
     return false
 end
 ------------------------------------------------------------------------------------------------------------------
+--[[
+#showtooltip Берсерк
+/run UseBers()
+]]
+
+
+local bersTimer = 0
+function UseBers()
+    bersTimer = GetTime()
+end
+
+function IsBers()
+    return (GetTime() - bersTimer < 5)
+end
+
+
 local peaceBuff = {"Пища", "Питье", "Походный облик", "Облик стремительной птицы", "Водный облик"}
 local fixRageTime = 0
 local steathClass = {"ROGUE", "DRUID"}
@@ -103,22 +119,21 @@ function Idle()
         
         if InCombatLockdown() and IsAttack() and IsValidTarget("target") and InRange("Звериный рывок(Облик кошки)", "target") and DoSpell("Звериный рывок(Облик кошки)") then return end
                 
-        --RunMacroText("/startattack [nostealth]")
-
-
 --~      Ротация для кошки 
         if IsShift() and HasBuff("Облик кошки") and DoSpell("Размах(Облик кошки)") then return end
-       
-        --if HasBuff("Неистовство дикой природы") and UseEquippedItem("Жетон завоевания гладиатора Катаклизма") then return end
+              
+
         if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания гладиатора Катаклизма") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
 
         if myHP < 50 and DoSpell("Инстинкты выживания") then return end
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
 
-        --if IsAlt() and DoSpell("Берсерк") then return end
-        --[[if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and InMelee() then
-            if UnitMana("player") > 25 and UnitMana("player") < 85 and HasSpell("Берсерк") and DoSpell("Берсерк") then return end
-        end]]
+                    
+        if IsBers() then
+            if DoSpell("Берсерк") then return end
+            if HasBuff("Берсерк") and UseEquippedItem("Жетон завоевания гладиатора Катаклизма") then return end
+        end
+
         
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and not IsStealthed() and not HasDebuff("Волшебный огонь", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
         
@@ -188,7 +203,7 @@ function TryTarget()
         for i = 1, #TARGET do
             local t = TARGET[i]
             if t and (UnitAffectingCombat(t) or IsPvP()) and ActualDistance(t) and (not IsPvP() or UnitIsPlayer(t)) and not IsStealthed() then 
-                RunMacroText("/startattack [@" .. target .. "][nostealth]") 
+                RunMacroText("/target [@" .. target .. "]") 
                 break
             end
         end
