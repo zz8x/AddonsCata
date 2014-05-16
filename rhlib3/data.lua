@@ -77,12 +77,24 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -- можно атаковать игрока (в противном случае не имеет смысла просаживать кд))
 local immuneList = {"Божественный щит", "Ледяная глыба", "Сдерживание"}
+local CanAttackInfo = ""
 function CanAttack(target)
+    CanAttackInfo = ""
     if nil == target then target = "target" end 
-    return IsValidTarget(target) 
-        and IsInView(target)
-        and not HasBuff(immuneList, 0.01, target) 
-        and not HasDebuff("Смерч", 0.01, target)
+    if not IsValidTarget(target) then
+        CanAttackInfo = "!IsValidTarget"
+        return false
+    end
+    if not IsInView(target) then
+        CanAttackInfo = "!IsInView"
+        return false
+    end
+    local aura = HasBuff(immuneList, 0.01, target) or HasDebuff("Смерч", 0.01, target)
+    if aura then
+        CanAttackInfo = "Immune: " .. aura
+        return false
+    end
+    return true
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -294,3 +306,33 @@ red list
 Быстрота хищника
 Стылая кровь
 ]]
+
+function StopAttack(target)
+    if not target then target = "target" end
+    -- не бьем в имун
+    local stop = false
+    local msg = ""
+    if not CanAttack(target) then 
+        msg = msg .. "!CanAttack " .. CanAttackInfo
+        result = true 
+    end
+    if not stop then
+        -- чтоб контроли не сбивать
+        local aura = HasDebuff(SappedList, 0.01, target)
+        if aura then 
+            msg = msg .. "На цели " .. aura .. " "
+            result = true
+        end
+    end
+    if stop and IsAttack() then
+        msg = msg .. "Force!"
+        stop = false
+    end
+    if (stop) then
+        RunMacroText("/stopattack")     
+    else
+        RunMacroText("/startattack [nostealth]")
+    end
+    if msg ~= "" then chat("StopAttack("..target.."): " .. msg) end
+    return stop
+end

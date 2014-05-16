@@ -1,17 +1,5 @@
 ﻿-- Druid Rotation Helper by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
-function StopAttack()
-    -- не бьем в имун
-    if not CanAttack("target")  then return true end
-    -- чтоб контроли не сбивать
-    if HasDebuff(SappedList, 0.01, "target") and not IsAttack() then 
-        RunMacroText("/stopattack") 
-        return true
-    end
-    RunMacroText("/startattack [nostealth]")
-    return false
-end
-------------------------------------------------------------------------------------------------------------------
 --[[
 #showtooltip Берсерк
 /run UseBers()
@@ -73,7 +61,7 @@ function Idle()
 
     if HasBuff("Облик медведя") and IsValidTarget("target") then
         if UnitMana("player") < 80 and DoSpell("Исступление") then return end
-        if StopAttack() then return end
+        if StopAttack("target") then return end
         if HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and InRange("Звериный рывок(Облик медведя)", "target") then 
             DoSpell("Звериный рывок(Облик медведя)")
             return
@@ -100,12 +88,13 @@ function Idle()
             DoSpell("Крадущийся зверь")
             return 
         end
-        
     
         if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then return end
         
+        if StopAttack("target") then return end
+
         if IsAttack() and HasSpell("Звериный рывок(Облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок(Облик кошки)") and RunMacroText("/stopattack") then return end
-        if StopAttack() then return end
+        
         if IsStealthed() then 
                 if DoSpell("Наскок") then return end
             if IsBehind() then

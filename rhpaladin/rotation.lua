@@ -20,12 +20,7 @@ function Idle()
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
     if (InCombatLockdown() or IsShift()) and TrySave() then return end
-    -- чтоб контроли не сбивать
-    if HasDebuff(SappedList, 0.01, "target") and not IsAttack() then 
-        RunMacroText("/stopattack") 
-        return
-    end
-
+    
 	if IsAttack() or InCombatLockdown() then
         if TryBuff() then return end
         if not InCombatLockdown() and DispelParty() then return end
@@ -205,8 +200,8 @@ function Rotation()
 
     
 
-    if not CanAttack("target") then return end
-    RunMacroText("/startattack [nostealth]")
+    
+    
 
     if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
     local speed = GetUnitSpeed("player")
@@ -215,6 +210,8 @@ function Rotation()
         if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 4)  and DoSpell("Очищение", "player") then return end
     end
 
+    if StopAttack("target") then return end
+    
     local canMagic = CanMagicAttack("target")
     -- Ротация
     if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end  
