@@ -210,7 +210,7 @@ function Rotation()
         if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 4)  and DoSpell("Очищение", "player") then return end
     end
 
-    if StopAttack("target") then return end
+    if IsNotAttack("target") then return end
     
     local canMagic = CanMagicAttack("target")
     -- Ротация
