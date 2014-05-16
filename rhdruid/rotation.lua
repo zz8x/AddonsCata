@@ -1,10 +1,10 @@
 ﻿-- Druid Rotation Helper by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
-function EsliNelziaMochit()
+function StopAttack()
     -- не бьем в имун
-    if not CanControl("target")  then return true end
+    if not CanAttack("target")  then return true end
     -- чтоб контроли не сбивать
-    if (not CanAttack("target") and HasDebuff(SappedList, 0.01, "target")) and not IsAttack() then 
+    if HasDebuff(SappedList, 0.01, "target") and not IsAttack() then 
         RunMacroText("/stopattack") 
         return true
     end
@@ -66,10 +66,14 @@ function Idle()
         end
     end
 
+    if IsBers() then
+        if DoSpell("Берсерк") then return end
+        if HasBuff("Берсерк") and UseEquippedItem("Жетон завоевания гладиатора Катаклизма") then return end
+    end
 
     if HasBuff("Облик медведя") and IsValidTarget("target") then
         if UnitMana("player") < 80 and DoSpell("Исступление") then return end
-        if EsliNelziaMochit() then return end
+        if StopAttack() then return end
         if HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and InRange("Звериный рывок(Облик медведя)", "target") then 
             DoSpell("Звериный рывок(Облик медведя)")
             return
@@ -101,7 +105,7 @@ function Idle()
         if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then return end
         
         if IsAttack() and HasSpell("Звериный рывок(Облик кошки)") and (IsStealthed() or not IsReadySpell("Крадущийся зверь")) and DoSpell("Звериный рывок(Облик кошки)") and RunMacroText("/stopattack") then return end
-        if EsliNelziaMochit() then return end
+        if StopAttack() then return end
         if IsStealthed() then 
                 if DoSpell("Наскок") then return end
             if IsBehind() then
@@ -127,14 +131,7 @@ function Idle()
 
         if myHP < 50 and DoSpell("Инстинкты выживания") then return end
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
-
-                    
-        if IsBers() then
-            if DoSpell("Берсерк") then return end
-            if HasBuff("Берсерк") and UseEquippedItem("Жетон завоевания гладиатора Катаклизма") then return end
-        end
-
-        
+       
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and not IsStealthed() and not HasDebuff("Волшебный огонь", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
         
         if HasSpell("Увечье(Облик кошки)") and not HasMyDebuff("Увечье") then

@@ -66,30 +66,31 @@ function EquipItem(itemName)
     return  IsEquippedItem(itemName)
 end
 ------------------------------------------------------------------------------------------------------------------
+
 function UseItem(itemName, count)
-    if SpellIsTargeting() then CameraOrSelectOrMoveStart() CameraOrSelectOrMoveStop() end  
+    --if SpellIsTargeting() then CameraOrSelectOrMoveStart() CameraOrSelectOrMoveStop() end  
     if IsPlayerCasting() then return false end
     if not IsEquippedItem(itemName) and not IsUsableItem(itemName) then return false end
     if not IsReadyItem(itemName) then return false end
+    local spellName = GetItemSpell(itemName)
+    local err = GetLastSpellError(spellName, 1.8)
+    if err then
+        if Debug then chat(itemName .. " - " .. err) end
+        return false
+    end 
     if not count then count = 1 end
     for i = 1, count do
         RunMacroText("/use " .. itemName)
-        if SpellIsTargeting() then
-            --SpellTargetUnit("target")
-            CameraOrSelectOrMoveStart() CameraOrSelectOrMoveStop() 
-            --TurnOrActionStart()  TurnOrActionStop()
-            break 
+        if SpellIsTargeting() then break end
+    end
+    if not IsReadyItem(itemName) then 
+        if Debug then
+            print(itemName)
         end
-        if not IsReadyItem(itemName) then 
-            if Debug then
-                print(itemName)
-            end
-            return true
-        end
+        return true
     end
     return false
 end
-
 ------------------------------------------------------------------------------------------------------------------
 function UseEquippedItem(item)
     if ItemExists(item) and IsReadyItem(item) then

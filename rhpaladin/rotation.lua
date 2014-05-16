@@ -1,7 +1,17 @@
 ﻿-- Paladin Rotation Helper by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
+local bersTimer = 0
+function UseBers()
+    bersTimer = GetTime()
+end
+
+function IsBers()
+    return (GetTime() - bersTimer < 5)
+end
+------------------------------------------------------------------------------------------------------------------
 local peaceBuff = {"Пища", "Питье"}
 function Idle()
+
     if TryAura() then return end
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
@@ -9,12 +19,13 @@ function Idle()
     end
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
+    if (InCombatLockdown() or IsShift()) and TrySave() then return end
     -- чтоб контроли не сбивать
     if HasDebuff(SappedList, 0.01, "target") and not IsAttack() then 
         RunMacroText("/stopattack") 
         return
     end
-    if IsShift() or InCombatLockdown() and  TrySave() then return end
+
 	if IsAttack() or InCombatLockdown() then
         if TryBuff() then return end
         if not InCombatLockdown() and DispelParty() then return end
@@ -192,6 +203,8 @@ function Rotation()
         end
     end
 
+    
+
     if not CanAttack("target") then return end
     RunMacroText("/startattack [nostealth]")
 
@@ -206,8 +219,8 @@ function Rotation()
     -- Ротация
     if GetBuffStack("Титаническая мощь") > 4 then UseEquippedItem("Устройство Каз'горота") end  
 
-    if IsCtr() then 
-        if UseItem("Зелье из крови голема") then return end
+    if IsBers() then 
+        --if UseItem("Зелье из крови голема") then return end
         if DoSpell("Гнев карателя") then return end
         if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
         if DoSpell("Защитник древних королей") then return end
@@ -255,32 +268,34 @@ function TrySave()
         if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
 
-    local h = UnitHealth100("player")
-
-    if h < 15 and  DoSpell("Божественный щит") then return true end
-    if h < 85 and DoSpell("Божественная защита") then return true end
-    if h < 95 and DoSpell("Кровь земли") then return true end
-
     local members, membersHP = GetHealingMembers(IsArena() and IUNITS or healList)
     if #members < 1 then return false end
     local u = members[1]
-    if not IsOneUnit(u, "player") and membersHP[u] > 45 then 
+    local h = membersHP[u]
+    local isPlayer = IsOneUnit(u, "player")
+    if not isPlayer and h > 50 then 
         u = "player" 
-    else 
         h = membersHP[u]
+        if not h then return false end
     end
-    if not UnitIsPet(u) then
-        if IsBattleground() and h < 20 and DoSpell("Возложение рук",u) then return end
+
+    if isPlayer or not UnitIsPet(u) then
+        local combat = UnitAffectingCombat(u)
+        if combat and isPlayer and h < 10 and  DoSpell("Божественный щит") then return true end
+
+        if combat and IsBattleground() and h < 15 and DoSpell("Возложение рук",u) then return true end
+
         if (not IsValidTarget("target") or not InMelee("target")) and h < 25 and (UnitPower("player", 9) > 0) and DoSpell("Торжество", u) then return true end
 
+        if combat and isPlayer and h < 96 and DoSpell("Кровь земли") then return true end
+
+        if combat and isPlayer and h < 85 and DoSpell("Божественная защита") then return true end
+
         if PlayerInPlace() and h < 95 and IsShift() and DoSpell(HasBuff("Священная война") and "Свет небес" or "Вспышка света", u) then return true end
-        --if not IsAttack() and  PlayerInPlace()  and DoSpell("Свет небес", u) then return true end
 
         if h < 65 and UnitMana100("player") > 30 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", u) then return true end
-        
     end
     return false
-
 end
 
 ------------------------------------------------------------------------------------------------------------------

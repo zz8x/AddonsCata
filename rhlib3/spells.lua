@@ -235,7 +235,15 @@ function IsBehind(target)
     return checkTargetInErrList(target, notBehind)
 end
 
+local lastFailedSpellTime = {}
+local lastFailedSpellError = {}
 
+function GetLastSpellError(spellName, t)
+    if not spellName then return nil end
+    local lastTime = lastFailedSpellTime[spellName]
+    if t and lastTime and (GetTime() - lastTime > t) then return nil end
+    return lastFailedSpellError[spellName]
+end
 
 local function UpdateTargetPosition(event, ...)
 
@@ -243,8 +251,12 @@ local function UpdateTargetPosition(event, ...)
       sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,   
       spellId, spellName, spellSchool,                                                                     
       amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ...
-    if sourceGUID == UnitGUID("player") and (type:match("^SPELL_CAST") and spellId and spellName)  then
+    if sourceGUID == UnitGUID("player") and sContains(type, "SPELL_CAST_FAILED") and spellId and spellName  then
         local err = amount
+        if err then
+            lastFailedSpellTime[spellName] = GetTime()
+            lastFailedSpellError[spellName] = err
+        end
         local cast = getCastInfo(spellName)
         local guid = cast.TargetGUID or nil
         if err and guid then
@@ -287,6 +299,12 @@ function UseSpell(spellName, target)
         if Debug then error("Спел [".. spellName .. "] не найден!") end
         return false;
     end
+
+    local err = GetLastSpellError(spellName, 0.5)
+    if err then
+        if Debug then chat(spellName .. " - " .. err) end
+        return false
+    end 
     -- проверяем, что этот спел не используется сейчас
     local IsBusy = IsSpellInUse(spellName)
     if IsBusy then

@@ -299,6 +299,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function UnitHealth100(target)
     if target == nil then target = "player" end
+    --if target == "player" and IsCtr() then return 5 end
     --return UnitHealth(target) * 100 / UnitHealthMax(target)
     return UnitHP(target) * 100 / UnitHealthMax(target)
 end
