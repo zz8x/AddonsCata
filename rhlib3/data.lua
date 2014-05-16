@@ -59,34 +59,54 @@ SappedList  = { -- > 4
 ------------------------------------------------------------------------------------------------------------------
 -- Можно законтролить игрока
 local imperviousList = {"Вихрь клинков", "Зверь внутри", "Незыблемость льда"} -- TODO: Незыблемость льда под вопросом
+CanControlInfo = ""
 function CanControl(target)
+    CanControlInfo = ""
     if nil == target then target = "target" end 
-    return CanMagicAttack(target) and not HasBuff(imperviousList, 0.1, target) 
-        and not HasDebuff(ControlList, 1.5, target)
+    if not CanAttack(target) then
+        CanControlInfo = CanAttackInfo
+        return false
+    end
+    local aura = HasBuff(imperviousList, 0.1, target) or HasDebuff(ControlList, 1.5, target)
+    if aura then
+        CanControlInfo = aura
+        return false
+    end 
+    return true   
 end
 
 ------------------------------------------------------------------------------------------------------------------
 -- можно использовать магические атаки против игрока
+CanMagicAttackInfo = ""
 local magicList = {"Отражение заклинания", "Антимагический панцирь", "Рунический покров", "Эффект тотема заземления"}
 function CanMagicAttack(target)
+    CanMagicAttackInfo = ""
     if nil == target then target = "target" end 
-    return CanAttack(target) 
-        and not HasBuff(magicList, 0.1, target)
+    if not CanAttack(target) then
+        CanMagicAttackInfo = CanAttackInfo
+        return false
+    end
+    local aura = HasBuff(magicList, 0.1, target) 
+    if aura then
+        CanMagicAttackInfo = aura
+        return false
+    end
+    return true
 end
 
 ------------------------------------------------------------------------------------------------------------------
 -- можно атаковать игрока (в противном случае не имеет смысла просаживать кд))
 local immuneList = {"Божественный щит", "Ледяная глыба", "Сдерживание"}
-local CanAttackInfo = ""
+CanAttackInfo = ""
 function CanAttack(target)
     CanAttackInfo = ""
     if nil == target then target = "target" end 
     if not IsValidTarget(target) then
-        CanAttackInfo = "Неверная цель"
+        CanAttackInfo = IsValidTargetInfo
         return false
     end
     if not IsInView(target) then
-        CanAttackInfo = "Не лицом к цели"
+        CanAttackInfo = "Спиной к цели"
         return false
     end
     local aura = HasBuff(immuneList, 0.01, target) or HasDebuff("Смерч", 0.01, target)
@@ -196,24 +216,30 @@ function IsNotAttack(target)
     if not CanAttack(target) then 
         msg = msg .. CanAttackInfo .. " "
         stop = true 
-    end
-    if not stop then
-        -- чтоб контроли не сбивать
-        local aura = HasDebuff(SappedList, 0.01, target)
-        if aura then 
-            msg = msg .. "На цели " .. aura .. " "
-            result = true
-        end
-    end
-    if stop and IsAttack() then
-        msg = msg .. "(Force!)"
-        stop = false
-    end
-    if (stop) then
-        RunMacroText("/stopattack")
     else
-        RunMacroText("/startattack [nostealth]")
+        if not stop and not UnitAffectingCombat("target") then 
+            msg = msg .. "Цель не в бою "
+            stop = true
+        end
+        if not stop then
+            -- чтоб контроли не сбивать
+            local aura = HasDebuff(SappedList, 0.01, target)
+            if aura then 
+                msg = msg .. "На цели " .. aura .. " "
+                result = true
+            end
+        end
+        if stop and IsAttack() then
+            msg = msg .. "(Force!)"
+            stop = false
+        end
+        if (stop) then
+            RunMacroText("/stopattack")
+        else
+            RunMacroText("/startattack [nostealth]")
+        end    
     end
-    if msg ~= "" then chat("!Attack("..target.."): " .. msg) end
+    
+    if msg ~= "" then chat(target..": " .. msg) end
     return stop
 end

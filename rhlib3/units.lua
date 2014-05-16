@@ -210,14 +210,36 @@ function GetTargets()
 end
 
 ------------------------------------------------------------------------------------------------------------------
+IsValidTargetInfo = ""
 function IsValidTarget(target)
+    IsValidTargetInfo = ""
     if target == nil then target = "target" end
-    if not UnitExists(target) then return false end
-    if IsIgnored(target) then return false end
-    if UnitIsDeadOrGhost(target) then return false end
-    if UnitIsEnemy("player",target) and UnitCanAttack("player", target) then return true end 
-    if (UnitInParty(target) or UnitInRaid(target)) then return false end 
-    return UnitCanAttack("player", target)
+    if not UnitExists(target) then 
+        IsValidTargetInfo = "Нет цели"
+        return false 
+    end
+    if IsIgnored(target) then 
+        IsValidTargetInfo = "Цель в игнор листе"
+        return false 
+    end
+    if UnitIsDeadOrGhost(target) then 
+        IsValidTargetInfo = "Цель дохлая"
+        return false 
+    end
+    if (UnitInParty(target) or UnitInRaid(target)) then 
+        IsValidTargetInfo = "Цель из нашей пати"
+        return false 
+    end 
+
+    if not UnitCanAttack("player", target) then
+        IsValidTargetInfo = "Невозможно атаковать"
+        return false
+    end
+
+    --[[if UnitIsEnemy("player",target) then 
+        return true 
+    end]]
+    return true
 end
 
 ------------------------------------------------------------------------------------------------------------------

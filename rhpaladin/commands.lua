@@ -46,10 +46,12 @@ SetCommand("control",
     end, 
     function(spell, target) 
         if target == nil then target = "target" end
-        if HasDebuff(spell, 0.1, target) then chat(spell..':OK!') return true end
-        if not CanControl(target) then chat(spell..':!control') return true end
-        if not InGCD() and not IsReadySpell(spell) then chat(spell..':!Ready') return true end
-        if not CanMagicAttack(target)  then  chat(spell..':!Magic') return true end
+        if HasDebuff(spell, 0.1, target) then chat(spell..': OK!') return true end
+        if not HasSpell(spell) then chat(spell .. ": Нет спела!") return true end
+        if not InRange(spell, target) then chat(spell .. ": Неверная дистанция!") return true end
+        if not CanControl(target) then chat(spell..': '..CanControlInfo) return true end
+        if not CanMagicAttack(target)  then  chat(spell..': '.. CanMagicAttackInfo) return true end
+        if (not InGCD() and not IsReadySpell(spell)) or not IsSpellNotUsed(spell, 1) then chat(spell..': КД') return true end
         return false  
     end
 )

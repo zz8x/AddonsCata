@@ -288,7 +288,7 @@ function TrySave()
 
         if combat and isPlayer and h < 85 and DoSpell("Божественная защита") then return true end
 
-        if PlayerInPlace() and h < 95 and IsShift() and DoSpell(HasBuff("Священная война") and "Свет небес" or "Вспышка света", u) then return true end
+        if PlayerInPlace() and h < 95 and IsShift() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
 
         if h < 65 and UnitMana100("player") > 30 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", u) then return true end
     end

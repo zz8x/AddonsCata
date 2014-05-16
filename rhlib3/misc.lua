@@ -147,7 +147,7 @@ end
 local lastEchoMsg = ""
 local lastEchoTime = 0
 function chat(msg)
-    if msg == lastEchoMsg and GetTime() - lastEchoTime < 1 then return end
+    if msg == lastEchoMsg and GetTime() - lastEchoTime < 2 then return end
     DEFAULT_CHAT_FRAME:AddMessage(msg, 1.0, 0.5, 0.5);
     lastEchoTime = GetTime()
     lastEchoMsg = msg

@@ -88,8 +88,6 @@ function Idle()
             DoSpell("Крадущийся зверь")
             return 
         end
-    
-        if not (IsValidTarget("target") and (UnitAffectingCombat("target") or IsAttack()))  then return end
         
         if IsNotAttack("target") then return end
 

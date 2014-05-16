@@ -300,7 +300,7 @@ function UseSpell(spellName, target)
         return false;
     end
 
-    local err = GetLastSpellError(spellName, 0.5)
+    local err = GetLastSpellError(spellName, 0.15)
     if err then
         if Debug then chat(spellName .. " - " .. err) end
         return false
