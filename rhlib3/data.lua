@@ -82,16 +82,16 @@ function CanAttack(target)
     CanAttackInfo = ""
     if nil == target then target = "target" end 
     if not IsValidTarget(target) then
-        CanAttackInfo = "!IsValidTarget"
+        CanAttackInfo = "Неверная цель"
         return false
     end
     if not IsInView(target) then
-        CanAttackInfo = "!IsInView"
+        CanAttackInfo = "Не лицом к цели"
         return false
     end
     local aura = HasBuff(immuneList, 0.01, target) or HasDebuff("Смерч", 0.01, target)
     if aura then
-        CanAttackInfo = "Immune: " .. aura
+        CanAttackInfo = "Цель имунна: " .. aura
         return false
     end
     return true
@@ -313,8 +313,8 @@ function StopAttack(target)
     local stop = false
     local msg = ""
     if not CanAttack(target) then 
-        msg = msg .. "!CanAttack " .. CanAttackInfo
-        result = true 
+        msg = msg .. CanAttackInfo .. " "
+        stop = true 
     end
     if not stop then
         -- чтоб контроли не сбивать
@@ -325,7 +325,7 @@ function StopAttack(target)
         end
     end
     if stop and IsAttack() then
-        msg = msg .. "Force!"
+        msg = msg .. "(Force!)"
         stop = false
     end
     if (stop) then
