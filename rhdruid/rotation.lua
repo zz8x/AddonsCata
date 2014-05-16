@@ -69,7 +69,7 @@ function Idle()
 
         if DoSpell("Оглушить") then return end
         if IsReadySpell("Оглушить") then return end
-        RunMacroText("/startattack")
+        --RunMacroText("/startattack")
             if myHP < 60 and DoSpell("Неистовое восстановление") then return end
             if myHP < 60 and DoSpell("Дубовая кожа") then return end
             if DoSpell("Увечье(Облик медведя)") then return end
