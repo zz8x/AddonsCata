@@ -177,11 +177,8 @@ function Rotation()
     if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
     if not IsPvP() and HasBuff("Праведное неистовство") then RunMacroText("/cancelaura Праведное неистовство") end
 
-    
-
     if (UnitMana100("player") < 60 or UnitHealth100("player") < 50) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
     if (UnitMana100("player") > 80 and UnitHealth100("player") > 80) then RunMacroText("/cancelaura Печать прозрения") end
-
 
     if IsPvP() and IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 6) then
         for i = 1, #TARGETS do
@@ -197,11 +194,6 @@ function Rotation()
             if UnitIsPlayer(t) and tContains(steathClass, GetClass(t)) and not UnitAffectingCombat(t) and DoSpell("Длань возмездия", t) then return end
         end
     end
-
-    
-
-    
-    
 
     if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
     local speed = GetUnitSpeed("player")
@@ -278,13 +270,13 @@ function TrySave()
 
     if isPlayer or not UnitIsPet(u) then
         local combat = UnitAffectingCombat(u)
-        if combat and isPlayer and h < 10 and  DoSpell("Божественный щит") then return true end
+        if combat and isPlayer and h < 25 and  DoSpell("Божественный щит") then return true end
 
         if combat and IsBattleground() and h < 15 and DoSpell("Возложение рук",u) then return true end
 
         if (not IsValidTarget("target") or not InMelee("target")) and h < 25 and (UnitPower("player", 9) > 0) and DoSpell("Торжество", u) then return true end
 
-        if combat and isPlayer and h < 96 and DoSpell("Кровь земли") then return true end
+        if isPlayer and h < (IsShift() and 80 or 60)  and UseSlot(10, 5) then return true end
 
         if combat and isPlayer and h < 85 and DoSpell("Божественная защита") then return true end
 

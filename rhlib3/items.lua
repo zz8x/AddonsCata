@@ -73,7 +73,7 @@ function UseItem(itemName, count)
     if not IsEquippedItem(itemName) and not IsUsableItem(itemName) then return false end
     if not IsReadyItem(itemName) then return false end
     local spellName = GetItemSpell(itemName)
-    local err = GetLastSpellError(spellName, 1.8)
+    local err = GetLastSpellError(spellName, 2)
     if err then
         if Debug then chat(itemName .. " - " .. err) end
         return false

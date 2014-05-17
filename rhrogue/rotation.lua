@@ -65,7 +65,7 @@ function Idle()
     if (IsValidTarget("target") or IsAttack()) and not IsStealthed() and not InCombatLockdown() and DoSpell("Незаметность") then return end
 
     local hp = UnitHealth100("player")
-    if not IsArena() and hp < 40 and UseItem("Зелье разбойника") or UseHealPotion() then return end
+    if not IsArena() and hp < 40 and (UseItem("Зелье разбойника") or UseHealPotion()) then return end
     if InCombatLockdown() and (IsOneUnit("player", "target-target") or IsOneUnit("player", "focus-target")) then
         if hp < 50 and DoSpell("Ускользание") then return end
         if hp < 60 and InMelee() and DoSpell("Дымовая шашка") then return end
