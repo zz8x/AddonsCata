@@ -214,7 +214,7 @@ IsValidTargetInfo = ""
 function IsValidTarget(target)
     IsValidTargetInfo = ""
     if target == nil then target = "target" end
-    if not UnitExists(target) then 
+    if not UnitName(target) then 
         IsValidTargetInfo = "Нет цели"
         return false 
     end

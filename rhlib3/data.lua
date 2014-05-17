@@ -217,10 +217,10 @@ function IsNotAttack(target)
         msg = msg .. CanAttackInfo .. " "
         stop = true 
     else
-        if not stop and not UnitAffectingCombat("target") then 
+        --[[if not stop and not IsPvP() and not UnitAffectingCombat(target) then 
             msg = msg .. "Цель не в бою "
             stop = true
-        end
+        end]]
         if not stop then
             -- чтоб контроли не сбивать
             local aura = HasDebuff(SappedList, 0.01, target)
