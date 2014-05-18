@@ -51,7 +51,27 @@ function ActualDistance(target)
     return (CheckInteractDistance(target, 3) == 1)
 end
 ------------------------------------------------------------------------------------------------------------------
+local pvpTarget = {"Вороная горгулья", "Тотем заземления", "Тотем оков земли", "Тотем трепета"}
+function FindPvPTarget()
+    if not IsCtr() then return end
+    for i=1,#pvpTarget do
+        local uName = UnitName("target")
+        if not uName  or not tContains(pvpTarget, uName) then
+            if uName then RunMacroText("/cleartarget") end
+            RunMacroText("/targetexact [harm, nodead] " .. pvpTarget[i])
+        end
+    end
+    if not IsValidTarget("target") then 
+        RunMacroText("/targetlasttarget") 
+    end
+end
+
 function TryTarget(useFocus)
+
+    FindPvPTarget()
+
+
+
     -- помощь в группе
     if not IsValidTarget("target") and InGroup() then
         -- если что-то не то есть в цели
@@ -180,10 +200,11 @@ function Rotation()
     if (UnitMana100("player") < 60 or UnitHealth100("player") < 50) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
     if (UnitMana100("player") > 80 and UnitHealth100("player") > 80) then RunMacroText("/cancelaura Печать прозрения") end
 
+
     if IsPvP() and IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 6) then
         for i = 1, #TARGETS do
             local t = TARGETS[i]
-            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон") 
+            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон") and (not IsOneUnit(t, "mousseover") or IsIsMouse3())
                 and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
         end
     end
