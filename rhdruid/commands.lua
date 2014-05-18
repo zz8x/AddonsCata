@@ -131,7 +131,7 @@ SetCommand("roots",
 ------------------------------------------------------------------------------------------------------------------
  SetCommand("stun", 
    function() return DoSpell("Калечение") end, 
-   function() return HasDebuff("Калечение", 1, "target") end
+   function() return HasDebuff("Калечение", 1, "target") or GetComboPoints("player", "target") == 0 end
 )
 ------------------------------------------------------------------------------------------------------------------ 
  SetCommand("heal", 
