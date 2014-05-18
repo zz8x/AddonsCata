@@ -163,7 +163,8 @@ local InterruptRedList = {
     "Отпугивание зверя",
     "Святое сияние",
     "Божественный свет",
-    "Звездный поток"
+    "Звездный поток",
+    "Рука Гул'дана"
 }
 
 function InInterruptRedList(spellName)

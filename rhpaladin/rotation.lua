@@ -206,9 +206,9 @@ function Rotation()
     
     local canMagic = CanMagicAttack("target")
     -- Ротация
+    if UseSlot(10) then return end
     if GetBuffStack("Титаническая мощь") > (IsBers() and 3 or 4) then UseEquippedItem("Устройство Каз'горота") end  
     if IsBers() then 
-        if UseSlot(10) then return end
         --if UseItem("Зелье из крови голема") then return end
         if DoSpell("Гнев карателя") then return end
         if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
