@@ -39,7 +39,7 @@ function Idle()
         if not HasBuff("Облик медведя") and myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
     end
 
-    if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
+    --if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
     if IsCtr() and GetBuffStack("Жизнецвет", "player") < 3 and DoSpell("Жизнецвет", "player") then return end
     
     --[[if not HasBuff("Облик медведя") and GetTime() - fixRageTime > 5 then
@@ -114,7 +114,7 @@ function Idle()
         if IsShift() and HasBuff("Облик кошки") and DoSpell("Размах(Облик кошки)") then return end
               
 
-        if InMelee("target") and HasBuff("Неистовство дикой природы") and not IsReadyItem("Жетон завоевания гладиатора Катаклизма") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
+        if InMelee("target") and HasBuff("Неистовство дикой природы") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
 
         if myHP < 50 and DoSpell("Инстинкты выживания") then return end
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
