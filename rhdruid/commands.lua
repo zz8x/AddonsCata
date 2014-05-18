@@ -90,7 +90,12 @@ SetCommand("сyclone",
   end, 
   function(target) 
     if target == nil then target = "target" end
-    if (not InGCD() and not IsSpellNotUsed("Смерч",1)) or not CanMagicAttack(target) then return true end
+    local spell = "Смерч"
+    if HasDebuff(spell, 0.1, target) then chat(spell..': OK!') return true end
+    if not InRange(spell, target) then chat(spell .. ": Неверная дистанция!") return true end
+    if not CanControl(target) then chat(spell..': '..CanControlInfo) return true end
+    if not CanMagicAttack(target)  then  chat(spell..': '.. CanMagicAttackInfo) return true end
+    if (not InGCD() and not IsReadySpell(spell)) or not IsSpellNotUsed(spell, 1) then chat(spell..': КД') return true end
     if GetTime() - clnTime < 0.2 then
       clnTime = 0
       return true
