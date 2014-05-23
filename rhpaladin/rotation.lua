@@ -212,7 +212,7 @@ function Rotation()
     if IsPvP() and IsReadySpell("Длань возмездия") then
         for i = 1, #ITARGETS do
             local t = ITARGETS[i]
-            if UnitIsPlayer(t) and tContains(steathClass, GetClass(t)) and not UnitAffectingCombat(t) and DoSpell("Длань возмездия", t) then return end
+            if UnitIsPlayer(t) and IsValidTarget(t) and tContains(steathClass, GetClass(t)) and not UnitAffectingCombat(t) and DoSpell("Длань возмездия", t) then return end
         end
     end
 
