@@ -4,7 +4,8 @@
 ## Version: 3.0
 ## DefaultState: Disabled
 ## LoadOnDemand: 1
-## SavedVariables: Paused,Debug,HarmfulCastingSpell
+## SavedVariables: HarmfulCastingSpell
+## SavedVariablesPerCharacter: Paused,Debug,FollowTarget
 lib.lua
 misc.lua
 units.lua

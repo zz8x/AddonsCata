@@ -5,6 +5,7 @@ BINDING_HEADER_RHLIB = "Rotation Helper Library"
 BINDING_NAME_RHLIB_OFF = "Выкл ротацию"
 BINDING_NAME_RHLIB_DEBUG = "Вкл/Выкл режим отладки"
 BINDING_NAME_RHLIB_RELOAD = "Перезагрузить интерфейс"
+BINDING_NAME_RHLIB_FOLLOW = "Вкл/Выкл режим следования"
 ------------------------------------------------------------------------------------------------------------------
 -- Условие для включения ротации
 function IsAttack()
@@ -37,6 +38,40 @@ function DebugToggle()
         echo("Режим отладки: OFF",true)
     end 
 end
+
+
+------------------------------------------------------------------------------------------------------------------
+
+if FollowTarget == nil then FollowTarget = false end
+-- Переключает режим следования
+function FollowToggle()
+    if FollowTarget then
+       FollowTarget = false
+       echo("Режим следования: OFF",true)
+    else
+        if CanHeal("target") then
+            FollowTarget = UnitName("target")
+            RunMacroText("/follow target")
+            echo("Режим следования ("..FollowTarget.."): ON",true)
+        end
+    end
+end
+
+local followTime = 0
+local followState = false
+function IsFollow()
+    return followState
+end
+
+function FollowBegin(event, unit)
+    followState = true
+end
+AttachEvent("AUTOFOLLOW_BEGIN", FollowBegin)
+
+function FollowEnd()
+    followState = false
+end
+AttachEvent("AUTOFOLLOW_END", FollowEnd)
 
 ------------------------------------------------------------------------------------------------------------------
 -- Вызывает функцию Idle если таковая имеется, с заданным рекомендованным интервалом UpdateInterval, 
@@ -122,6 +157,37 @@ local function UpdateIdle()
     	end
         ITARGETS = IsArena() and iTargets or TARGETS
     end
+
+    if FollowTarget and GetTime() - followTime > 1 then
+        followTime = GetTime()
+        if IsFollow() then
+            if not InCombatLockdown() and not IsMounted() then
+                local s = GetUnitSpeed("Танак")
+                if s and (s / 7 * 100) > 190 then 
+                    RunMacroText("/run MoveForwardStart()")
+                    RunMacroText("/run MoveForwardStop()")
+                    DoCommand("mount")
+                end
+            end
+            if UnitAffectingCombat(FollowTarget) then
+                if IsMounted() and not IsFalling() then
+                    RunMacroText("/dismount")
+                end
+                if not IsOneUnit("target",  FollowTarget .."-target") then
+                    RunMacroText("/assist " .. FollowTarget)
+                end
+                if UnitAffectingCombat("target") then
+                    RunMacroText("/startattack")
+                end
+            end
+        else
+            if ( CheckInteractDistance(FollowTarget, 4) ) then
+              if not IsPlayerCasting() then RunMacroText("/follow ".. FollowTarget) end
+            end
+            --if IsFriend(FollowTarget) then RunMacroText("/w "..FollowTarget .. " Вернись чуть назад плиз") end
+        end
+    end
+    
     if Idle then Idle() end
 end
 AttachUpdate(UpdateIdle, -1000)

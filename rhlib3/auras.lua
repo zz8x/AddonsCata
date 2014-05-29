@@ -28,7 +28,7 @@ local function HasAura(aura, last, target, method, my)
         local name, _, _, _, debuffType, _, Expires, unitCaster  = method(target, i)
         if not name then break end
         if (sContains(name, aura) or (debuffType and sContains(debuffType, aura)))
-            and (Expires - GetTime() >= last or Expires == 0) 
+            and (not Expires or Expires - GetTime() >= last or Expires == 0) 
             and (not my or unitCaster == "player") then
             result = name
             break
