@@ -104,6 +104,7 @@ local meleeSpells = {
     PALADIN = "Удар воина Света",
     SHAMAN = "Удар бури",
     WARRIOR = "Кровопускание",
+    HUNTER = "Удар ящера",
     ROGUE = "Коварный удар"
 }
 MeleeSpell = meleeSpells[GetClass()]

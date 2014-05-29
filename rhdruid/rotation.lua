@@ -41,7 +41,7 @@ function Idle()
 
     --if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
     if IsCtr() and GetBuffStack("Жизнецвет", "player") < 3 and DoSpell("Жизнецвет", "player") then return end
-    
+    if IsCtr() and GetBuffStack("Жизнецвет", "player") == 3 and  not HasBuff("Омоложение", "player") and DoSpell("Омоложение", "player") then return end
     --[[if not HasBuff("Облик медведя") and GetTime() - fixRageTime > 5 then
         if InRage("target") and DoSpell("Умиротворение", "target") then return end
         if InRage("focus") and DoSpell("Умиротворение", "focus") then return end
@@ -170,7 +170,7 @@ function Idle()
         
     else
         if HasBuff("Облик медведя") and InCombatLockdown() then return end
-        if not HasBuff("Неистовое восстановление") and ((HasBuff("дикой природы") or HasBuff("королей")) or InCombatLockdown()) and UseMount("Облик кошки") then return end
+        if not IsCtr() and not HasBuff("Неистовое восстановление") and ((HasBuff("дикой природы") or HasBuff("королей")) or InCombatLockdown()) and UseMount("Облик кошки") then return end
     end
 end
 
