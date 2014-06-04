@@ -154,10 +154,11 @@ function UpdateAutoFreedom(event, ...)
         end
         return
     end 
-    -- остальные контроли
-    debuff = HasDebuff(ControlList, 2, "player")
-    if debuff and (GetDebuffTime(debuff, "player") > 3) and (not tContains(SappedList, debuff)) then 
-        Notify('lich: ' .. debuff)
+    -- остальные контроли  или сапы (по атаке)
+    debuff = InStun("player", 2) or (IsCtr() and InSup("player", 2))
+    -- больше 3 сек
+     if debuff and (IsCtr() or GetDebuffTime(debuff, "player") > 3) then
+        Notify('freedom: ' .. debuff)
         if DoSpell("Каждый за себя") then
             print("freedom", debuff)
         end

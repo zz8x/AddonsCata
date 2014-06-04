@@ -174,10 +174,10 @@ local function UpdateIdle()
                     RunMacroText("/dismount")
                 end
                 if not IsOneUnit("target",  FollowTarget .."-target") then
-                    RunMacroText("/assist " .. FollowTarget)
+                    RunMacroText("/target " .. FollowTarget .. "-target")
                 end
                 if UnitAffectingCombat("target") then
-                    RunMacroText("/startattack")
+                    RunMacroText("/startattack target")
                 end
             end
         else

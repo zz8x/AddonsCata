@@ -1,38 +1,21 @@
 ﻿-- Rotation Helper Library by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
 -- TODO: need review
-ControlList = { -- > 4
+StunList = { -- > 4
 "Низвержение",
-"Ненасытная стужа", -- 10s
 "Смерч", -- 6s
 "Калечение", -- 5s max
-"Сон", -- 20s
 "Тайфун", -- 6s
 "Эффект замораживающей стрелы", -- 20s
 "Эффект замораживающей ловушки", -- 10s
 "Глубокая заморозка", -- 5s
 "Дыхание дракона", -- 5s
-"Превращение", -- 20s
 "Молот правосудия", -- 6s
-"Покаяние", -- 6s
 "Удар по почкам", -- 6s max
-"Сглаз", -- 30s
-"Соблазн", -- 30s
 "Огненный шлейф", -- 5s
 "Оглушающий удар", -- 5s
-"Пронзительный вой", -- 6s
 "Головокружение", -- 6s
-"Ошеломление", -- 20s
-"Подлый трюк",
-"Парализующий удар",
-"Сон",
-"Соблазн",
-"Страх", 
-"Вой ужаса", 
-"Устрашающий крик", 
 "Контроль над разумом", 
-"Глубинный ужас", 
-"Ментальный крик"
 }
 
 SappedList  = { -- > 4
@@ -58,21 +41,44 @@ SappedList  = { -- > 4
 
 ------------------------------------------------------------------------------------------------------------------
 -- Можно законтролить игрока
-local imperviousList = {"Вихрь клинков", "Зверь внутри", "Незыблемость льда"} -- TODO: Незыблемость льда под вопросом
+local magicControlList = {"Покаяние", "Смерч", "Молот правосудия"} -- TODO: дополнить
+local imperviousList = {"Вихрь клинков", "Зверь внутри"}
+local physicsList = {"Незыблемость льда"}
 CanControlInfo = ""
-function CanControl(target)
+function CanControl(target, spell)
     CanControlInfo = ""
     if nil == target then target = "target" end 
-    if not CanAttack(target) then
-        CanControlInfo = CanAttackInfo
+    local physic = false
+    local magic = false
+    if spell then
+        if tContains(magicControlList, spell) then
+            magic = true
+        else
+            physic = true
+        end
+    end 
+    if not (magic and CanMagicAttack or CanAttack)(target) then
+        CanControlInfo = (magic and CanMagicAttackInfo or CanAttackInfo) 
         return false
     end
-    local aura = HasBuff(imperviousList, 0.1, target) or HasDebuff(ControlList, 1.5, target)
+    local aura = HasBuff(imperviousList, 0.1, target) or (physic and HasBuff(physicsList, 0.1, target))
     if aura then
         CanControlInfo = aura
         return false
     end 
     return true   
+end
+
+function InStun(target, t) 
+    return HasDebuff(StunList, t, target)
+end
+
+function InSap(target, t) 
+    return HasDebuff(SappedList, t, target)
+end
+
+function InControl(target, t) 
+    return InStun(target, t) or InSap(target, t)
 end
 
 ------------------------------------------------------------------------------------------------------------------

@@ -217,8 +217,9 @@ function Rotation()
     end
 
     if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
+
     local speed = GetUnitSpeed("player")
-    if ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
+    if InCombatLockdown() and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
         if DoSpell("Длань свободы", "player") then return end
         if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 4)  and DoSpell("Очищение", "player") then return end
     end
@@ -260,9 +261,9 @@ function Rotation()
 end
 
 ------------------------------------------------------------------------------------------------------------------
-
+local forceBuff = {"Настой силы титанов", "Повышенная сила"}
 function TryBuff()
-    if not HasBuff("Повышенная сила") and UseItem("Эликсир улучшения") then return true end
+    if not HasBuff(forceBuff) and UseItem("Эликсир улучшения") then return true end
     --if IsPvP() and not HasDebuff("Праведное неистовство") and DoSpell("Праведное неистовство") then return true end
     if not HasBuff("печать") and DoSpell("Печать правды") then return true end
     if not InCombatLockdown() and not HasBuff("Благословение могущества") and DoSpell("Благословение могущества", "player") then return true end
