@@ -324,3 +324,7 @@ function setTimeout(delay, func, ...)
   tinsert(waitTable,{delay,func,{...}});
   return true;
 end
+------------------------------------------------------------------------------------------------------------------
+function round(number, decimals)
+    return (("%%.%df"):format(decimals)):format(number)
+end

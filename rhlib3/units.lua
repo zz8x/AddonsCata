@@ -33,15 +33,17 @@ function GetHealingMembers(units)
                     h = h * 1.5
                 end
             else
-                local status = 0
-                for j = 1, #TARGETS do
-                    local t = TARGETS[j]
-                    if tContains(dangerousType, UnitClassification(t)) then 
-                        local isTanking, state, scaledPercent, rawPercent, threatValue = UnitDetailedThreatSituation("player", t)
-                        if state ~= nil and state > status then status = state end
+                if not IsPvP() then
+                    local status = 0
+                    for j = 1, #TARGETS do
+                        local t = TARGETS[j]
+                        if tContains(dangerousType, UnitClassification(t)) then 
+                            local isTanking, state, scaledPercent, rawPercent, threatValue = UnitDetailedThreatSituation("player", t)
+                            if state ~= nil and state > status then status = state end
+                        end
                     end
+                    h = h - 2 * status
                 end
-                h = h - 2 * status
                 if HasBuff(protBuffsList, 1, u) then h = h + 5 end
                 if not IsArena() and myHP < 50 and not IsOneUnit("player", u) and not (UnitThreat(u) == 3) then h = h + 30 end
             end
@@ -335,17 +337,16 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function UnitLostHP(unit)
     local hp = UnitHP(unit)
-    local maxhp = UnitHealthMax(unit)
+    local maxhp = UnitHealthMax(unit) 
     local lost = maxhp - hp
     if UnitThreatAlert(unit) == 3 then lost = lost * 1.5 end
     return lost
 end
 
 ------------------------------------------------------------------------------------------------------------------
-function UnitHP(t)
-  local incomingheals = UnitGetIncomingHeals(t) or 0
-  local hp = UnitHealth(t) + incomingheals
-  if hp > UnitHealthMax(t) then hp = UnitHealthMax(t) end
+function UnitHP(unit)
+  local hp = UnitHealth(unit) + (UnitGetIncomingHeals(unit) or 0)
+  if hp > UnitHealthMax(unit) then hp = UnitHealthMax(unit) end
   return hp
 end
 

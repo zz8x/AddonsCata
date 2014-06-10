@@ -197,7 +197,7 @@ function Rotation()
     if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
     if not IsPvP() and HasBuff("Праведное неистовство") then RunMacroText("/cancelaura Праведное неистовство") end
 
-    if (UnitMana100("player") < 60 or UnitHealth100("player") < 50) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
+    --if (UnitMana100("player") < 40 or UnitHealth100("player") < 40) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
     if (UnitMana100("player") > 80 and UnitHealth100("player") > 80) then RunMacroText("/cancelaura Печать прозрения") end
 
 
@@ -219,7 +219,7 @@ function Rotation()
     if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
 
     local speed = GetUnitSpeed("player")
-    if InCombatLockdown() and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
+    if not InMelee("target") and InCombatLockdown() and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
         if DoSpell("Длань свободы", "player") then return end
         if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 4)  and DoSpell("Очищение", "player") then return end
     end
@@ -257,7 +257,7 @@ function Rotation()
     if canMagic and InMelee() and DoSpell("Гнев небес") then return end
 
     if UnitHealth100("player") > 80 and UnitMana100("player") < 50 and DoSpell("Святая клятва") then return end
-    if not IsFinishHim("target") and UnitMana100("player") > 20 and IsSpellNotUsed("Очищение", 6) and DispelParty() then return end
+    if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 20 and IsSpellNotUsed("Очищение", 6) and DispelParty() then return end
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -273,9 +273,13 @@ end
 ------------------------------------------------------------------------------------------------------------------
 local healList = {"player", "Смерчебот", "Ириха", "Омниссия"}
 function TrySave()
+
+    local h1 = round(UnitHealth100("player"),1)
+    local h2 = round((UnitHealth("player") * 100 / UnitHealthMax("player")),1)
+
     if not IsArena() and InCombatLockdown() then
         if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
-        if UnitHealth100("player") < 35 and UseHealPotion() then return true end
+        --if UnitHealth100("player") < 35 and UseHealPotion() then return true end
         if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
 
@@ -285,14 +289,14 @@ function TrySave()
     local h = membersHP[u]
     local isPlayer = IsOneUnit(u, "player")
     if not isPlayer and h > 50 then 
+        if not CanHeal(u) then return false end
         u = "player" 
         h = membersHP[u]
         if not h then return false end
     end
-
     if isPlayer or not UnitIsPet(u) then
         local combat = UnitAffectingCombat(u)
-        if combat and isPlayer and h < 25 and  DoSpell("Божественный щит") then return true end
+        if combat and isPlayer and h < 20 and  DoSpell("Божественный щит", u) then chat("Божественный щит "..round(h,1).."%") return true end
 
         if combat and IsBattleground() and h < 15 and DoSpell("Возложение рук",u) then return true end
 
@@ -302,7 +306,7 @@ function TrySave()
 
         if PlayerInPlace() and h < 95 and IsShift() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
 
-        if h < 65 and UnitMana100("player") > 30 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", u) then return true end
+        if h < (IsAttack() and 45 or 65) and UnitMana100("player") > 30 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", u) then return true end
     end
     return false
 end
