@@ -36,7 +36,6 @@ function DoSpell(spell, target, mana)
     return UseSpell(spell, target, mana)
 end
 ------------------------------------------------------------------------------------------------------------------
-local nointerruptBuffs = {"Мастер аур", "Сила духа"}
 function TryInterrupt(target)
     if target == nil then target = "target" end
     if not IsValidTarget(target) then return false end
@@ -58,15 +57,13 @@ function TryInterrupt(target)
 
     m = " -> " .. spell .. " ("..target..")"
 
-    if not notinterrupt and not HasBuff(nointerruptBuffs, 0.1, target) and HasBuff("Облик кошки") then 
-        if (channel or t < 0.8) and InRange("Лобовая атака(Облик кошки)", target) and DoSpell("Лобовая атака(Облик кошки)", target) then 
+    if not notinterrupt and not IsInterruptImmune(target) and (channel or t < 0.8)  then 
+        if HasBuff("Облик кошки") and InRange("Лобовая атака(Облик кошки)", target) and DoSpell("Лобовая атака(Облик кошки)", target) then 
             echo("Лобовая атака"..m)
             interruptTime = GetTime() + 4
             return true 
         end
-    end
-    if not notinterrupt and not HasBuff(nointerruptBuffs, 0.1, target) and HasBuff("Облик медведя") then 
-        if (channel or t < 0.8) and InRange("Лобовая атака(Облик медведя)", target) and DoSpell("Лобовая атака(Облик медведя)", target) then 
+        if HasBuff("Облик медведя") and InRange("Лобовая атака(Облик медведя)", target) and DoSpell("Лобовая атака(Облик медведя)", target) then 
             echo("Лобовая атака"..m)
             interruptTime = GetTime() + 4
             return true 

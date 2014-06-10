@@ -84,7 +84,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 -- можно использовать магические атаки против игрока
 CanMagicAttackInfo = ""
-local magicList = {"Отражение заклинания", "Антимагический панцирь", "Рунический покров", "Эффект тотема заземления"}
+local magicList = {"Отражение заклинания", "Антимагический панцирь", "Эффект тотема заземления"}
 function CanMagicAttack(target)
     CanMagicAttackInfo = ""
     if nil == target then target = "target" end 
@@ -213,6 +213,13 @@ local AlertList = {
 
 function InAlertList(spellName)
     return tContains(AlertList, spellName)
+end
+------------------------------------------------------------------------------------------------------------------
+local nointerruptBuffs = {"Мастер аур", "Сила духа"}
+function IsInterruptImmune(target, t)
+    if target == nil then target = "target" end
+    if t == nil then t = 0.1 end
+    return HasBuff(nointerruptBuffs, t , target)
 end
 ------------------------------------------------------------------------------------------------------------------
 function IsNotAttack(target)

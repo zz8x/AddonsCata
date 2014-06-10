@@ -17,7 +17,6 @@ function UseInterrupt()
 end
 
 ------------------------------------------------------------------------------------------------------------------
-local nointerruptBuffs = {"Мастер аур"}
 function TryInterrupt(target)
     if target == nil then target = "target" end
     if not IsValidTarget(target) then return false end
@@ -39,7 +38,7 @@ function TryInterrupt(target)
 
     m = " -> " .. spell .. " ("..target..")"
 
-    if not notinterrupt and not HasBuff(nointerruptBuffs, 0.1, target) then 
+    if not notinterrupt and not IsInterruptImmune(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Пинок", target) then 
             echo("Пинок"..m)
             interruptTime = GetTime() + 4

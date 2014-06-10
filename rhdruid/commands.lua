@@ -80,6 +80,17 @@ SetCommand("mount",
 )
 ------------------------------------------------------------------------------------------------------------------
 local clnTime = 0
+local immuneList = {
+  "Божественный щит",
+  "Ледяная глыба",
+  "Сдерживание",
+  "Вихрь клинков",
+  "Зверь внутри",
+  "Отражение заклинания",
+  "Антимагический панцирь",
+  "Эффект тотема заземления"
+}
+local controlList = {"Покаяние", "Изгнание зла", "Молот правосудия"} -- TODO: для игры с паладином
 SetCommand("сyclone", 
   function(target) 
     if clnTime ~= 0 and GetTime() - clnTime < 0.2 then return end
@@ -91,10 +102,15 @@ SetCommand("сyclone",
   function(target) 
     if target == nil then target = "target" end
     local spell = "Смерч"
-    if HasDebuff(spell, 0.1, target) then chat(spell..': OK!') return true end
+    if not IsValidTarget(target) then chat(spell .. ": Неверная цель!") return true end
     if not InRange(spell, target) then chat(spell .. ": Неверная дистанция!") return true end
-    if not CanControl(target, spell) then chat(spell..': '..CanControlInfo) return true end
-    if (not InGCD() and not IsReadySpell(spell)) or not IsSpellNotUsed(spell, 1) then chat(spell..': КД') return true end
+    local predictionTime = HasBuff("Быстрота хищника") and 0.2 or 1.5
+    local aura = HasBuff(immuneList, predictionTime, target) or HasDebuff(spell, predictionTime, target)
+    if aura then chat(spell .. ": Цель имунна: " .. aura) return true end
+    if IsArena() then
+      local control = HasDebuff(spell, predictionTime, target)        
+      if control then chat(spell..': Цель еще в котроле: '.. control) return true end
+    end
     if GetTime() - clnTime < 0.2 then
       clnTime = 0
       return true

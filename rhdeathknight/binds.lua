@@ -34,8 +34,6 @@ function InterruptToggle()
     end 
 end
 ------------------------------------------------------------------------------------------------------------------
-
-local nointerruptBuffs = {"Мастер аур"}
 local lichSpells = {"Превращение", "Сглаз", "Соблазн", "Страх", "Вой ужаса", "Контроль над разумом"}
 local conrLichSpells = {"Изгнание зла", "Сковывание нежити"}
 function TryInterrupt(target)
@@ -61,7 +59,7 @@ function TryInterrupt(target)
 
     m = " -> " .. spell .. " ("..target..")"
 
-    if not notinterrupt and not HasBuff(nointerruptBuffs, 0.1, target) and CanMagicAttack(target) then 
+    if not notinterrupt and not IsInterruptImmune(target) and CanMagicAttack(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Заморозка разума", target) then 
             echo("Заморозка разума"..m)
             interruptTime = GetTime() + 4

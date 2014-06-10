@@ -49,7 +49,7 @@ SetCommand("control",
         if HasDebuff(spell, 0.1, target) then chat(spell..': OK!') return true end
         if not HasSpell(spell) then chat(spell .. ": Нет спела!") return true end
         if not InRange(spell, target) then chat(spell .. ": Неверная дистанция!") return true end
-        local aura = InControl(target, 2)
+        local aura = InControl(target, 0.1)
         if aura then chat(spell..': уже в котроле '..aura) return true end
         if not CanControl(target, spell) then chat(spell..': '..CanControlInfo) return true end
         if (not InGCD() and not IsReadySpell(spell)) or not IsSpellNotUsed(spell, 1) then chat(spell..': КД') return true end
