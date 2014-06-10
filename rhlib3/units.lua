@@ -226,10 +226,10 @@ function IsValidTarget(target)
         IsValidTargetInfo = "Цель дохлая"
         return false 
     end
-    if (UnitInParty(target) or UnitInRaid(target)) then 
+    --[[if (UnitInParty(target) or UnitInRaid(target)) then 
         IsValidTargetInfo = "Цель из нашей пати"
         return false 
-    end 
+    end]]
 
     if not UnitCanAttack("player", target) then
         IsValidTargetInfo = "Невозможно атаковать"
