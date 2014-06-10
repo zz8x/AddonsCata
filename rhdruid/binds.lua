@@ -36,7 +36,7 @@ function DoSpell(spell, target, mana)
     return UseSpell(spell, target, mana)
 end
 ------------------------------------------------------------------------------------------------------------------
-local nointerruptBuffs = {"Мастер аур"}
+local nointerruptBuffs = {"Мастер аур", "Сила духа"}
 function TryInterrupt(target)
     if target == nil then target = "target" end
     if not IsValidTarget(target) then return false end
