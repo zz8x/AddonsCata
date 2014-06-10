@@ -48,7 +48,7 @@ function Idle()
         fixRageTime = GetTime()
     end]]
 
-    if CanInterrupt then
+    if not IsStealthed() and CanInterrupt then
         for i=1,#TARGETS do
             TryInterrupt(TARGETS[i])
         end

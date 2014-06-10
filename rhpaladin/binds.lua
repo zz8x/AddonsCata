@@ -55,7 +55,7 @@ function TryInterrupt(target)
 
     m = " -> " .. spell .. " ("..target..")"
 
-    if not notinterrupt and not IsInterruptImmune(target)(target) then 
+    if not notinterrupt and not IsInterruptImmune(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Укор", target) then 
             echo("Укор"..m)
             interruptTime = GetTime() + 2
