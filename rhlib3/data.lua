@@ -5,6 +5,7 @@ StunList = { -- > 4
 "Низвержение",
 "Смерч", -- 6s
 "Калечение", -- 5s max
+"Оглушить", --4s
 "Тайфун", -- 6s
 "Эффект замораживающей стрелы", -- 20s
 "Эффект замораживающей ловушки", -- 10s
@@ -42,6 +43,7 @@ SappedList  = { -- > 4
 ------------------------------------------------------------------------------------------------------------------
 -- Можно законтролить игрока
 local magicControlList = {"Покаяние", "Смерч", "Молот правосудия"} -- TODO: дополнить
+local physicControlList = {"Молот правосудия", "Калечение", "Оглушить"} -- TODO: дополнить
 local imperviousList = {"Вихрь клинков", "Зверь внутри"}
 local physicsList = {"Незыблемость льда"}
 CanControlInfo = ""
@@ -51,11 +53,8 @@ function CanControl(target, spell)
     local physic = false
     local magic = false
     if spell then
-        if tContains(magicControlList, spell) then
-            magic = true
-        else
-            physic = true
-        end
+        magic = tContains(magicControlList, spell)
+        physic = tContains(physicControlList, spell)
     end 
     if not (magic and CanMagicAttack or CanAttack)(target) then
         CanControlInfo = (magic and CanMagicAttackInfo or CanAttackInfo) 
