@@ -35,7 +35,7 @@ function InterruptToggle()
 end
 ------------------------------------------------------------------------------------------------------------------
 
-local nointerruptBuffs = {"Мастер аур", "Слово силы: Барьер"}
+local nointerruptBuffs = {"Мастер аур"}
 local lichSpells = {"Превращение", "Сглаз", "Соблазн", "Страх", "Вой ужаса", "Контроль над разумом"}
 local conrLichSpells = {"Изгнание зла", "Сковывание нежити"}
 function TryInterrupt(target)
