@@ -17,7 +17,7 @@ function UseInterrupt()
 end
 
 ------------------------------------------------------------------------------------------------------------------
-local nointerruptBuffs = {"Мастер аур"}
+local nointerruptBuffs = {"Мастер аур", "Слово силы: Барьер"}
 function TryInterrupt(target)
     if target == nil then target = "target" end
     if not IsValidTarget(target) then return false end
