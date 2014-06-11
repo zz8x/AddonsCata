@@ -196,7 +196,7 @@ function Rotation()
     if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
     if not IsPvP() and HasBuff("Праведное неистовство") then RunMacroText("/cancelaura Праведное неистовство") end
 
-    --if (UnitMana100("player") < 40 or UnitHealth100("player") < 40) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
+    if (UnitMana100("player") < 40 or UnitHealth100("player") < 40) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
     if (UnitMana100("player") > 80 and UnitHealth100("player") > 80) then RunMacroText("/cancelaura Печать прозрения") end
 
 
@@ -227,6 +227,7 @@ function Rotation()
     
     local canMagic = CanMagicAttack("target")
     -- Ротация
+    
     if UseSlot(10) then return end
     if GetBuffStack("Титаническая мощь") > (IsBers() and 3 or 4) then UseEquippedItem("Устройство Каз'горота") end  
     if IsBers() then 

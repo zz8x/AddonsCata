@@ -15,7 +15,7 @@ StunList = { -- > 4
 "Удар по почкам", -- 6s max
 "Огненный шлейф", -- 5s
 "Оглушающий удар", -- 5s
-"Головокружение", -- 6s
+--"Головокружение", -- 6s
 "Контроль над разумом", 
 }
 
@@ -236,7 +236,7 @@ function IsNotAttack(target)
         end]]
         if not stop then
             -- чтоб контроли не сбивать
-            local aura = HasDebuff(SappedList, 0.01, target)
+            local aura = InSap(target)
             if aura then 
                 msg = msg .. "На цели " .. aura .. " "
                 result = true
@@ -246,7 +246,7 @@ function IsNotAttack(target)
             msg = msg .. "(Force!)"
             stop = false
         end
-        if (stop) then
+        if stop then
             RunMacroText("/stopattack")
         else
             RunMacroText("/startattack [nostealth]")
@@ -254,5 +254,6 @@ function IsNotAttack(target)
     end
     
     if msg ~= "" then chat(target..": " .. msg) end
+    if IsValidTarget(target) then stop = true end
     return stop
 end
