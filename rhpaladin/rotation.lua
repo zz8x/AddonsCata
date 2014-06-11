@@ -277,7 +277,7 @@ function TrySave()
         --if UnitHealth100("player") < 35 and UseHealPotion() then return true end
         if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
-    local members, membersHP = GetHealingMembers(IsArena() and IUNITS or healList)
+    local members = GetHealingMembers(IsArena() and IUNITS or healList)
     if #members < 1 then return false end
     local u = members[1]
     local h = UnitHealth100(u)
