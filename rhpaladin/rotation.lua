@@ -6,12 +6,11 @@ function UseBers()
 end
 
 function IsBers()
-    return (GetTime() - bersTimer < 5)
+    return (GetTime() - bersTimer < 10)
 end
 ------------------------------------------------------------------------------------------------------------------
 local peaceBuff = {"Пища", "Питье"}
 function Idle()
-
     if TryAura() then return end
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
@@ -232,8 +231,8 @@ function Rotation()
     if GetBuffStack("Титаническая мощь") > (IsBers() and 3 or 4) then UseEquippedItem("Устройство Каз'горота") end  
     if IsBers() then 
         --if UseItem("Зелье из крови голема") then return end
-        if DoSpell("Гнев карателя") then return end
         if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
+        if DoSpell("Гнев карателя") then return end
         if DoSpell("Защитник древних королей") then return end
     end
   
@@ -273,26 +272,21 @@ end
 ------------------------------------------------------------------------------------------------------------------
 local healList = {"player", "Смерчебот", "Ириха", "Омниссия"}
 function TrySave()
-
-    local h1 = round(UnitHealth100("player"),1)
-    local h2 = round((UnitHealth("player") * 100 / UnitHealthMax("player")),1)
-
     if not IsArena() and InCombatLockdown() then
         if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
         --if UnitHealth100("player") < 35 and UseHealPotion() then return true end
         if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
-
     local members, membersHP = GetHealingMembers(IsArena() and IUNITS or healList)
     if #members < 1 then return false end
     local u = members[1]
-    local h = membersHP[u]
+    local h = UnitHealth100(u)
     local isPlayer = IsOneUnit(u, "player")
     if not isPlayer and h > 50 then 
-        if not CanHeal(u) then return false end
         u = "player" 
-        h = membersHP[u]
-        if not h then return false end
+        isPlayer = true
+        if not CanHeal(u) then return false end
+        h = UnittHealth100(u)
     end
     if isPlayer or not UnitIsPet(u) then
         local combat = UnitAffectingCombat(u)

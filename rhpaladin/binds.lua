@@ -71,7 +71,7 @@ function UpdateAutoFreedom(event, ...)
     if GetTime() - freedomTime < 0.5 then return end
     freedomTime = GetTime()
     -- контроли или сапы (по атаке)
-    debuff = InStun("player", 2) or (IsCtr() and InSup("player", 2))
+    debuff = InStun("player", 2) or (IsCtr() and InSap("player", 2))
     -- больше 3 сек
     if debuff and (IsCtr() or GetDebuffTime(debuff, "player") > 3) then
         Notify('freedom: ' .. debuff)

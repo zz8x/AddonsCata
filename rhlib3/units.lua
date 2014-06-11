@@ -11,7 +11,7 @@ end
 function GetHealingMembers(units)
     local myHP = UnitHealth100("player")
     if #members > 0 and UpdateInterval == 0 then
-        return members, membersHP
+        return members
     end
     wipe(members)
     wipe(membersHP)
@@ -23,10 +23,9 @@ function GetHealingMembers(units)
     for i = 1, #units do
         local u = units[i]
         if CanHeal(u) then 
-             local h =  UnitHealth100(u)
-            if IsFriend(u) then 
-                if UnitAffectingCombat(u) and h > 99 then h = h - 1 end
-                h = h  - ((100 - h) * 1.15) 
+            local h =  UnitHealth100(u)
+            if IsFriend(u) and UnitAffectingCombat(u) then 
+                h = h - (110 - h) / 10
             end
             if UnitIsPet(u) then
                 if UnitAffectingCombat("player") then 
@@ -52,11 +51,7 @@ function GetHealingMembers(units)
         end
     end
     table.sort(members, compareMembers)  
-    for i = 1, #members do
-        local u = members[i]
-        if UnitHealth100(u) == 100 then membersHP[u] = 100 end
-    end
-    return members, membersHP
+    return members
 end
 ------------------------------------------------------------------------------------------------------------------
 -- friend list
