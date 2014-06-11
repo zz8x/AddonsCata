@@ -254,6 +254,5 @@ function IsNotAttack(target)
     end
     
     if msg ~= "" then chat(target..": " .. msg) end
-    if IsValidTarget(target) then stop = true end
     return stop
 end
