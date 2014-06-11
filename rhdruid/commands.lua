@@ -167,3 +167,24 @@ SetCommand("roots",
   end, 
   function() return HasBuff("Тревожный рев") end
 )
+------------------------------------------------------------------------------------------------------------------
+local slpTime = 0
+local controlList = {"Покаяние", "Изгнание зла", "Молот правосудия"} -- TODO: для игры с паладином
+SetCommand("sleep", 
+  function(target) 
+    if slpTime ~= 0 and GetTime() - slpTime < 0.2 then return end
+    if DoSpell("Спячка", target) then
+      slpTime = GetTime()
+      return
+    end
+  end, 
+  function(target) 
+    if target == nil then target = "target" end
+    if (not InGCD() and not IsSpellNotUsed("Спячка",1)) or not CanMagicAttack(target) then return true end
+    if GetTime() - slpTime < 0.2 then
+      rtsTime = 0
+      return true
+      end
+    return false 
+  end
+)
