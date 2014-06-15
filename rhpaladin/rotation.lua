@@ -52,17 +52,17 @@ end
 ------------------------------------------------------------------------------------------------------------------
 local pvpTarget = {"Вороная горгулья", "Тотем заземления", "Тотем оков земли", "Тотем трепета"}
 function FindPvPTarget()
-    if not IsCtr() then return end
+    --if not IsCtr() then return end
     for i=1,#pvpTarget do
         local uName = UnitName("target")
         if not uName  or not tContains(pvpTarget, uName) then
-            if uName then RunMacroText("/cleartarget") end
+            --if uName then RunMacroText("/cleartarget") end
             RunMacroText("/targetexact [harm, nodead] " .. pvpTarget[i])
         end
     end
-    if not IsValidTarget("target") then 
+    --[[if not IsValidTarget("target") then 
         RunMacroText("/targetlasttarget") 
-    end
+    end]]
 end
 
 function TryTarget(useFocus)
@@ -130,7 +130,7 @@ end
 local toggleAuraTime = 0
 function TryAura()
     local t = GetTime()
-    if IsMounted() then
+    if IsMounted() and not IsArena() then
         if not HasBuff("Аура воина Света") then return DoSpell("Аура воина Света") end
         toggleAuraTime = t
         return false
@@ -177,6 +177,7 @@ local rootDispelList = {
     "Хватка земли"
 }
 local steathClass = {"ROGUE", "DRUID"}
+local eTime = 0
 function Rotation()
 
     if IsAttack() then
@@ -231,7 +232,11 @@ function Rotation()
         if UseSlot(10) then return end
         if GetBuffStack("Титаническая мощь") > (IsBers() and 3 or 4) then UseEquippedItem("Устройство Каз'горота") end  
         if IsBers() then 
-            --if UseItem("Зелье из крови голема") then return end
+            UseEquippedItem("Жетон победы гладиатора Катаклизма")
+            if GetTime() - eTime > 2 then
+                eTime = GetTime()
+                if UseItem("Зелье из крови голема") then return end
+            end
             if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
             if DoSpell("Гнев карателя") then return end
             if DoSpell("Защитник древних королей") then return end
@@ -275,7 +280,7 @@ local healList = {"player", "Смерчебот", "Ириха", "Омнисси�
 function TrySave()
     if not IsArena() and InCombatLockdown() then
         if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
-        --if UnitHealth100("player") < 35 and UseHealPotion() then return true end
+        if UnitHealth100("player") < 35 and UseHealPotion() then return true end
         if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
     local members = GetHealingMembers(IsArena() and IUNITS or healList)
@@ -287,7 +292,7 @@ function TrySave()
         u = "player" 
         isPlayer = true
         if not CanHeal(u) then return false end
-        h = UnittHealth100(u)
+        h = UnitHealth100(u)
     end
     if isPlayer or not UnitIsPet(u) then
         local combat = UnitAffectingCombat(u)
@@ -295,7 +300,7 @@ function TrySave()
 
         if combat and IsBattleground() and h < 15 and DoSpell("Возложение рук",u) then return true end
 
-        if (not IsValidTarget("target") or not InMelee("target")) and h < 25 and (UnitPower("player", 9) > 0) and DoSpell("Торжество", u) then return true end
+        if (not IsValidTarget("target") or not InMelee("target")) and h < (IsShift() and 55 or 25) and (UnitPower("player", 9) > 0) and DoSpell("Торжество", u) then return true end
 
         if combat and isPlayer and h < 85 and DoSpell("Божественная защита") then return true end
 

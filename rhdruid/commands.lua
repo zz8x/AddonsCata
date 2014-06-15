@@ -104,7 +104,7 @@ SetCommand("сyclone",
     local spell = "Смерч"
     if not IsValidTarget(target) then chat(spell .. ": Неверная цель!") return true end
     if not InRange(spell, target) then chat(spell .. ": Неверная дистанция!") return true end
-    local predictionTime = HasBuff("Быстрота хищника") and 0.2 or 1.5
+    local predictionTime = HasBuff("Быстрота хищника") and 0.01 or 1.5
     local aura = HasBuff(immuneList, predictionTime, target) or HasDebuff(spell, predictionTime, target)
     if aura then chat(spell .. ": Цель имунна: " .. aura) return true end
     if IsArena() then
