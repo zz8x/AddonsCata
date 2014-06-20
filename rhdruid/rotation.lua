@@ -70,7 +70,7 @@ function Idle()
         if DoSpell("Оглушить") then return end
         if IsReadySpell("Оглушить") then return end
         --RunMacroText("/startattack")
-            if myHP < 60 and DoSpell("Неистовое восстановление") then return end
+            if myHP < 20 and DoSpell("Неистовое восстановление") then return end
             if myHP < 60 and DoSpell("Дубовая кожа") then return end
             if DoSpell("Увечье(Облик медведя)") then return end
             if IsShiftKeyDown() == 1 and DoSpell("Размах(Облик медведя)") then return end
@@ -121,7 +121,7 @@ function Idle()
        
         if HasDebuff("Глубокая рана") and HasDebuff("Разорвать",7) and not IsStealthed() and not HasDebuff("Волшебный огонь", 2) and DoSpell("Волшебный огонь (облик зверя)") then return end
         
-        if HasSpell("Увечье(Облик кошки)") and not HasMyDebuff("Увечье") then
+        if HasSpell("Увечье(Облик кошки)") and not HasDebuff("Увечье") then
                 DoSpell("Увечье(Облик кошки)") 
             return
         end
