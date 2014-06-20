@@ -110,10 +110,10 @@ function CanAttack(target)
         CanAttackInfo = IsValidTargetInfo
         return false
     end
-    if not IsInView(target) then
+    --[[if not IsInView(target) then
         CanAttackInfo = "Спиной к цели"
         return false
-    end
+    end]]
     local aura = HasBuff(immuneList, 0.01, target) or HasDebuff("Смерч", 0.01, target)
     if aura then
         CanAttackInfo = "Цель имунна: " .. aura
