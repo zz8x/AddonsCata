@@ -51,25 +51,26 @@ function ActualDistance(target)
 end
 ------------------------------------------------------------------------------------------------------------------
 local pvpTarget = {"Вороная горгулья", "Тотем заземления", "Тотем оков земли", "Тотем трепета"}
+local pvpTargetTime = 0;
 function FindPvPTarget()
-    --if not IsCtr() then return end
+    if GetTime() - pvpTargetTime < 3 then return end
+    pvpTargetTime = GetTime()
+    RunMacroText("/cleartarget")
     for i=1,#pvpTarget do
         local uName = UnitName("target")
-        if not uName  or not tContains(pvpTarget, uName) then
-            --if uName then RunMacroText("/cleartarget") end
+        if not uName or not tContains(pvpTarget, uName) then
             RunMacroText("/targetexact [harm, nodead] " .. pvpTarget[i])
         end
     end
-    --[[if not IsValidTarget("target") then 
-        RunMacroText("/targetlasttarget") 
-    end]]
+    if uName then
+        RunMacroText("/focus target")
+        RunMacroText("/targetlasttarget")
+    end
 end
 
 function TryTarget(useFocus)
 
     FindPvPTarget()
-
-
 
     -- помощь в группе
     if not IsValidTarget("target") and InGroup() then
@@ -219,7 +220,7 @@ function Rotation()
     if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
 
     local speed = GetUnitSpeed("player")
-    if not InMelee("target") and InCombatLockdown() and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
+    if not InMelee("target") and InCombatLockdown() and HasDebuff("") and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
         if DoSpell("Длань свободы", "player") then return end
         if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 4)  and DoSpell("Очищение", "player") then return end
     end
@@ -229,7 +230,7 @@ function Rotation()
     local canMagic = CanMagicAttack("target")
     -- Ротация
     if IsValidTarget("target") then 
-        if UseSlot(10) then return end
+        if InMelee() and UseSlot(10) then return end
         if GetBuffStack("Титаническая мощь") > (IsBers() and 3 or 4) then UseEquippedItem("Устройство Каз'горота") end  
         if IsBers() then 
             UseEquippedItem("Жетон победы гладиатора Катаклизма")
@@ -257,9 +258,10 @@ function Rotation()
         end
     end
 
-    if canMagic and DoSpell("Правосудие") then return end
-
-    if canMagic and InMelee() and DoSpell("Гнев небес") then return end
+    if canMagic or HasBuff("Эффект тотема заземления",0.1, "target") then 
+        if DoSpell("Правосудие") then return end
+        if InMelee() and DoSpell("Гнев небес") then return end
+    end
 
     if UnitHealth100("player") > 80 and UnitMana100("player") < 50 and DoSpell("Святая клятва") then return end
     if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 20 and IsSpellNotUsed("Очищение", 6) and DispelParty() then return end
@@ -300,7 +302,7 @@ function TrySave()
 
         if combat and IsBattleground() and h < 15 and DoSpell("Возложение рук",u) then return true end
 
-        if (not IsValidTarget("target") or not InMelee("target")) and h < (IsShift() and 55 or 25) and (UnitPower("player", 9) > 0) and DoSpell("Торжество", u) then return true end
+        if (not IsValidTarget("target") or not InMelee("target")) and h < (IsShift() and 55 or 25) and (UnitPower("player", 9) > 1) and DoSpell("Торжество", u) then return true end
 
         if combat and isPlayer and h < 85 and DoSpell("Божественная защита") then return true end
 
