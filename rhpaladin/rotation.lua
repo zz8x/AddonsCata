@@ -50,14 +50,16 @@ function ActualDistance(target)
     return (CheckInteractDistance(target, 3) == 1)
 end
 ------------------------------------------------------------------------------------------------------------------
-local pvpTarget = {"Вороная горгулья", "Тотем заземления", "Тотем оков земли", "Тотем трепета"}
+--[[local pvpTarget = {"Вороная горгулья", "Тотем заземления", "Тотем оков земли", "Тотем трепета"}
 local pvpTargetTime = 0;
 function FindPvPTarget()
     if GetTime() - pvpTargetTime < 3 then return end
     pvpTargetTime = GetTime()
+    local tName = UnitName("target")
     RunMacroText("/cleartarget")
+    local uName
     for i=1,#pvpTarget do
-        local uName = UnitName("target")
+        uName = UnitName("target")
         if not uName or not tContains(pvpTarget, uName) then
             RunMacroText("/targetexact [harm, nodead] " .. pvpTarget[i])
         end
@@ -66,11 +68,11 @@ function FindPvPTarget()
         RunMacroText("/focus target")
         RunMacroText("/targetlasttarget")
     end
-end
+end]]
 
 function TryTarget(useFocus)
 
-    FindPvPTarget()
+    --FindPvPTarget()
 
     -- помощь в группе
     if not IsValidTarget("target") and InGroup() then
@@ -205,7 +207,7 @@ function Rotation()
     if IsPvP() and IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 6) then
         for i = 1, #TARGETS do
             local t = TARGETS[i]
-            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон") and (not IsOneUnit(t, "mousseover") or IsIsMouse3())
+            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон") and (not IsOneUnit(t, "mousseover") or IsIsMouse3() or (UnitName(t) == "Вороная горгулья"))
                 and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
         end
     end
@@ -278,14 +280,16 @@ function TryBuff()
 end
 
 ------------------------------------------------------------------------------------------------------------------
-local healList = {"player", "Смерчебот", "Ириха", "Омниссия"}
+--local healList = {"player", "Смерчебот", "Ириха", "Омниссия"}
 function TrySave()
     if not IsArena() and InCombatLockdown() then
         if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
         if UnitHealth100("player") < 35 and UseHealPotion() then return true end
         if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
-    local members = GetHealingMembers(IsArena() and IUNITS or healList)
+
+    --local members = GetHealingMembers(IsArena() and IUNITS or healList)
+    local members = GetHealingMembers(IUNITS)
     if #members < 1 then return false end
     local u = members[1]
     local h = UnitHealth100(u)
@@ -298,7 +302,7 @@ function TrySave()
     end
     if isPlayer or not UnitIsPet(u) then
         local combat = UnitAffectingCombat(u)
-        if combat and isPlayer and h < 20 and  DoSpell("Божественный щит", u) then chat("Божественный щит "..round(h,1).."%") return true end
+        if combat and isPlayer and h < (IsArena() and 45 or 20) and  DoSpell("Божественный щит", u) then chat("Божественный щит "..round(h,1).."%") return true end
 
         if combat and IsBattleground() and h < 15 and DoSpell("Возложение рук",u) then return true end
 

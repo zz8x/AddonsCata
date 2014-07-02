@@ -66,6 +66,7 @@ local function friendListUpdate()
         end
     end
 end
+friendListUpdate()
 AttachEvent("FRIENDLIST_UPDATE", friendListUpdate)
 
 function IsFriend(unit)
