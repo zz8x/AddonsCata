@@ -114,7 +114,7 @@ function Idle()
         if IsShift() and HasBuff("Облик кошки") and DoSpell("Размах(Облик кошки)") then return end
               
 
-        if InMelee("target") and HasBuff("Неистовство дикой природы") and UseEquippedItem("Перчатки беспощадного гладиатора из драконьей шкуры") then return end
+        if InMelee("target") and HasBuff("Неистовство дикой природы") and UseEquippedItem("Перчатки из драконьей шкуры гладиатора Катаклизма") then return end
 
         if myHP < 50 and DoSpell("Инстинкты выживания") then return end
         if myHP < 80 and DoSpell("Дубовая кожа") then return end
