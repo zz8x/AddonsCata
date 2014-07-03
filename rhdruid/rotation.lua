@@ -104,7 +104,7 @@ function Idle()
         if IsPvP() and IsReadySpell("Волшебный огонь (облик зверя)") then
             for i = 1, #ITARGETS do
                 local t = ITARGETS[i]
-                if UnitIsPlayer(t) and tContains(steathClass, GetClass(t)) and not HasDebuff("Волшебный огонь", 1, t) and DoSpell("Волшебный огонь (облик зверя)", t) then return end
+                if UnitIsPlayer(t) and (tContains(steathClass, GetClass(t)) or HasBuff("Эффект тотема заземления", 1, t)) and not HasDebuff("Волшебный огонь", 1, t) and DoSpell("Волшебный огонь (облик зверя)", t) then return end
             end
         end
         
