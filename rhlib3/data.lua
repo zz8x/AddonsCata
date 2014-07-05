@@ -207,11 +207,11 @@ local AlertList = {
     "Питье",
     "Длань свободы",
     "Воля Отрекшихся",
-    "Перерождение"
+    "Перерождение",
 }
 
 function InAlertList(spellName)
-    return tContains(AlertList, spellName)
+    return tContains(AlertList, spellName) or tContains(SappedList, spellName) or tContains(StunList, spellName)
 end
 ------------------------------------------------------------------------------------------------------------------
 local nointerruptBuffs = {"Мастер аур", "Сила духа"}
