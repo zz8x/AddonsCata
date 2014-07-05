@@ -303,16 +303,15 @@ function UpdateSpellAlert(event, ...)
       spellId, spellName, spellSchool,                                                                     
       amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ...
     if type and InAlertList(spellName) then
-        type = type:gsub("SPELL_AURA_", "")
-        type = type:gsub("SPELL_CAST_", "")
+        type = type:gsub("SPELL_", "")
+        type = type:gsub("AURA_", "")
+        type = type:gsub("CAST_", "")
         if UnitGUID("player") == sourceGUID and IsArena() then
-            RunMacroText("/p " .. spellName .. " -> "..(destName or "unknown").." - " .. type .. "!")
-            PlaySound("AlarmClockWarning3", "master")
+            RunMacroText("/p " .. spellName .. (destName and (": ".. destName) or "") .." - " .. type .. "!")
         end
         for i=1,#checkedTargets do
             local t = checkedTargets[i]
             if IsValidTarget(t) and UnitGUID(t) == sourceGUID then
-                print("|cffff7d0a" .. spellName .. " ("..(sourceName or "unknown")..")|r  - " .. type .. "!")
                 Notify("|cffff7d0a" .. spellName .. " ("..(sourceName or "unknown")..")|r  - " .. type .. "!")
                 PlaySound("AlarmClockWarning2", "master");
                 break

@@ -181,6 +181,11 @@ local rootDispelList = {
 }
 local steathClass = {"ROGUE", "DRUID"}
 local eTime = 0
+function HasLight(c)
+    if not c then c = 3 end
+    if IsReadySpell("Фанатизм") and IsBers() then return false end
+    return UnitPower("player", 9) == c or HasBuff("Божественный замысел")
+end
 function Rotation()
 
     if IsAttack() then
@@ -240,12 +245,15 @@ function Rotation()
                 eTime = GetTime()
                 if UseItem("Зелье из крови голема") then return end
             end
+            if IsReadySpell("Фанатизм") then
+                print(UnitPower("player", 9), HasBuff("Божественный замысел"))
+            end
             if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
             if DoSpell("Гнев карателя") then return end
             if DoSpell("Защитник древних королей") then return end
         end
     end
-    if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) then
+    if HasLight() then
         if  not HasBuff("Дознание", 2) and DoSpell("Дознание") then return end
         if DoSpell("Вердикт храмовника") then return end
     end
@@ -306,13 +314,13 @@ function TrySave()
 
         if combat and IsBattleground() and h < 15 and DoSpell("Возложение рук",u) then return true end
 
-        if (not IsValidTarget("target") or not InMelee("target")) and h < (IsShift() and 55 or 25) and (UnitPower("player", 9) > 1) and DoSpell("Торжество", u) then return true end
+        if (not IsValidTarget("target") or not InMelee("target")) and h < (IsShift() and 55 or 25) and HasLight(2) and DoSpell("Торжество", u) then return true end
 
         if combat and isPlayer and h < 85 and DoSpell("Божественная защита") then return true end
 
         if PlayerInPlace() and h < 95 and IsShift() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
 
-        if h < (IsAttack() and 45 or 65) and UnitMana100("player") > 30 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Торжество", u) then return true end
+        if h < (IsAttack() and 45 or 65) and UnitMana100("player") > 30 and HasLight() and DoSpell("Торжество", u) then return true end
     end
     return false
 end
