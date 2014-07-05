@@ -306,6 +306,7 @@ function UpdateSpellAlert(event, ...)
         type = type:gsub("SPELL_", "")
         type = type:gsub("AURA_", "")
         type = type:gsub("CAST_", "")
+        if type == "APPLIED" then return end
         if UnitGUID("player") == sourceGUID and IsArena() then
             RunMacroText("/p " .. spellName .. (destName and (": ".. destName) or "") .." - " .. type .. "!")
         end
