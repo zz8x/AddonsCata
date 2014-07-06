@@ -285,7 +285,7 @@ function UpdateSapped(event, ...)
       amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ...
 	if spellName == "Ошеломление"
 	and destGUID == UnitGUID("player")
-	and (type == "SPELL_AURA_APPLIED" or type == "SPELL_AURA_REFRESH")
+	and type == "SPELL_AURA_APPLIED"
 	then
 		RunMacroText("/к Меня сапнули, помогите плиз!")
 		Notify("Словил сап от роги: "..(sourceName or "(unknown)"))
@@ -306,14 +306,14 @@ function UpdateSpellAlert(event, ...)
         type = type:gsub("SPELL_", "")
         type = type:gsub("AURA_", "")
         type = type:gsub("CAST_", "")
-        if type == "APPLIED" then return end
+        if type == "APPLIED" or type == "PERIODIC_ENERGIZE" then return end
         if UnitGUID("player") == sourceGUID and IsArena() then
             RunMacroText("/p " .. spellName .. (destName and (": ".. destName) or "") .." - " .. type .. "!")
         end
         for i=1,#checkedTargets do
             local t = checkedTargets[i]
             if IsValidTarget(t) and UnitGUID(t) == sourceGUID then
-                Notify("|cffff7d0a" .. spellName .. " ("..(sourceName or "unknown")..")|r  - " .. type .. "!")
+                Notify(spellName .. ": "..(sourceName or "unknown").." - " .. type .. "!")
                 PlaySound("AlarmClockWarning2", "master");
                 break
             end

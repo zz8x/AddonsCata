@@ -245,9 +245,6 @@ function Rotation()
                 eTime = GetTime()
                 if UseItem("Зелье из крови голема") then return end
             end
-            if IsReadySpell("Фанатизм") then
-                print(UnitPower("player", 9), HasBuff("Божественный замысел"))
-            end
             if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
             if DoSpell("Гнев карателя") then return end
             if DoSpell("Защитник древних королей") then return end
