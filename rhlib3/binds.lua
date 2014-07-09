@@ -306,7 +306,7 @@ function UpdateSpellAlert(event, ...)
         type = type:gsub("SPELL_", "")
         type = type:gsub("AURA_", "")
         type = type:gsub("CAST_", "")
-        if type == "APPLIED" or type == "PERIODIC_ENERGIZE" then return end
+        if type == "APPLIED" or type == "FAILED" or type == "PERIODIC_ENERGIZE" then return end
         if UnitGUID("player") == sourceGUID and IsArena() then
             RunMacroText("/p " .. spellName .. (destName and (": ".. destName) or "") .." - " .. type .. "!")
         end
@@ -333,6 +333,22 @@ AttachEvent('MERCHANT_SHOW', SellGrayAndRepair)
 ------------------------------------------------------------------------------------------------------------------
 -- Автоматическoe удаление хлама
 AttachEvent('MERCHANT_CLOSED', DelGray)
+------------------------------------------------------------------------------------------------------------------
+local inDuel = false
+local startDuel = StartDuel
+function StartDuel()
+    inDuel = true
+    startDuel()
+end
+
+function InDuel()
+    return inDuel
+end
+local function DuelUpdate(event)
+   inDuel = event == 'DUEL_REQUESTED' and true or false
+end
+AttachEvent('DUEL_REQUESTED', DuelUpdate)
+AttachEvent('DUEL_FINISHED', DuelUpdate)
 ------------------------------------------------------------------------------------------------------------------
 -- Запоминаем вредоносные спелы которые нужно кастить (нужно для сбивания кастов, например тотемом заземления)
 if HarmfulCastingSpell == nil then HarmfulCastingSpell = {} end

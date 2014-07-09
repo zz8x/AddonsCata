@@ -187,7 +187,6 @@ function HasLight(c)
     return UnitPower("player", 9) == c or HasBuff("Божественный замысел")
 end
 function Rotation()
-
     if IsAttack() then
         if HasBuff("Парашют") then RunMacroText("/cancelaura Парашют") return end
         if CanExitVehicle() then VehicleExit() return end
@@ -287,7 +286,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 --local healList = {"player", "Смерчебот", "Ириха", "Омниссия"}
 function TrySave()
-    if not IsArena() and InCombatLockdown() then
+    if not (IsArena() or InDuel()) and InCombatLockdown() then
         if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
         if UnitHealth100("player") < 35 and UseHealPotion() then return true end
         if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
@@ -307,17 +306,17 @@ function TrySave()
     end
     if isPlayer or not UnitIsPet(u) then
         local combat = UnitAffectingCombat(u)
-        if combat and isPlayer and h < (IsArena() and 45 or 20) and  DoSpell("Божественный щит", u) then chat("Божественный щит "..round(h,1).."%") return true end
+        
+        if h < (IsAttack() and 45 or 65) and UnitMana100("player") > 30 and HasLight() and DoSpell("Торжество", u) then return true end
 
-        if combat and IsBattleground() and h < 15 and DoSpell("Возложение рук",u) then return true end
+        if combat and isPlayer and h < (IsArena() and 45 or 25) and DoSpell("Божественный щит", u) then chat("Божественный щит "..round(h,1).."%") return true end
 
-        if (not IsValidTarget("target") or not InMelee("target")) and h < (IsShift() and 55 or 25) and HasLight(2) and DoSpell("Торжество", u) then return true end
+        if combat and not (IsArena() or InDuel()) and h < 15 and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return true end
 
         if combat and isPlayer and h < 85 and DoSpell("Божественная защита") then return true end
 
-        if PlayerInPlace() and h < 95 and IsShift() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
+        if PlayerInPlace() and h < 95 and IsCtr() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
 
-        if h < (IsAttack() and 45 or 65) and UnitMana100("player") > 30 and HasLight() and DoSpell("Торжество", u) then return true end
     end
     return false
 end
