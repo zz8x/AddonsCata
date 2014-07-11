@@ -169,7 +169,7 @@ local function UpdateIdle()
                     DoCommand("mount")
                 end
             end
-            if UnitAffectingCombat(FollowTarget) then
+            --[[if UnitAffectingCombat(FollowTarget) then
                 if IsMounted() and not IsFalling() then
                     RunMacroText("/dismount")
                 end
@@ -179,7 +179,7 @@ local function UpdateIdle()
                 if UnitAffectingCombat("target") then
                     RunMacroText("/startattack target")
                 end
-            end
+            end]]
         else
             if ( CheckInteractDistance(FollowTarget, 4) ) then
               if not IsPlayerCasting() then RunMacroText("/follow ".. FollowTarget) end

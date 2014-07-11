@@ -242,16 +242,17 @@ function IsNotAttack(target)
                 result = true
             end
         end
-        if stop and IsAttack() then
-            msg = msg .. "(Force!)"
-            stop = false
-        end
-        if stop then
-            RunMacroText("/stopattack")
-        else
-            RunMacroText("/startattack [nostealth]")
-        end    
+        
     end
+    if stop and IsAttack() then
+        msg = msg .. "(Force!)"
+        stop = false
+    end
+    if stop then
+        RunMacroText("/stopattack")
+    else
+        RunMacroText("/startattack [nostealth]")
+    end   
     
     if msg ~= "" then chat(target..": " .. msg) end
     return stop
