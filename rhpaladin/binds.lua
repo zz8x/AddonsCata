@@ -101,8 +101,15 @@ local forbearanceSpells = {"Божественный щит", "Возложен�
 ------------------------------------------------------------------------------------------------------------------
 function DoSpell(spell, target, mana)
     if tContains(forbearanceSpells, spellName) then
-        if target == nil then target = "player" end
-        if HasDebuff("Воздержанность", 0.01, target) then return false end
+        local unit = target
+        if unit == nil then 
+            unit = "player" 
+        else
+            if not CanHeal(unit) then 
+                unit = "player"
+            end
+        end
+        if HasDebuff("Воздержанность", 0.01, unit) then return false end
     end
     return UseSpell(spell, target, mana)
 end

@@ -18,7 +18,7 @@ function Idle()
     end
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
-    if (InCombatLockdown() or IsShift()) and TrySave() then return end
+    if (InCombatLockdown() or IsCtr()) and TrySave() then return end
     
 	if IsAttack() or InCombatLockdown() then
         if TryBuff() then return end
@@ -291,7 +291,6 @@ function TrySave()
         if UnitHealth100("player") < 35 and UseHealPotion() then return true end
         if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
-
     --local members = GetHealingMembers(IsArena() and IUNITS or healList)
     local members = GetHealingMembers(IUNITS)
     if #members < 1 then return false end
