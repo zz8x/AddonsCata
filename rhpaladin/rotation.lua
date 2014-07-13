@@ -50,10 +50,6 @@ function ActualDistance(target)
     return (CheckInteractDistance(target, 4) == 1)
 end
 ------------------------------------------------------------------------------------------------------------------
-local totemTarget = {"Тотем заземления", "Тотем оков земли", "Тотем трепета"}
-local totemTargetTime = 0;
-local fearTarget = {"Вороная горгулья"}
-local fearTargetTime = 0;
 function TryTarget(useFocus)
     -- помощь в группе
     if not IsValidTarget("target") and InGroup() then
@@ -170,6 +166,11 @@ function HasLight(c)
     if IsReadySpell("Фанатизм") and IsBers() then return false end
     return UnitPower("player", 9) == c or HasBuff("Божественный замысел")
 end
+
+local totemTarget = {"Тотем заземления", "Тотем оков земли", "Тотем трепета"}
+local totemTargetTime = 0;
+local fearTarget = {"Вороная горгулья"}
+local fearTargetTime = 0;
 function Rotation()
     if IsAttack() then
         if HasBuff("Парашют") then RunMacroText("/cancelaura Парашют") return end
@@ -196,7 +197,9 @@ function Rotation()
         if GetTime() - fearTargetTime > 3 then 
             fearTargetTime = GetTime()
             local tName = UnitName("target")
-            RunMacroText("/cleartarget")
+            if tName then
+                RunMacroText("/cleartarget")
+            end
             local uName
             for i=1,#fearTarget do
                 uName = UnitName("target")
@@ -205,7 +208,9 @@ function Rotation()
                 end
             end
             if uName and DoSpell("Изгнание зла",uName) then return end
-            RunMacroText("/targetlasttarget")
+            if tName then
+                RunMacroText("/targetlasttarget")
+            end
         end
         for i = 1, #TARGETS do
             local t = TARGETS[i]
@@ -222,7 +227,9 @@ function Rotation()
         if GetTime() - totemTargetTime > 3 then 
             totemTargetTime = GetTime()
             local tName = UnitName("target")
-            RunMacroText("/cleartarget")
+            if tName then
+                RunMacroText("/cleartarget")
+            end
             local uName
             for i=1,#totemTarget do
                 uName = UnitName("target")
@@ -231,7 +238,9 @@ function Rotation()
                 end
             end
             if uName and DoSpell("Длань возмездия",uName) then return end
-            RunMacroText("/targetlasttarget")
+            if tName then
+                RunMacroText("/targetlasttarget")
+            end
         end
     end
 
