@@ -2,7 +2,6 @@
 ------------------------------------------------------------------------------------------------------------------
 local peaceBuff = {"Пища", "Питье", "Призрачный волк"}
 function Idle()
-    if TryAura() then return end
     if IsAttack() then
         if HasBuff("Призрачный волк") then RunMacroText("/cancelaura Призрачный волк") return end
         if CanExitVehicle() then VehicleExit() end
@@ -99,5 +98,20 @@ function Rotation()
             TryInterrupt(TARGETS[i])
         end
     end
-    --...
+
+    if GetInventoryItemID("player",16) and not sContains(GetTemporaryEnchant(16), "Язык пламени") and DoSpell("Оружие языка пламени") then return end
+    if not HasBuff("Щит молний") and DoSpell("Щит молний") then return end
+    if InCombatLockdown() and HasBuff("Покорение стихий") and UseEquippedItem("Чаша Лунного колодца") then return end
+    if not HasMyDebuff("Огненный шок", 0.5,"target") and  DoSpell("Огненный шок") then return end
+    if HasMyDebuff("Огненный шок", 1,"target") and  DoSpell("Выброс лавы") then return end
+    if HasTotem(1) ~= "Тотем элементаля огня" then
+        if HasTotem(1) ~= "Опаляющий тотем" and DoSpell("Опаляющий тотем") then return end
+    end
+    if InCombatLockdown() and DoSpell("Покорение стихий") then return end
+    if IsShift() and DoSpell("Цепная молния") then return end
+    if HasMyDebuff("Огненный шок", 5,"target") and GetBuffStack("Щит молний") > 6 and DoSpell("Земной шок") then return end
+    if GetBuffStack("Щит молний") > 8 and DoSpell("Земной шок") then return end
+    if (IsLeftAltKeyDown() == 1) and HasTotem(1) ~= "Тотем магмы VII" and DoSpell("Тотем магмы") then return end
+    if (IsRightAltKeyDown() == 1) and DoSpell("Зов Стихий") then return end
+    if DoSpell("Молния") then return end
 end
