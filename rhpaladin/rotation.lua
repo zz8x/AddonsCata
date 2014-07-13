@@ -47,33 +47,14 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function ActualDistance(target)
     if target == nil then target = "target" end
-    return (CheckInteractDistance(target, 3) == 1)
+    return (CheckInteractDistance(target, 4) == 1)
 end
 ------------------------------------------------------------------------------------------------------------------
---[[local pvpTarget = {"Вороная горгулья", "Тотем заземления", "Тотем оков земли", "Тотем трепета"}
-local pvpTargetTime = 0;
-function FindPvPTarget()
-    if GetTime() - pvpTargetTime < 3 then return end
-    pvpTargetTime = GetTime()
-    local tName = UnitName("target")
-    RunMacroText("/cleartarget")
-    local uName
-    for i=1,#pvpTarget do
-        uName = UnitName("target")
-        if not uName or not tContains(pvpTarget, uName) then
-            RunMacroText("/targetexact [harm, nodead] " .. pvpTarget[i])
-        end
-    end
-    if uName then
-        RunMacroText("/focus target")
-        RunMacroText("/targetlasttarget")
-    end
-end]]
-
+local totemTarget = {"Тотем заземления", "Тотем оков земли", "Тотем трепета"}
+local totemTargetTime = 0;
+local fearTarget = {"Вороная горгулья"}
+local fearTargetTime = 0;
 function TryTarget(useFocus)
-
-    --FindPvPTarget()
-
     -- помощь в группе
     if not IsValidTarget("target") and InGroup() then
         -- если что-то не то есть в цели
@@ -105,11 +86,14 @@ function TryTarget(useFocus)
     end
 
     if useFocus ~= false then 
+        if IsMouse3() and IsValidTarget("mouseover") and IsOneUnit("target", "mouseover") then 
+            RunMacroText("/focus mouseover") 
+        end
         if not IsValidTarget("focus") then
             if UnitExists("focus") then RunMacroText("/clearfocus") end
             for i = 1, #TARGETS do
                 local t = TARGETS[i]
-                if UnitAffectingCombat(t) and ActualDistance(t) and not IsOneUnit("target", t) then 
+                if UnitAffectingCombat(t) and ActualDistance(t) and not IsOneUnit("target", t) and (not IsPvP() or UnitIsPlayer(t)) then 
                     RunMacroText("/focus " .. t) 
                     break
                 end
@@ -209,9 +193,23 @@ function Rotation()
 
 
     if IsPvP() and IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 6) then
+        if GetTime() - fearTargetTime > 3 then 
+            fearTargetTime = GetTime()
+            local tName = UnitName("target")
+            RunMacroText("/cleartarget")
+            local uName
+            for i=1,#fearTarget do
+                uName = UnitName("target")
+                if not uName or not tContains(fearTarget, uName) then
+                    RunMacroText("/targetexact [harm, nodead] " .. fearTarget[i])
+                end
+            end
+            if uName and DoSpell("Изгнание зла",uName) then return end
+            RunMacroText("/targetlasttarget")
+        end
         for i = 1, #TARGETS do
             local t = TARGETS[i]
-            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон") and (not IsOneUnit(t, "mousseover") or IsIsMouse3() or (UnitName(t) == "Вороная горгулья"))
+            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон") and (not IsOneUnit(t, "mouseover") or IsIsMouse3() or (UnitName(t) == "Вороная горгулья"))
                 and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
         end
     end
@@ -220,6 +218,20 @@ function Rotation()
         for i = 1, #ITARGETS do
             local t = ITARGETS[i]
             if UnitIsPlayer(t) and IsValidTarget(t) and (tContains(steathClass, GetClass(t)) or HasBuff("Эффект тотема заземления", 1, t)) and not UnitAffectingCombat(t) and DoSpell("Длань возмездия", t) then return end
+        end
+        if GetTime() - totemTargetTime > 3 then 
+            totemTargetTime = GetTime()
+            local tName = UnitName("target")
+            RunMacroText("/cleartarget")
+            local uName
+            for i=1,#totemTarget do
+                uName = UnitName("target")
+                if not uName or not tContains(totemTarget, uName) then
+                    RunMacroText("/targetexact [harm, nodead] " .. totemTarget[i])
+                end
+            end
+            if uName and DoSpell("Длань возмездия",uName) then return end
+            RunMacroText("/targetlasttarget")
         end
     end
 
