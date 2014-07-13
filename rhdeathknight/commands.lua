@@ -142,7 +142,7 @@ SetCommand("mount",
                 tryMount = GetTime()
                 return true
             end
-            -- парашут
+            -- Парашют
             if GetFalingTime() > 1 and UseSlot(15) then
                 chat("Парашют")
                 tryMount = GetTime()
