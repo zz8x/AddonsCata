@@ -118,6 +118,7 @@ local function notifyFrame_OnUpdate()
 				end
         end
 end
+-- /run Notify("test")
 -- Debug & Notification Frame
 notifyFrame = CreateFrame('Frame')
 notifyFrame:ClearAllPoints()
@@ -125,7 +126,7 @@ notifyFrame:SetHeight(300)
 notifyFrame:SetWidth(800)
 notifyFrame:SetScript('OnUpdate', notifyFrame_OnUpdate)
 notifyFrame:Hide()
-notifyFrame.text = notifyFrame:CreateFontString(nil, 'BACKGROUND', 'PVPInfoTextFont')
+notifyFrame.text = notifyFrame:CreateFontString(nil, 'BACKGROUND', 'BossEmoteNormalHuge')
 notifyFrame.text:SetAllPoints()
 notifyFrame:SetPoint('CENTER', 0, 0)
 

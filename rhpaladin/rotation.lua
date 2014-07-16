@@ -9,6 +9,7 @@ function IsBers()
     return (GetTime() - bersTimer < 10)
 end
 ------------------------------------------------------------------------------------------------------------------
+local fearTargetTime = 0
 local peaceBuff = {"Пища", "Питье"}
 function Idle()
     if TryAura() then return end
@@ -18,6 +19,20 @@ function Idle()
     end
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
+    if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
+
+
+    if IsReadySpell("Изгнание зла") and (GetTime() - fearTargetTime > 2) then 
+        fearTargetTime = GetTime()
+        local tName = UnitName("target")
+        RunMacroText("/targetexact [harm, nodead] Вороная горгулья")
+        local uName = UnitName("target")
+        if uName and uName == "Вороная горгулья"  then
+            if not HasDebuff("Изгнание зла", 1, "target") then DoSpell("Изгнание зла") end
+            if tName then RunMacroText("/targetlasttarget") end
+        end
+    end
+    
     if (InCombatLockdown() or IsCtr()) and TrySave() then return end
     
 	if IsAttack() or InCombatLockdown() then
@@ -167,10 +182,6 @@ function HasLight(c)
     return UnitPower("player", 9) == c or HasBuff("Божественный замысел")
 end
 
-local totemTarget = {"Тотем заземления", "Тотем оков земли", "Тотем трепета"}
-local totemTargetTime = 0;
-local fearTarget = {"Вороная горгулья"}
-local fearTargetTime = 0;
 function Rotation()
     if IsAttack() then
         if HasBuff("Парашют") then RunMacroText("/cancelaura Парашют") return end
@@ -193,28 +204,10 @@ function Rotation()
     if (UnitMana100("player") > 80 and UnitHealth100("player") > 80) then RunMacroText("/cancelaura Печать прозрения") end
 
 
-    if IsPvP() and IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 6) then
-        if GetTime() - fearTargetTime > 3 then 
-            fearTargetTime = GetTime()
-            local tName = UnitName("target")
-            if tName then
-                RunMacroText("/cleartarget")
-            end
-            local uName
-            for i=1,#fearTarget do
-                uName = UnitName("target")
-                if not uName or not tContains(fearTarget, uName) then
-                    RunMacroText("/targetexact [harm, nodead] " .. fearTarget[i])
-                end
-            end
-            if uName and DoSpell("Изгнание зла",uName) then return end
-            if tName then
-                RunMacroText("/targetlasttarget")
-            end
-        end
+    if IsPvP() and IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 5) then
         for i = 1, #TARGETS do
             local t = TARGETS[i]
-            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон") and (not IsOneUnit(t, "mouseover") or IsIsMouse3() or (UnitName(t) == "Вороная горгулья"))
+            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон")
                 and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
         end
     end
@@ -224,32 +217,12 @@ function Rotation()
             local t = ITARGETS[i]
             if UnitIsPlayer(t) and IsValidTarget(t) and (tContains(steathClass, GetClass(t)) or HasBuff("Эффект тотема заземления", 1, t)) and not UnitAffectingCombat(t) and DoSpell("Длань возмездия", t) then return end
         end
-        if GetTime() - totemTargetTime > 3 then 
-            totemTargetTime = GetTime()
-            local tName = UnitName("target")
-            if tName then
-                RunMacroText("/cleartarget")
-            end
-            local uName
-            for i=1,#totemTarget do
-                uName = UnitName("target")
-                if not uName or not tContains(totemTarget, uName) then
-                    RunMacroText("/targetexact [harm, nodead] " .. totemTarget[i])
-                end
-            end
-            if uName and DoSpell("Длань возмездия",uName) then return end
-            if tName then
-                RunMacroText("/targetlasttarget")
-            end
-        end
     end
-
-    if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
 
     local speed = GetUnitSpeed("player")
     if not InMelee("target") and InCombatLockdown() and HasDebuff("") and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
         if DoSpell("Длань свободы", "player") then return end
-        if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 4)  and DoSpell("Очищение", "player") then return end
+        if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 3)  and DoSpell("Очищение", "player") then return end
     end
 
     if IsNotAttack("target") then return end
@@ -291,7 +264,7 @@ function Rotation()
     end
 
     if UnitHealth100("player") > 80 and UnitMana100("player") < 50 and DoSpell("Святая клятва") then return end
-    if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 20 and IsSpellNotUsed("Очищение", 6) and DispelParty() then return end
+    if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 20 and IsSpellNotUsed("Очищение", 2) and DispelParty() then return end
 end
 
 ------------------------------------------------------------------------------------------------------------------
