@@ -12,13 +12,16 @@ end
 local fearTargetTime = 0
 local peaceBuff = {"Пища", "Питье"}
 function Idle()
-    if TryAura() then return end
+    if not IsPlayerCasting() and TryAura() then return end
     if IsAttack() then
-        if CanExitVehicle() then VehicleExit() end
+        if HasBuff("Парашют") then RunMacroText("/cancelaura Парашют") return end
+        if CanExitVehicle() then VehicleExit() return end
         if IsMounted() then Dismount() return end 
+    else
+        -- дайте поесть (побегать) спокойно
+        if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff) or not InCombatLockdown() or IsPlayerCasting() then return end
     end
-    -- дайте поесть (побегать) спокойно 
-    if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
+     
     if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
 
 
@@ -29,6 +32,7 @@ function Idle()
         local uName = UnitName("target")
         if uName and uName == "Вороная горгулья"  then
             if not HasDebuff("Изгнание зла", 1, "target") then DoSpell("Изгнание зла") end
+            RunMacroText("/focus target")
             if tName then RunMacroText("/targetlasttarget") end
         end
     end
@@ -97,7 +101,7 @@ function TryTarget(useFocus)
     end
 
     if useFocus ~= false then 
-        if IsMouse3() and IsValidTarget("mouseover") and IsOneUnit("target", "mouseover") then 
+        if IsMouse3() and IsValidTarget("mouseover") and not IsOneUnit("target", "mouseover") then 
             RunMacroText("/focus mouseover") 
         end
         if not IsValidTarget("focus") then
@@ -183,13 +187,6 @@ function HasLight(c)
 end
 
 function Rotation()
-    if IsAttack() then
-        if HasBuff("Парашют") then RunMacroText("/cancelaura Парашют") return end
-        if CanExitVehicle() then VehicleExit() return end
-        if IsMounted() then Dismount() return end 
-    else
-        if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff) or not InCombatLockdown() or IsPlayerCasting() then return end
-    end
 
     if CanInterrupt then
         for i=1,#TARGETS do

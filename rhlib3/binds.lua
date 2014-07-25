@@ -102,16 +102,31 @@ local function getTargetWeight(t)
 end
 local targetWeights = {}
 local function compareTargets(t1,t2) return targetWeights[t1] < targetWeights[t2] end
+local cameraCD = 0
 local function UpdateIdle()
 
     if (IsAttack() and Paused) then
         echo("Авто ротация: ON",true)
         Paused = false
     end
-    
+
     if UpdateCommands() then return end
     
     if Paused then return end
+
+    if SpellIsTargeting() and GetTime() - cameraCD > 0.25 then 
+        cameraCD = GetTime()
+        local look = IsMouselooking()
+        if look then
+            TurnOrActionStop()
+        end
+        CameraOrSelectOrMoveStart() 
+        CameraOrSelectOrMoveStop()
+        if look then
+            TurnOrActionStart() 
+        end
+        SpellStopTargeting()
+    end
     
     if GetTime() - StartTime < 2 then return end
     
@@ -122,7 +137,7 @@ local function UpdateIdle()
 
     if UnitIsDeadOrGhost("player") or UnitIsCharmed("player") 
         or not UnitPlayerControlled("player") then return end
-    if UpdateInterval > 0 then    
+    if not FastUpdate then    
         -- Update units
         UNITS = GetUnits()
         wipe(unitWeights)
@@ -157,6 +172,7 @@ local function UpdateIdle()
     	end
         ITARGETS = IsArena() and iTargets or TARGETS
     end
+
 
     if FollowTarget and GetTime() - followTime > 1 then
         followTime = GetTime()

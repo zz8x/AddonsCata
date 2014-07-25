@@ -131,7 +131,7 @@ local lichList = {
 }
 
 local freedomTime = 0
-function UpdateAutoFreedom(event, ...)
+function UpdateAutoFreedom()
     -- не слишком часто
     if GetTime() - freedomTime < 0.5 then return end
     freedomTime = GetTime()

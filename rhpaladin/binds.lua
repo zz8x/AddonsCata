@@ -36,7 +36,7 @@ end
 
 function TryInterrupt(target)
     if target == nil then target = "target" end
-    if not IsValidTarget(target) then return false end
+    if not CanAttack(target) then return false end
     local channel = false
     local spell, _, _, _, _, endTime, _, _, notinterrupt = UnitCastingInfo(target)
         
@@ -55,18 +55,29 @@ function TryInterrupt(target)
 
     m = " -> " .. spell .. " ("..target..")"
 
-    if not notinterrupt and not IsInterruptImmune(target) then 
+    if not notinterrupt and not IsInterruptImmune(target) and CanMagicAttack(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Укор", target) then 
             echo("Укор"..m)
             interruptTime = GetTime() + 2
             return true 
         end
+
+        local item = "Высокомощный крепежный пистолет"
+        if not IsArena() and (channel or t < 1.8) and IsOneUnit(target, "mouseover") 
+            and GetItemCount(item) > 0 and IsReadyItem(item) and GetItemCount("Горсть обсидиановых болтов") > 0 
+            and (UnitIsPlayer(target) or GetUnitName("player") == GetUnitName(target .. "-target")  or UnitClassification(target) == "worldboss") 
+            and UseItem(item) then 
+            echo(item..m)
+            interruptTime = GetTime() + 2
+            return true 
+        end
     end
 
+    return false
 end
 ------------------------------------------------------------------------------------------------------------------
 local freedomTime = 0
-function UpdateAutoFreedom(event, ...)
+function UpdateAutoFreedom()
     -- не слишком часто
     if GetTime() - freedomTime < 0.5 then return end
     freedomTime = GetTime()
@@ -80,7 +91,7 @@ function UpdateAutoFreedom(event, ...)
         end
     end 
 end
-AttachUpdate(UpdateAutoFreedom, -1)
+AttachUpdate(UpdateAutoFreedom, -7)
 ------------------------------------------------------------------------------------------------------------------
 local dispelSpell = "Очищение"
 local dispelTypes = {"Poison", "Disease"}

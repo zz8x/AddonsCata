@@ -46,24 +46,41 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 -- Выполняем обработчики события OnUpdate, согласно приоритету (return true - выход)
+FastUpdate = false
+local UpdateInterval = 0.35
 local LastUpdate = 0
-UpdateInterval = 0.03
+-- для снижения нагрузки на проц
+local UpdateIntervalFast = 0.03
+local LastUpdateFast = 0
+
 local function OnUpdate(frame, elapsed)
+
     LastUpdate = LastUpdate + elapsed 
-    if LastUpdate < UpdateInterval then return end -- для снижения нагрузки на проц
-    LastUpdate = 0
-    
-    for i = 1, #UpdateList do
-        local upd = UpdateList[i]
-        if UpdateInterval == 0 then
+    LastUpdateFast = LastUpdateFast + elapsed 
+
+    if LastUpdate > UpdateInterval then 
+        LastUpdate = 0
+        LastUpdateFast = 0
+        FastUpdate = false
+        for i = 1, #UpdateList do
+            local upd = UpdateList[i]
+            -- выполняем все что есть
+            upd.func(frame, elapsed)
+        end
+        return
+    end
+
+    if LastUpdateFast > UpdateIntervalFast then 
+        LastUpdateFast = 0
+        FastUpdate = true
+        for i = 1, #UpdateList do
+            local upd = UpdateList[i]
             -- выполняем только самое важное
             if upd.weight < 0 then 
                 upd.func(frame, elapsed) 
             end
-        else
-            -- выполняем все что есть
-            upd.func(frame, elapsed)
         end
     end
+   
 end
 frame:SetScript("OnUpdate", OnUpdate)
