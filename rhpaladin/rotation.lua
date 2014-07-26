@@ -9,6 +9,7 @@ function IsBers()
     return IsPvP() and (GetTime() - bersTimer < 30) or (bersTimer ~= 0)
 end
 ------------------------------------------------------------------------------------------------------------------
+local steathClass = {"ROGUE", "DRUID"}
 local fearTargetTime = 0
 local peaceBuff = {"Пища", "Питье"}
 function Idle()
@@ -20,59 +21,61 @@ function Idle()
         if IsMounted() then Dismount() return end 
     else
         -- дайте поесть (побегать) спокойно
-        if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff) or not InCombatLockdown() or IsPlayerCasting() then return end
+        if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)  or IsPlayerCasting() then return end
     end
      
-    if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
+    if InCombatLockdown() then
+        if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
 
-    if TryProtect() then return end
+        if TryProtect() then  return end
 
-    if IsReadySpell("Изгнание зла") and (GetTime() - fearTargetTime > 2) then 
-        fearTargetTime = GetTime()
-        local tName = UnitName("target")
-        RunMacroText("/targetexact [harm, nodead] Вороная горгулья")
-        local uName = UnitName("target")
-        if uName and uName == "Вороная горгулья"  then
-            if not HasDebuff("Изгнание зла", 1, "target") then DoSpell("Изгнание зла") end
-            RunMacroText("/focus target")
-            if tName then RunMacroText("/targetlasttarget") end
+        if IsReadySpell("Изгнание зла") and (GetTime() - fearTargetTime > 2) then 
+            fearTargetTime = GetTime()
+            local tName = UnitName("target")
+            RunMacroText("/targetexact [harm, nodead] Вороная горгулья")
+            local uName = UnitName("target")
+            if uName and uName == "Вороная горгулья"  then
+                if not HasDebuff("Изгнание зла", 1, "target") then DoSpell("Изгнание зла") end
+                RunMacroText("/focus target")
+                if tName then RunMacroText("/targetlasttarget") end
+            end
         end
-    end
 
 
-    if IsReadySpell("Молот гнева") then
-        for i = 1, #TARGETS do
-            local t = TARGETS[i]
-            if CanAttack(t) and UnitHealth100(t) < 20 and DoSpell("Молот гнева", t) then return end    
-        end
-    end
-
-    if IsPvP() then
-        if IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 5) then
+        if IsReadySpell("Молот гнева") then
             for i = 1, #TARGETS do
                 local t = TARGETS[i]
-                if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон")
-                    and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
+                if CanAttack(t) and UnitHealth100(t) < 20 and DoSpell("Молот гнева", t) then return end    
             end
         end
 
-        if IsReadySpell("Длань возмездия") then
-            for i = 1, #ITARGETS do
-                local t = ITARGETS[i]
-                if UnitIsPlayer(t) and CanAttack(t) and ((tContains(steathClass, GetClass(t)) and not UnitAffectingCombat(t)) or HasBuff("Эффект тотема заземления", 1, t)) and DoSpell("Длань возмездия", t) then return end
+        if IsPvP() then
+            if IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 5) then
+                for i = 1, #TARGETS do
+                    local t = TARGETS[i]
+                    if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон")
+                        and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
+                end
             end
-        end
 
-        if IsReadySpell("Укор") then
-            for i = 1, #ITARGETS do
-                local t = ITARGETS[i]
-                if UnitIsPlayer(t) and CanAttack(t) and HasBuff(reflectBuff, 1, t) and DoSpell("Укор", t) then return end
+            if IsReadySpell("Длань возмездия") then
+                for i = 1, #ITARGETS do
+                    local t = ITARGETS[i]
+                    if UnitIsPlayer(t) and CanAttack(t) and ((tContains(steathClass, GetClass(t)) and not UnitAffectingCombat(t)) or HasBuff("Эффект тотема заземления", 1, t)) and DoSpell("Длань возмездия", t) then return end
+                end
+            end
+
+            if IsReadySpell("Укор") then
+                for i = 1, #ITARGETS do
+                    local t = ITARGETS[i]
+                    if UnitIsPlayer(t) and CanAttack(t) and HasBuff(reflectBuff, 1, t) and DoSpell("Укор", t) then return end
+                end
             end
         end
     end
 
     if HasSpell("Шок небес") then
-        if TryBuff() then return end
+        if not InCombatLockdown() and TryBuff() then return end
         if IsAttack() then TryTarget() end
         HolyRotation()
         if not IsPlayerCasting() and TryBuff() then return end
@@ -232,7 +235,7 @@ local reflectBuff = {"Отражение заклинания", "Эффект т
 local eTime = 0
 function HasLight(c)
     if not c then c = 3 end
-    if IsReadySpell("Фанатизм") and IsBers() then return false end
+    if HasSpell("Фанатизм") and IsReadySpell("Фанатизм") and IsBers() then return false end
     return UnitPower("player", 9) == c or HasBuff("Божественный замысел")
 end
 
@@ -240,7 +243,7 @@ function Rotation()
 
     if CanInterrupt then
         for i=1,#TARGETS do
-            TryInterrupt(TARGETS[i])
+            if TryInterrupt(TARGETS[i]) then return end
         end
     end
 
@@ -310,7 +313,8 @@ function TryBuff()
     if not HasBuff(IsHeal and healBuff or forceBuff) and UseItem("Эликсир улучшения") then return true end
     --if IsPvP() and not HasDebuff("Праведное неистовство") and DoSpell("Праведное неистовство") then return true end
     if IsHeal then
-        if not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
+        if not HasBuff("Частица Света",1 , UNITS) and DoSpell("Частица Света", "player") then return end
+        if not HasBuff("Печать прозрения") and DoSpell("Печать прозрения", "player") then return end
         if not HasBuff("Благословение королей") and not HasBuff("Знак дикой природы") then
             if DoSpell("Благословение королей", "player") then return true end
         else
@@ -327,7 +331,8 @@ end
 function TryProtect()
     local hp = UnitHealth100("player")
     local mana = UnitMana100("player")
-    if InCombatLockdown() then return false end
+    if not InCombatLockdown() then return false end
+    
     if hp < (IsArena() and 45 or 25) and DoSpell("Божественный щит", u) then chat("Божественный щит "..round(hp,1).."%") return true end
     -- банки
     if not (IsArena() or InDuel()) then
@@ -364,38 +369,62 @@ function TrySave()
 end
 
 ------------------------------------------------------------------------------------------------------------------
-
+local improveTime = 0;
 function HolyRotation()
-    local members = GetHealingMembers(IUNITS)
+    local members = GetHealingMembers(UNITS)
     if #members < 1 then return false end
     local u = members[1]
     local h = UnitHealth100(u)
-    local isPlayer = IsOneUnit(u, "player")
-    if not isPlayer and h > 50 then 
-        u = "player" 
-        isPlayer = true
-        if not CanHeal(u) then return false end
-        h = UnitHealth100(u)
-    end
+    local l = UnitLostHP(u)
+    local combat = UnitAffectingCombat(u)
 
-    if IsCtr() then h = 50 end
+    if combat and h < 40 and PlayerInPlace() then
+        if DoSpell("Мастер аур") then return end
+    end
     
     if h > 40 and CanInterrupt then
         for i=1,#TARGETS do
-            TryInterrupt(TARGETS[i])
+            if TryInterrupt(TARGETS[i]) then return end
         end
     end
 
+    
+
+    if combat and IsBers() then 
+        if DoSpell("Защитник древних королей") then return end
+    end
+
+    if combat and not InGCD() and (GetTime() - improveTime > 5) and h < 40 then
+        improveTime = GetTime()
+        if  UseEquippedItem("Жетон господства беспощадного гладиатора") then  return end
+        if  DoSpell("Гнев карателя") then return end
+        if  DoSpell("Божественное одобрение") then return end
+    end
+
+    if combat and  h > 50 and UnitMana100("player") < 93 and DoSpell("Святая клятва") then return end
+    if PlayerInPlace() and (l > 32000 or h < 20) and HasBuff("Прилив света") and DoSpell("Божественный свет", u) then return end
+    if (l > 17000 or h < 30) and HasBuff("Прилив света") and DoSpell(IsShift() and "Святое сияние" or "Вспышка света") then return end
+
+    if (l > 5000 or h < 30) and DoSpell("Шок небес", u) then return end
+
+    
+    if (IsAttack() or InCombatLockdown()) and not IsNotAttack("target") then 
+        if DoSpell("Шок небес", "target") then return end
+        if InMelee() and DoSpell("Удар воина Света", "target") then return end
+        if DoSpell("Правосудие", "target") then return end
+    end
+
+    local p = UnitPower("player", 9)
+    if p > 0 and (l > 6500 * p ) and DoSpell("Торжество", u) then return true end
 
 
-    local combat = UnitAffectingCombat(u)
-    
-    if h < 65 and HasLight() and DoSpell("Торжество", u) then return true end
-    
-    if combat and not (IsArena() or InDuel()) and h < 15 and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return true end
-    
-    if PlayerInPlace() and h < 95 and IsCtr() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
 
-    
-    return false
+    if combat and not (IsArena() or InDuel()) and (l > (UnitHealthMax("player") * 0.8) or h < 15) and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return end
+    if PlayerInPlace() and (l > 17000 or h < 30) and HasSpell("Вспышка света") and DoSpell(IsShift() and "Святое сияние" or "Вспышка света", u) then return end
+
+    if IsReadySpell("Очищение") and UnitMana100("player") > 30 and IsSpellNotUsed("Очищение", 3) then
+        for i = 1, #members do
+            if TryDispel(members[i]) then return end
+        end
+    end
 end
