@@ -6,12 +6,13 @@ function UseBers()
 end
 
 function IsBers()
-    return (GetTime() - bersTimer < 10)
+    return IsPvP() and (GetTime() - bersTimer < 30) or (bersTimer ~= 0)
 end
 ------------------------------------------------------------------------------------------------------------------
 local fearTargetTime = 0
 local peaceBuff = {"Пища", "Питье"}
 function Idle()
+    if bersTimer ~= 0 and not InCombatLockdown() then bersTimer = 0 end
     if not IsPlayerCasting() and TryAura() then return end
     if IsAttack() then
         if HasBuff("Парашют") then RunMacroText("/cancelaura Парашют") return end
@@ -179,6 +180,7 @@ local rootDispelList = {
     "Хватка земли"
 }
 local steathClass = {"ROGUE", "DRUID"}
+local reflectBuff = {"Отражение заклинания", "Эффект тотема заземления"}
 local eTime = 0
 function HasLight(c)
     if not c then c = 3 end
@@ -200,27 +202,44 @@ function Rotation()
     if (UnitMana100("player") < 40 or UnitHealth100("player") < 40) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
     if (UnitMana100("player") > 80 and UnitHealth100("player") > 80) then RunMacroText("/cancelaura Печать прозрения") end
 
-
-    if IsPvP() and IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 5) then
+    if IsReadySpell("Молот гнева") then
         for i = 1, #TARGETS do
             local t = TARGETS[i]
-            if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон")
-                and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
+            if CanAttack(t) and UnitHealth100(t) < 20 and DoSpell("Молот гнева", t) then return end    
         end
     end
 
-    if IsPvP() and IsReadySpell("Длань возмездия") then
-        for i = 1, #ITARGETS do
-            local t = ITARGETS[i]
-            if UnitIsPlayer(t) and IsValidTarget(t) and (tContains(steathClass, GetClass(t)) or HasBuff("Эффект тотема заземления", 1, t)) and not UnitAffectingCombat(t) and DoSpell("Длань возмездия", t) then return end
+    if IsPvP() then
+        if IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 5) then
+            for i = 1, #TARGETS do
+                local t = TARGETS[i]
+                if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон")
+                    and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
+            end
+        end
+
+        if IsReadySpell("Длань возмездия") then
+            for i = 1, #ITARGETS do
+                local t = ITARGETS[i]
+                if UnitIsPlayer(t) and CanAttack(t) and ((tContains(steathClass, GetClass(t)) and not UnitAffectingCombat(t)) or HasBuff("Эффект тотема заземления", 1, t)) and DoSpell("Длань возмездия", t) then return end
+            end
+        end
+
+        if IsReadySpell("Укор") then
+            for i = 1, #ITARGETS do
+                local t = ITARGETS[i]
+                if UnitIsPlayer(t) and CanAttack(t) and HasBuff(reflectBuff, 1, t) and DoSpell("Укор", t) then return end
+            end
         end
     end
 
-    local speed = GetUnitSpeed("player")
-    if not InMelee("target") and InCombatLockdown() and HasDebuff("") and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
-        if DoSpell("Длань свободы", "player") then return end
-        if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 3)  and DoSpell("Очищение", "player") then return end
-    end
+    if not FastUpdate then
+        local speed = GetUnitSpeed("player")
+        if not InMelee("target") and InCombatLockdown() and HasDebuff("") and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
+            if DoSpell("Длань свободы", "player") then return end
+            if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 3)  and DoSpell("Очищение", "player") then return end
+        end
+    end    
 
     if IsNotAttack("target") then return end
     
@@ -235,33 +254,35 @@ function Rotation()
                 eTime = GetTime()
                 if UseItem("Зелье из крови голема") then return end
             end
-            if (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
-            if DoSpell("Гнев карателя") then return end
             if DoSpell("Защитник древних королей") then return end
+            local last  = GetSpellLastTime("Защитник древних королей")
+            if last == 0 and GetSpellCooldownLeft("Защитник древних королей") > 10 then
+                last = 10
+            end
+            if last > 0 and GetTime() - last > 9 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
+            if HasBuff("Фанатизм") and DoSpell("Гнев карателя") then return end
+            
         end
     end
-    if HasLight() then
-        if  not HasBuff("Дознание", 2) and DoSpell("Дознание") then return end
-        if DoSpell("Вердикт храмовника") then return end
-    end
-
+    if HasLight() and not HasBuff("Дознание", 1) and DoSpell("Дознание") then return end
     if InMelee() and DoSpell("Удар воина Света") then return end
+    if HasLight() and HasBuff("Дознание", 1) and DoSpell("Вердикт храмовника") then return end
     if canMagic and HasBuff("Искусство войны") and DoSpell("Экзорцизм") then return end
     if canMagic and DoSpell("Молот гнева") then return end
-    if IsReadySpell("Молот гнева") then
-        for i = 1, #TARGETS do
-            local t = TARGETS[i]
-            if CanAttack(t) and UnitHealth100(t) < 20 and DoSpell("Молот гнева", t) then return end    
-        end
-    end
-
+    if HasLight() and InMelee() then return end
+    
     if canMagic or HasBuff("Эффект тотема заземления",0.1, "target") then 
         if DoSpell("Правосудие") then return end
-        if InMelee() and DoSpell("Гнев небес") then return end
+
+        if InMelee() then
+            if UnitMana100() > 30 and DoSpell("Гнев небес") then return end
+            if UnitMana100() > 95 and DoSpell("Освящение") then return end
+        end
     end
 
     if UnitHealth100("player") > 80 and UnitMana100("player") < 50 and DoSpell("Святая клятва") then return end
-    if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 20 and IsSpellNotUsed("Очищение", 2) and DispelParty() then return end
+    if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 30 and IsSpellNotUsed("Очищение", 2) and DispelParty() then return end
+    if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 50 and TryBuff() then return end
 end
 
 ------------------------------------------------------------------------------------------------------------------

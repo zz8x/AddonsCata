@@ -19,6 +19,7 @@ end
 local peaceBuff = {"Пища", "Питье", "Походный облик", "Облик стремительной птицы", "Водный облик"}
 local fixRageTime = 0
 local steathClass = {"ROGUE", "DRUID"}
+
 function Idle()
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
@@ -101,10 +102,11 @@ function Idle()
             return 
         end
        
-        if IsPvP() and IsReadySpell("Волшебный огонь (облик зверя)") then
+        if not FastUpdate and IsPvP() and IsReadySpell("Волшебный огонь (облик зверя)") then
+            --не дать уйти в инвиз или сбить рефлект
             for i = 1, #ITARGETS do
                 local t = ITARGETS[i]
-                if UnitIsPlayer(t) and (tContains(steathClass, GetClass(t)) or HasBuff("Эффект тотема заземления", 1, t)) and not HasDebuff("Волшебный огонь", 1, t) and DoSpell("Волшебный огонь (облик зверя)", t) then return end
+                if UnitIsPlayer(t) and CanAttack(t) and (tContains(steathClass, GetClass(t)) or HasBuff(reflectBuff, 1, t)) and not HasDebuff("Волшебный огонь", 1, t) and DoSpell("Волшебный огонь (облик зверя)", t) then return end
             end
         end
         
