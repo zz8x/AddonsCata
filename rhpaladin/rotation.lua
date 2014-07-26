@@ -25,6 +25,7 @@ function Idle()
      
     if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
 
+    if TryProtect() then return end
 
     if IsReadySpell("Изгнание зла") and (GetTime() - fearTargetTime > 2) then 
         fearTargetTime = GetTime()
@@ -36,6 +37,46 @@ function Idle()
             RunMacroText("/focus target")
             if tName then RunMacroText("/targetlasttarget") end
         end
+    end
+
+
+    if IsReadySpell("Молот гнева") then
+        for i = 1, #TARGETS do
+            local t = TARGETS[i]
+            if CanAttack(t) and UnitHealth100(t) < 20 and DoSpell("Молот гнева", t) then return end    
+        end
+    end
+
+    if IsPvP() then
+        if IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 5) then
+            for i = 1, #TARGETS do
+                local t = TARGETS[i]
+                if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон")
+                    and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
+            end
+        end
+
+        if IsReadySpell("Длань возмездия") then
+            for i = 1, #ITARGETS do
+                local t = ITARGETS[i]
+                if UnitIsPlayer(t) and CanAttack(t) and ((tContains(steathClass, GetClass(t)) and not UnitAffectingCombat(t)) or HasBuff("Эффект тотема заземления", 1, t)) and DoSpell("Длань возмездия", t) then return end
+            end
+        end
+
+        if IsReadySpell("Укор") then
+            for i = 1, #ITARGETS do
+                local t = ITARGETS[i]
+                if UnitIsPlayer(t) and CanAttack(t) and HasBuff(reflectBuff, 1, t) and DoSpell("Укор", t) then return end
+            end
+        end
+    end
+
+    if HasSpell("Шок небес") then
+        if TryBuff() then return end
+        if IsAttack() then TryTarget() end
+        HolyRotation()
+        if not IsPlayerCasting() and TryBuff() then return end
+        return
     end
     
     if (InCombatLockdown() or IsCtr()) and TrySave() then return end
@@ -141,10 +182,17 @@ function TryAura()
     if t - toggleAuraTime < 10 then return false end
     if not IsAttack() then
         if not HasBuff("Аура") or HasMyBuff("Аура воина Света") then 
-            if not HasBuff("Аура благочестия") then return DoSpell("Аура благочестия") end
-            if not HasBuff("Аура воздаяния") then return DoSpell("Аура воздаяния") end
-            if not HasBuff("Аура сопротивления") then return DoSpell("Аура сопротивления") end
-            if not HasBuff("Аура сосредоточенности") then return DoSpell("Аура сосредоточенности") end
+            if HasSpell("Шок небес") then
+                if not HasBuff("Аура сосредоточенности") then return DoSpell("Аура сосредоточенности") end
+                if not HasBuff("Аура благочестия") then return DoSpell("Аура благочестия") end
+                if not HasBuff("Аура воздаяния") then return DoSpell("Аура воздаяния") end
+                if not HasBuff("Аура сопротивления") then return DoSpell("Аура сопротивления") end
+            else
+                if not HasBuff("Аура благочестия") then return DoSpell("Аура благочестия") end
+                if not HasBuff("Аура воздаяния") then return DoSpell("Аура воздаяния") end
+                if not HasBuff("Аура сопротивления") then return DoSpell("Аура сопротивления") end
+                if not HasBuff("Аура сосредоточенности") then return DoSpell("Аура сосредоточенности") end
+            end
         end
         toggleAuraTime = t
     end
@@ -202,44 +250,13 @@ function Rotation()
     if (UnitMana100("player") < 40 or UnitHealth100("player") < 40) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
     if (UnitMana100("player") > 80 and UnitHealth100("player") > 80) then RunMacroText("/cancelaura Печать прозрения") end
 
-    if IsReadySpell("Молот гнева") then
-        for i = 1, #TARGETS do
-            local t = TARGETS[i]
-            if CanAttack(t) and UnitHealth100(t) < 20 and DoSpell("Молот гнева", t) then return end    
-        end
-    end
-
-    if IsPvP() then
-        if IsReadySpell("Изгнание зла") and IsSpellNotUsed("Изгнание зла", 5) then
-            for i = 1, #TARGETS do
-                local t = TARGETS[i]
-                if CanMagicAttack(t) and (UnitCreatureType(t) == "Нежить" or UnitCreatureType(t) == "Демон")
-                    and not HasDebuff("Изгнание зла", 0.1, t) and DoSpell("Изгнание зла",t) then return end
-            end
-        end
-
-        if IsReadySpell("Длань возмездия") then
-            for i = 1, #ITARGETS do
-                local t = ITARGETS[i]
-                if UnitIsPlayer(t) and CanAttack(t) and ((tContains(steathClass, GetClass(t)) and not UnitAffectingCombat(t)) or HasBuff("Эффект тотема заземления", 1, t)) and DoSpell("Длань возмездия", t) then return end
-            end
-        end
-
-        if IsReadySpell("Укор") then
-            for i = 1, #ITARGETS do
-                local t = ITARGETS[i]
-                if UnitIsPlayer(t) and CanAttack(t) and HasBuff(reflectBuff, 1, t) and DoSpell("Укор", t) then return end
-            end
-        end
-    end
-
-    if not FastUpdate then
+    if not FastUpdate and InCombatLockdown() and HasDebuff("") and not InMelee("target") and not IsFinishHim("target") then
         local speed = GetUnitSpeed("player")
-        if not InMelee("target") and InCombatLockdown() and HasDebuff("") and ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player")) and not InMelee("target") and not IsFinishHim("target") then
+        if ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player"))  then
             if DoSpell("Длань свободы", "player") then return end
             if not HasBuff("Длань свободы") and not HasDebuff(zonalRoot, 0.1, "player") and IsSpellNotUsed("Очищение", 3)  and DoSpell("Очищение", "player") then return end
         end
-    end    
+    end  
 
     if IsNotAttack("target") then return end
     
@@ -287,22 +304,44 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 local forceBuff = {"Настой силы титанов", "Повышенная сила"}
+local healBuff = {"Повышенный интеллект"}
 function TryBuff()
-    if not HasBuff(forceBuff) and UseItem("Эликсир улучшения") then return true end
+    local IsHeal = HasSpell("Шок небес")
+    if not HasBuff(IsHeal and healBuff or forceBuff) and UseItem("Эликсир улучшения") then return true end
     --if IsPvP() and not HasDebuff("Праведное неистовство") and DoSpell("Праведное неистовство") then return true end
-    if not HasBuff("печать") and DoSpell("Печать правды") then return true end
-    if not InCombatLockdown() and not HasBuff("Благословение могущества") and DoSpell("Благословение могущества", "player") then return true end
+    if IsHeal then
+        if not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
+        if not HasBuff("Благословение королей") and not HasBuff("Знак дикой природы") then
+            if DoSpell("Благословение королей", "player") then return true end
+        else
+            if not HasMyBuff("Благословение королей") and not HasBuff("Благословение могущества") and DoSpell("Благословение могущества", "player") then return true end
+        end
+    else
+        if not HasBuff("печать") and DoSpell("Печать правды") then return true end
+        if not InCombatLockdown() and not HasBuff("Благословение могущества") and DoSpell("Благословение могущества", "player") then return true end
+    end
     return false
 end
 
 ------------------------------------------------------------------------------------------------------------------
+function TryProtect()
+    local hp = UnitHealth100("player")
+    local mana = UnitMana100("player")
+    if InCombatLockdown() then return false end
+    if hp < (IsArena() and 45 or 25) and DoSpell("Божественный щит", u) then chat("Божественный щит "..round(hp,1).."%") return true end
+    -- банки
+    if not (IsArena() or InDuel()) then
+        if IsBattleground() and  mana < 30 or hp < 35 and UseItem("Глоток войны", 5) then return true end
+        if hp < 35 and UseHealPotion() then return true end
+        if mana < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
+    end
+    if hp < 85 and DoSpell("Божественная защита") then return true end
+    return false
+end
+------------------------------------------------------------------------------------------------------------------
+
 --local healList = {"player", "Смерчебот", "Ириха", "Омниссия"}
 function TrySave()
-    if not (IsArena() or InDuel()) and InCombatLockdown() then
-        if IsBattleground() and UnitMana100() < 30 or UnitHealth100("player") < 35 and UseItem("Глоток войны", 5) then return true end
-        if UnitHealth100("player") < 35 and UseHealPotion() then return true end
-        if UnitMana100() < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
-    end
     --local members = GetHealingMembers(IsArena() and IUNITS or healList)
     local members = GetHealingMembers(IUNITS)
     if #members < 1 then return false end
@@ -317,19 +356,46 @@ function TrySave()
     end
     if isPlayer or not UnitIsPet(u) then
         local combat = UnitAffectingCombat(u)
-        
-        if h < (IsAttack() and 45 or 65) and UnitMana100("player") > 30 and HasLight() and DoSpell("Торжество", u) then return true end
-
-        if combat and isPlayer and h < (IsArena() and 45 or 25) and DoSpell("Божественный щит", u) then chat("Божественный щит "..round(h,1).."%") return true end
-
+        if h < (IsAttack() and 45 or 65) and HasLight() and DoSpell("Торжество", u) then return true end
         if combat and not (IsArena() or InDuel()) and h < 15 and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return true end
-
-        if combat and isPlayer and h < 85 and DoSpell("Божественная защита") then return true end
-
         if PlayerInPlace() and h < 95 and IsCtr() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
-
     end
     return false
 end
 
 ------------------------------------------------------------------------------------------------------------------
+
+function HolyRotation()
+    local members = GetHealingMembers(IUNITS)
+    if #members < 1 then return false end
+    local u = members[1]
+    local h = UnitHealth100(u)
+    local isPlayer = IsOneUnit(u, "player")
+    if not isPlayer and h > 50 then 
+        u = "player" 
+        isPlayer = true
+        if not CanHeal(u) then return false end
+        h = UnitHealth100(u)
+    end
+
+    if IsCtr() then h = 50 end
+    
+    if h > 40 and CanInterrupt then
+        for i=1,#TARGETS do
+            TryInterrupt(TARGETS[i])
+        end
+    end
+
+
+
+    local combat = UnitAffectingCombat(u)
+    
+    if h < 65 and HasLight() and DoSpell("Торжество", u) then return true end
+    
+    if combat and not (IsArena() or InDuel()) and h < 15 and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return true end
+    
+    if PlayerInPlace() and h < 95 and IsCtr() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
+
+    
+    return false
+end

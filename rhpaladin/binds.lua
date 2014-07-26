@@ -95,12 +95,14 @@ AttachUpdate(UpdateAutoFreedom, -7)
 ------------------------------------------------------------------------------------------------------------------
 local dispelSpell = "Очищение"
 local dispelTypes = {"Poison", "Disease"}
+local dispelTypesHeal = {"Poison", "Disease", "Magic"}
+
 function TryDispel(unit)
     if not IsReadySpell(dispelSpell) or InGCD() or not CanHeal(unit) or HasDebuff("Нестабильное колдовство", 0.1, unit) then return false end
     for i = 1, 40 do
         if not ret then
             local name, _, _, _, debuffType, duration, expirationTime   = UnitDebuff(unit, i,true) 
-            if name and (expirationTime - GetTime() >= 3 or expirationTime == 0) and tContains(dispelTypes, debuffType) then
+            if name and (expirationTime - GetTime() >= 3 or expirationTime == 0) and tContains(HasSpell("Шок небес") and dispelTypesHeal or dispelTypes, debuffType) then
                 return DoSpell(dispelSpell, unit)
             end
         end

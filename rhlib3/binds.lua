@@ -114,7 +114,7 @@ local function UpdateIdle()
     
     if Paused then return end
 
-    if SpellIsTargeting() and GetTime() - cameraCD > 0.25 then 
+    if InCombatLockdown() and  SpellIsTargeting() and GetTime() - cameraCD > 0.25 then 
         cameraCD = GetTime()
         local look = IsMouselooking()
         if look then
