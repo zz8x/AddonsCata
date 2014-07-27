@@ -37,7 +37,8 @@ SappedList  = { -- > 4
 "Вой ужаса", 
 "Устрашающий крик", 
 "Глубинный ужас", 
-"Ментальный крик"
+"Ментальный крик",
+"Замораживающая ловушка"
 }
 
 ------------------------------------------------------------------------------------------------------------------
@@ -244,8 +245,12 @@ function IsNotAttack(target)
         end
         
     end
+
+    if msg ~= "Нет цели" then 
+        msg = "" 
+    end
     if stop and IsAttack() then
-        msg = msg .. "(Force!)"
+        if msg ~= "" then msg = msg .. "(Force!)" end
         stop = false
     end
     if stop then

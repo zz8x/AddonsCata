@@ -24,10 +24,10 @@ function Idle()
         if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)  or IsPlayerCasting() then return end
     end
      
-    if InCombatLockdown() then
+    if true or InCombatLockdown() then
         if HasDebuff("Темный симулякр", 0.1, "player") and DoSpell("Очищение", "player") then return end
 
-        if TryProtect() then  return end
+        if TryProtect() then return end
 
         if IsReadySpell("Изгнание зла") and (GetTime() - fearTargetTime > 2) then 
             fearTargetTime = GetTime()
@@ -331,14 +331,16 @@ end
 function TryProtect()
     local hp = UnitHealth100("player")
     local mana = UnitMana100("player")
-    if not InCombatLockdown() then return false end
-    
     if hp < (IsArena() and 45 or 25) and DoSpell("Божественный щит", u) then chat("Божественный щит "..round(hp,1).."%") return true end
-    -- банки
     if not (IsArena() or InDuel()) then
-        if IsBattleground() and  mana < 35 or hp < 45 and UseItem("Глоток войны", 5) then return true end
-        if (not IsBattleground() or GetItemCount("Глоток войны") < 1) and hp < 35 and UseHealPotion() then return true end
-        if mana < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
+        local bg = IsBattleground()
+        if bg and (mana < 35 or hp < 45) then 
+            if UseItem("Глоток войны", 5) then chat("Глоток войны hp:"..round(hp,1).."%, mana: " ..round(mana,1).."%") end
+        end
+        if (not bg or GetItemCount("Глоток войны") < 1) then 
+            if hp < 35 then UseHealPotion() end
+            if mana < 20 then UseItem("Рунический флакон с зельем маны", 5) end
+        end
     end
     if hp < 85 and DoSpell("Божественная защита") then return true end
     return false
@@ -388,12 +390,10 @@ function HolyRotation()
         end
     end
 
-    
-
     if combat and IsBers() then 
         if DoSpell("Защитник древних королей") then return end
     end
-
+    if combat and h < 70 and UseSlot(10) then return end 
     if combat and not InGCD() and (GetTime() - improveTime > 5) and h < 40 then
         improveTime = GetTime()
         if  UseEquippedItem("Жетон господства беспощадного гладиатора") then  return end
@@ -417,12 +417,13 @@ function HolyRotation()
     local p = UnitPower("player", 9)
     if p > 0 and (l > 6500 * p ) and DoSpell("Торжество", u) then return true end
 
-
+    if IsReadySpell("Очищение") and UnitMana100("player") > 30 and IsSpellNotUsed("Очищение", 2)  and TryDispel(u) then return end
 
     if combat and not (IsArena() or InDuel()) and (l > (UnitHealthMax("player") * 0.8) or h < 15) and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return end
+    if PlayerInPlace() and (l > 34000 or h < 20) and DoSpell("Божественный свет", u) then return end
     if PlayerInPlace() and (l > 17000 or h < 30) and HasSpell("Вспышка света") and DoSpell(IsShift() and "Святое сияние" or "Вспышка света", u) then return end
 
-    if IsReadySpell("Очищение") and UnitMana100("player") > 30 and IsSpellNotUsed("Очищение", 3) then
+    if IsReadySpell("Очищение") and UnitMana100("player") > 50 and IsSpellNotUsed("Очищение", InCombatLockdown() and 5 or 1.5) then
         for i = 1, #members do
             if TryDispel(members[i]) then return end
         end
