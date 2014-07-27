@@ -307,7 +307,7 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 local forceBuff = {"Настой силы титанов", "Повышенная сила"}
-local healBuff = {"Повышенный интеллект"}
+local healBuff = {"Фляга текущей воды", "Настой драконьего разума", "Повышенный интеллект"}
 function TryBuff()
     local IsHeal = HasSpell("Шок небес")
     if not HasBuff(IsHeal and healBuff or forceBuff) and UseItem("Эликсир улучшения") then return true end
@@ -336,8 +336,8 @@ function TryProtect()
     if hp < (IsArena() and 45 or 25) and DoSpell("Божественный щит", u) then chat("Божественный щит "..round(hp,1).."%") return true end
     -- банки
     if not (IsArena() or InDuel()) then
-        if IsBattleground() and  mana < 30 or hp < 35 and UseItem("Глоток войны", 5) then return true end
-        if hp < 35 and UseHealPotion() then return true end
+        if IsBattleground() and  mana < 35 or hp < 45 and UseItem("Глоток войны", 5) then return true end
+        if (not IsBattleground() or GetItemCount("Глоток войны") < 1) and hp < 35 and UseHealPotion() then return true end
         if mana < 20 and UseItem("Рунический флакон с зельем маны", 5) then return true end
     end
     if hp < 85 and DoSpell("Божественная защита") then return true end
