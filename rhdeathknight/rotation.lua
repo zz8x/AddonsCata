@@ -134,7 +134,7 @@ function unholyRotation()
 
     if useBers then
         UseSlot(10)
-        UseEquippedItem("Жетон победы беспощадного гладиатора")
+        UseEquippedItem("Жетон победы гладиатора Катаклизма")
         if IsCtr() then UseEquippedItem("Устройство Каз'горота") end
         if DoSpell("Усиление рунического оружия") then return end
         if DoSpell("Нечестивое бешенство") then return end
@@ -163,21 +163,34 @@ function unholyRotation()
             DoSpell("Рунический удар") 
         end
     end
+
     if (UnitMana("player") < 20 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
     -- ресаем руну крови
     if not HasRunes(100) and DoSpell("Кровоотвод") then return end
     -- ресаем все.
     if not HasRunes(111) and DoSpell("Усиление рунического оружия") then return end
      -- накладываем болезни
+    if IsAttack() and UnitIsPlayer("target") and DoSpell("Некротический удар") then return end
     local frostSpell = (IsPvP() and not HasDebuff("Ледяные оковы", 5) and "Ледяные оковы" or "Ледяное прикосновение")
     if InCombatLockdown() and useBers and not Dotes(3) and DoSpell("Вспышка болезни") then return end    
-    if IsPvP() and (not HasMyDebuff("Кровавая чума", 3) or not HasDebuff("Осквернение")) and DoSpell("Удар чумы") then return end
+    if Dotes() and not Dotes(3) and DoSpell("Удар разложения") then return end  
+
+    if not HasMyDebuff("Кровавая чума", 3) and DoSpell("Удар чумы") then return end
+
+    if IsPvP() and not HasDebuff("Осквернение") and DoSpell("Удар чумы") then return end
+
     if not HasMyDebuff("Озноб", 3) and DoSpell(frostSpell) then return end
-    if Dotes(1) and HasRunes(010, true) and DoSpell("Удар разложения") then return end  
-    -- собственно ротация
-    if Dotes() and UnitHealth100("player") > 75 and DoSpell("Удар смерти") then return end 
-    if IsPvP() and (HasRunes(001, true) or (UnitHealth100("target") < 45 and not IsAttack())) and DoSpell("Некротический удар") then return end
-    if Dotes() and DoSpell("Удар Плети") then return end
+  
+    if Dotes(1) and UnitHealth100("player") < 75 and DoSpell("Удар смерти") then return end 
+    --if Dotes(1) and DoSpell("Некротический удар") then return end
+    if UnitIsPlayer("target") then
+        if DoSpell("Некротический удар") then return end
+    else
+        if Dotes(1) and DoSpell("Удар Плети") then return end
+    end
+    
+    --if Dotes(1) and UnitIsPlayer("target") and (IsAttack() or not HasDebuff("Некротический удар", 0.1, "target")) and DoSpell("Некротический удар") then return end
+    --if Dotes(1) and DoSpell("Удар Плети") then return end
     if HasRunes(100, true) and DoSpell("Кровавый удар") then return end
     if not InMelee() and DoSpell(frostSpell) then return end
     if (UnitMana("player") < 120 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end
