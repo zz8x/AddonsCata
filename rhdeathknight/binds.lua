@@ -84,6 +84,16 @@ function TryInterrupt(target)
         return true 
     end
 
+    if HasSpell("Отгрызть") and IsReadySpell("Отгрызть") and CanAttack(target) and (channel or t < 0.8) then 
+         RunMacroText("/cast [@" ..target.."] Прыжок")
+         RunMacroText("/cast [@" ..target.."] Отгрызть")
+         if not IsReadySpell("Отгрызть") then
+             echo("Отгрызть"..m)
+             interruptTime = GetTime() + 4
+             return false 
+         end
+    end
+
     if IsPvP() and IsHarmfulSpell(spell) and IsOneUnit("player", target .. "-target") and DoSpell("Антимагический панцирь") then 
         echo("Антимагический панцирь"..m)
         interruptTime = GetTime() + 5
@@ -108,7 +118,7 @@ AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateDeathPact)
 
 function TryDeathPact()
     -- вызываем пета
-    if not HasSpell("Отгрызть") and InCombatLockdown() and UnitHealth100("player") < 50 and IsSpellNotUsed("Смертельный союз", 118) then
+    if not HasSpell("Отгрызть") and InCombatLockdown() and UnitHealth100("player") < 40 and IsSpellNotUsed("Смертельный союз", 118) then
         DoSpell("Воскрешение мертвых")
     end
 
