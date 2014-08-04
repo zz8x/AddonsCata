@@ -59,6 +59,22 @@ function TryInterrupt(target)
 
     m = " -> " .. spell .. " ("..target..")"
 
+    if IsPvP() and IsHarmfulSpell(spell) and IsOneUnit("player", target .. "-target") and DoSpell("Антимагический панцирь") then 
+        echo("Антимагический панцирь"..m)
+        interruptTime = GetTime() + 5
+        return true 
+    end
+
+    if HasSpell("Отгрызть") and IsReadySpell("Отгрызть") and CanAttack(target) and (channel or t < 0.8) then 
+         RunMacroText("/cast [@" ..target.."] Прыжок")
+         RunMacroText("/cast [@" ..target.."] Отгрызть")
+         if not IsReadySpell("Отгрызть") then
+             echo("Отгрызть"..m)
+             interruptTime = GetTime() + 4
+             return false 
+         end
+    end
+
     if not notinterrupt and not IsInterruptImmune(target) and CanMagicAttack(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Заморозка разума", target) then 
             echo("Заморозка разума"..m)
@@ -81,22 +97,6 @@ function TryInterrupt(target)
     if HasSpell("Перерождение") and IsOneUnit("player",target .. "-target") and tContains(lichSpells, spell) and DoSpell("Перерождение") then 
         echo("Перерождение"..m)
         interruptTime = GetTime() + 2
-        return true 
-    end
-
-    if HasSpell("Отгрызть") and IsReadySpell("Отгрызть") and CanAttack(target) and (channel or t < 0.8) then 
-         RunMacroText("/cast [@" ..target.."] Прыжок")
-         RunMacroText("/cast [@" ..target.."] Отгрызть")
-         if not IsReadySpell("Отгрызть") then
-             echo("Отгрызть"..m)
-             interruptTime = GetTime() + 4
-             return false 
-         end
-    end
-
-    if IsPvP() and IsHarmfulSpell(spell) and IsOneUnit("player", target .. "-target") and DoSpell("Антимагический панцирь") then 
-        echo("Антимагический панцирь"..m)
-        interruptTime = GetTime() + 5
         return true 
     end
 

@@ -275,8 +275,25 @@ local function UpdateTargetPosition(event, ...)
 end
 AttachEvent('COMBAT_LOG_EVENT_UNFILTERED', UpdateTargetPosition)
 ------------------------------------------------------------------------------------------------------------------
+local cameraCD = 0;
+function TrySpellTargeting()
+    if SpellIsTargeting() and GetTime() - cameraCD > 0.05 then 
+        cameraCD = GetTime()
+        local look = IsMouselooking()
+        if look then
+            TurnOrActionStop()
+        end
+        CameraOrSelectOrMoveStart() 
+        CameraOrSelectOrMoveStop()
+        if look then
+            TurnOrActionStart() 
+        end
+        SpellStopTargeting()
+    end
+end
+------------------------------------------------------------------------------------------------------------------
 local badSpellTarget = {}
---local cameraCD = 0;
+
 local inCastSpells = {"Трепка", "Рунический удар", "Удар героя", "Рассекающий удар", "Гиперскоростное ускорение", "Нарукавная зажигательная ракетница"} -- TODO: Нужно уточнить и дополнить.
 function UseSpell(spellName, target)
     local dump = false --spellName == "Смерть и разложение"
@@ -285,7 +302,7 @@ function UseSpell(spellName, target)
 
     -- Не мешаем выбрать область для спела (нажат вручную)
     if SpellIsTargeting() then 
-        if dump then print("Ждем выбор цели, не можем прожать", spellName) end
+        if dump or true then print("Ждем выбор цели, не можем прожать", spellName) end
         return false 
     end 
     -- Не пытаемся что либо прожимать во время каста
@@ -357,11 +374,7 @@ function UseSpell(spellName, target)
         if Debug then print("Жмем", cast .. "!" .. spellName) end
         RunMacroText(cast .. "!" .. spellName)
         -- если нужно выбрать область - кидаем на текущий mouseover
-        --[[if SpellIsTargeting() and GetTime() - cameraCD > 2 then
-            cameraCD = GetTime()
-            RunMacroText("/run CameraOrSelectOrMoveStart() CameraOrSelectOrMoveStop()")
-            --TurnOrActionStart()  TurnOrActionStop()
-        end]]
+        TrySpellTargeting()
         -- данные о кастах
         local castInfo = getCastInfo(spellName)
         -- проверка на успешное начало кд

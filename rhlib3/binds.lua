@@ -102,7 +102,7 @@ local function getTargetWeight(t)
 end
 local targetWeights = {}
 local function compareTargets(t1,t2) return targetWeights[t1] < targetWeights[t2] end
-local cameraCD = 0
+
 local function UpdateIdle()
 
     if (IsAttack() and Paused) then
@@ -114,22 +114,8 @@ local function UpdateIdle()
     
     if Paused then return end
 
-    if InCombatLockdown() and SpellIsTargeting() and GetTime() - cameraCD > 0.25 then 
-        cameraCD = GetTime()
-        local look = IsMouselooking()
-        if look then
-            TurnOrActionStop()
-        end
-        CameraOrSelectOrMoveStart() 
-        CameraOrSelectOrMoveStop()
-        if look then
-            TurnOrActionStart() 
-        end
-        SpellStopTargeting()
-    end
-    
     if GetTime() - StartTime < 2 then return end
-    
+
     if IsBattleground() and UnitIsDead("player") and not UnitIsGhost("player") then
         --Notify("Выходим из тела!")
         RunMacroText("/run RepopMe()")

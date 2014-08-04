@@ -21,7 +21,7 @@ function Idle()
             useBers = false
         end
 
-        if not useBers and InCombatLockdown() and (IsCtr() or IsArena()) then
+        if not useBers and InCombatLockdown() and IsCtr() then
             chat("Подключаем бурсты по кд")
             useBers = true;
         end

@@ -9,15 +9,12 @@ function IsReadySlot(slot)
 end
 
 ------------------------------------------------------------------------------------------------------------------
+
 function UseSlot(slot)
     if IsPlayerCasting() then return false end
     if not IsReadySlot(slot) then return false end
     RunMacroText("/use " .. slot) 
-    if SpellIsTargeting() then
-        --SpellTargetUnit("target")
-        CameraOrSelectOrMoveStart() CameraOrSelectOrMoveStop() 
-        --TurnOrActionStart()  TurnOrActionStop()
-    end
+    TrySpellTargeting()
     return not IsReadySlot(slot)
 end
 
@@ -41,12 +38,15 @@ end
 function ItemExists(item)
     return GetItemInfo(item) and true or false
 end
+
+------------------------------------------------------------------------------------------------------------------
 function ItemInRange(item, unit)
     if ItemExists(item) then
         return (IsItemInRange(item, unit) == 1)
     end
     return false
 end
+
 ------------------------------------------------------------------------------------------------------------------
 function IsReadyItem(name)
    local usable = IsUsableItem(name) 
@@ -81,7 +81,7 @@ function UseItem(itemName, count)
     if not count then count = 1 end
     for i = 1, count do
         RunMacroText("/use " .. itemName)
-        if SpellIsTargeting() then break end
+        TrySpellTargeting()
     end
     if not IsReadyItem(itemName) then 
         if Debug then
