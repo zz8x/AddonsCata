@@ -262,7 +262,7 @@ function Rotation()
     if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
     if (UnitMana100("player") < 30 or UnitHealth100("player") < 30) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
     if (UnitMana100("player") > 70 and UnitHealth100("player") > 70) then RunMacroText("/cancelaura Печать прозрения") end
-    if UnitHealth100("player") > 60 and UnitMana100("player") < 82 and DoSpell("Святая клятва") then return end
+    if UnitHealth100("player") > 60 and UnitMana100("player") < 60 and DoSpell("Святая клятва") then return end
     if not FastUpdate and InCombatLockdown() and HasDebuff("") and not InMelee("target") and not IsFinishHim("target") then
         local speed = GetUnitSpeed("player")
         if ((speed > 0 and speed < 7 and not IsFalling()) or HasDebuff(rootDispelList, 0.1, "player"))  then
@@ -295,21 +295,17 @@ function Rotation()
         end
     end
 
-    if DoSpell("Удар воина Света") then return end
-
+    if not HasLight() and DoSpell("Удар воина Света") then return end
+    if not HasLight() and DoSpell("Правосудие") then return end
+    if canMagic and HasBuff("Искусство войны") and DoSpell("Экзорцизм") then return end
     if HasLight() and HasBuff("Дознание", 1) and DoSpell("Вердикт храмовника")  then return end
     if not HasBuff("Дознание", 1) and DoSpell("Дознание") then return end   
-    if canMagic and HasBuff("Искусство войны") and DoSpell("Экзорцизм") then return end
     if canMagic and DoSpell("Молот гнева") then return end
-    if HasLight() and InMelee() then return end
+    --if HasLight() and InMelee() then return end
     
-    if canMagic or HasBuff("Эффект тотема заземления",0.1, "target") then 
-        if DoSpell("Правосудие") then return end
-
-        if InMelee() then
+    if InMelee() then
             if UnitMana100() > 30 and DoSpell("Гнев небес") then return end
             --if UnitMana100() > 95 and DoSpell("Освящение") then return end
-        end
     end
 
     if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 30 and IsSpellNotUsed("Очищение", 2) and DispelParty() then return end
