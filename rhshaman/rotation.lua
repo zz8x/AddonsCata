@@ -102,8 +102,8 @@ function Rotation()
     if GetInventoryItemID("player",16) and not sContains(GetTemporaryEnchant(16), "Язык пламени") and DoSpell("Оружие языка пламени") then return end
     if not HasBuff("Щит молний") and DoSpell("Щит молний") then return end
     if InCombatLockdown() and HasBuff("Покорение стихий") and UseEquippedItem("Чаша Лунного колодца") then return end
-    if not HasMyDebuff("Огненный шок", 0.5,"target") and  DoSpell("Огненный шок") then return end
-    if HasMyDebuff("Огненный шок", 1,"target") and  DoSpell("Выброс лавы") then return end
+    if not HasMyDebuff("Огненный шок", 1,"target") and  DoSpell("Огненный шок") then return end
+    if HasMyDebuff("Огненный шок", 1.5,"target") and  DoSpell("Выброс лавы") then return end
     if HasTotem(1) ~= "Тотем элементаля огня" then
         if HasTotem(1) ~= "Опаляющий тотем" and DoSpell("Опаляющий тотем") then return end
     end
@@ -111,7 +111,7 @@ function Rotation()
     if IsShift() and DoSpell("Цепная молния") then return end
     if HasMyDebuff("Огненный шок", 5,"target") and GetBuffStack("Щит молний") > 6 and DoSpell("Земной шок") then return end
     if GetBuffStack("Щит молний") > 8 and DoSpell("Земной шок") then return end
-    if (IsLeftAltKeyDown() == 1) and HasTotem(1) ~= "Тотем магмы VII" and DoSpell("Тотем магмы") then return end
+    if (IsLeftAltKeyDown() == 1) and HasTotem(1) ~= "Тотем элементаля огня" and DoSpell("Тотем элементаля огня") then return end
     if (IsRightAltKeyDown() == 1) and DoSpell("Зов Стихий") then return end
     if DoSpell("Молния") then return end
 end
