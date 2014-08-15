@@ -275,6 +275,33 @@ local function UpdateTargetPosition(event, ...)
 end
 AttachEvent('COMBAT_LOG_EVENT_UNFILTERED', UpdateTargetPosition)
 ------------------------------------------------------------------------------------------------------------------
+local spellsAmounts = {};
+local spellsAmount = {};
+local function UpdateSpellsAmounts(event, ...)
+    local timestamp, type, hideCaster,                                                                      
+      sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,   
+      spellId, spellName, spellSchool,                                                                     
+      amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ...
+    if amount and sourceGUID == UnitGUID("player") and sContains(type, "SPELL_HEAL") and spellId and spellName  then
+        local amounts = spellsAmounts[spellName]
+        if nil == amounts then amounts = {} end
+        tinsert(amounts, amount)
+        if #amounts > 5 then tremove(amounts, 1) end
+        spellsAmounts[spellName] = amounts
+        local average = 0
+        for i = 1, #amounts do
+            average = average + amounts[i]
+        end
+        spellsAmount[spellName] = floor(average / #amounts)
+    end
+end
+AttachEvent('COMBAT_LOG_EVENT_UNFILTERED', UpdateSpellsAmounts)
+
+function GetSpellAmount(spellName, expected)
+    local amount = spellsAmount[spellName]
+    return nil == amount and expected or amount
+end
+------------------------------------------------------------------------------------------------------------------
 local cameraCD = 0;
 function TrySpellTargeting()
     if SpellIsTargeting() and GetTime() - cameraCD > 0.05 then 
@@ -303,6 +330,7 @@ function UseSpell(spellName, target)
     -- Не мешаем выбрать область для спела (нажат вручную)
     if SpellIsTargeting() then 
         if dump or true then print("Ждем выбор цели, не можем прожать", spellName) end
+        SpellStopTargeting()
         return false 
     end 
     -- Не пытаемся что либо прожимать во время каста

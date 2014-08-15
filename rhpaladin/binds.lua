@@ -55,19 +55,19 @@ function TryInterrupt(target)
 
     m = " -> " .. spell .. " ("..target..")"
 
+    local item = "Высокомощный крепежный пистолет"
+    if (not IsArena() and (channel or t < 1.8) and IsOneUnit(target, "mouseover") and not IsInterruptImmune(target) and CanAttack(target))
+        and (GetItemCount(item) > 0 and IsReadyItem(item) and GetItemCount("Горсть обсидиановых болтов") > 0)
+        and (UnitIsPlayer(target) or GetUnitName("player") == GetUnitName(target .. "-target")  or UnitClassification(target) == "worldboss") 
+        and UseItem(item) then 
+        echo(item..m)
+        interruptTime = GetTime() + 2
+        return true 
+    end
+
     if not notinterrupt and not IsInterruptImmune(target) and CanMagicAttack(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Укор", target) then 
             echo("Укор"..m)
-            interruptTime = GetTime() + 2
-            return true 
-        end
-
-        local item = "Высокомощный крепежный пистолет"
-        if not IsArena() and (channel or t < 1.8) and IsOneUnit(target, "mouseover") 
-            and GetItemCount(item) > 0 and IsReadyItem(item) and GetItemCount("Горсть обсидиановых болтов") > 0 
-            and (UnitIsPlayer(target) or GetUnitName("player") == GetUnitName(target .. "-target")  or UnitClassification(target) == "worldboss") 
-            and UseItem(item) then 
-            echo(item..m)
             interruptTime = GetTime() + 2
             return true 
         end
