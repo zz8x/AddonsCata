@@ -83,7 +83,7 @@ SetCommand("mount",
             tryMount = GetTime() 
             return true
         end
-        local mount = (IsShift() or IsBattleground() or IsArena()) and "Стремительный гнедой рысак" or "Ветролет" 
+        local mount = (IsShift() or IsBattleground() or IsArena()) and "Стремительный гнедой рысак" or "Камнешкурый дракон"--"Ветролет" 
         if IsAlt() then mount = "Тундровый мамонт путешественника" end
         if UseMount(mount) then 
             tryMount = GetTime() 

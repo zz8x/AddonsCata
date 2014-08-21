@@ -9,9 +9,9 @@ function IsBers()
     return IsPvP() and (GetTime() - bersTimer < 30) or (bersTimer ~= 0)
 end
 ------------------------------------------------------------------------------------------------------------------
-local steathClass = {"ROGUE", "DRUID"}
 local fearTargetTime = 0
 local peaceBuff = {"Пища", "Питье"}
+local steathClass = {"ROGUE", "DRUID"}
 function Idle()
     if bersTimer ~= 0 and not InCombatLockdown() then bersTimer = 0 end
     if not IsPlayerCasting() and TryAura() then return end
@@ -241,7 +241,7 @@ local rootDispelList = {
     "Леденящий взгляд",
     "Хватка земли"
 }
-local steathClass = {"ROGUE", "DRUID"}
+
 local reflectBuff = {"Отражение заклинания", "Эффект тотема заземления"}
 local eTime = 0
 function HasLight(c)
@@ -277,7 +277,7 @@ function Rotation()
     -- Ротация
     if IsValidTarget("target") then 
         if InMelee() and UseSlot(10) then return end
-        if GetBuffStack("Титаническая мощь") > (IsBers() and 3 or 4) then UseEquippedItem("Устройство Каз'горота") end  
+        if GetBuffStack("Титаническая мощь") > (IsBers() and 3 or 5) then UseEquippedItem("Устройство Каз'горота") end  
         if IsBers() then 
             UseEquippedItem("Жетон победы гладиатора Катаклизма")
             if GetTime() - eTime > 2 then
@@ -290,22 +290,24 @@ function Rotation()
                 last = 10
             end
             if last > 0 and GetTime() - last > 9 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
-            if HasBuff("Фанатизм") and DoSpell("Гнев карателя") then return end
+            if HasBuff("Фанатизм") (not IsPvP() or not HasClass(TARGETS, "MAGE") ) and DoSpell("Гнев карателя") then return end
             
         end
     end
 
     if not HasLight() and DoSpell("Удар воина Света") then return end
     if not HasLight() and DoSpell("Правосудие") then return end
+    if HasLight(2) and not HasBuff("Дознание") and DoSpell("Дознание") then return end   
     if canMagic and HasBuff("Искусство войны") and DoSpell("Экзорцизм") then return end
     if HasLight() and HasBuff("Дознание", 1) and DoSpell("Вердикт храмовника")  then return end
-    if not HasBuff("Дознание", 1) and DoSpell("Дознание") then return end   
+    
+
     if canMagic and DoSpell("Молот гнева") then return end
     --if HasLight() and InMelee() then return end
     
     if InMelee() then
-            if UnitMana100() > 30 and DoSpell("Гнев небес") then return end
-            --if UnitMana100() > 95 and DoSpell("Освящение") then return end
+        if UnitMana100() > 30 and DoSpell("Гнев небес") then return end
+        --if UnitMana100() > 95 and DoSpell("Освящение") then return end
     end
 
     if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 30 and IsSpellNotUsed("Очищение", 2) and DispelParty() then return end
@@ -372,9 +374,11 @@ function TrySave()
 
     if isPlayer or not UnitIsPet(u) then
         local combat = UnitAffectingCombat(u)
-        if h < 60 and HasLight() and DoSpell("Торжество", u) then return true end
+        if h < ((isPlayer and not IsAttack()) and 70 or 50) and HasLight() and DoSpell("Торжество", u) then return true end
         if combat and not (IsArena() or InDuel()) and h < 15 and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return true end
-        if PlayerInPlace() and h < 95 and IsCtr() and DoSpell(HasBuff("Воин света") and "Свет небес" or "Вспышка света", u) then return true end
+        if PlayerInPlace() and IsCtr() then
+            if h < 90 and DoSpell(HasBuff("Воин света") and "Свет небес" or "Божественный свет", u) then return true end
+        end
     end
     return false
 end
