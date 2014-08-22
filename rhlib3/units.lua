@@ -43,7 +43,7 @@ function GetHealingMembers(units)
                     end
                     h = h - 2 * status
                 end
-                if HasBuff(protBuffsList, 1, u) then h = h + 5 end
+                if not IsOneUnit("player", u) and HasBuff(protBuffsList, 1, u) then h = h + 5 end
                 if not IsArena() and myHP < 50 and not IsOneUnit("player", u) and not (UnitThreat(u) == 3) then h = h + 30 end
             end
             tinsert(members, u)
