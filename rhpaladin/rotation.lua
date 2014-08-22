@@ -290,7 +290,7 @@ function Rotation()
                 last = 10
             end
             if last > 0 and GetTime() - last > 9 and (UnitPower("player", 9) == 3 or HasBuff("Божественный замысел")) and DoSpell("Фанатизм") then return end
-            if HasBuff("Фанатизм") (not IsPvP() or not HasClass(TARGETS, "MAGE") ) and DoSpell("Гнев карателя") then return end
+            if HasBuff("Фанатизм") and (not IsPvP() or not HasClass(TARGETS, "MAGE")) and DoSpell("Гнев карателя") then return end
             
         end
     end
@@ -438,6 +438,9 @@ function HolyRotation()
 
     if combat and  h > 50 and UnitMana100("player") < 93 then DoSpell("Святая клятва") end
 
+    local p = UnitPower("player", 9)
+    if p > 0 and (l > 5000 * p ) and DoSpell("Торжество", u) then return true end
+
 
     if HasBuff("Прилив света") then
         if IsShift()  then
@@ -452,7 +455,7 @@ function HolyRotation()
         end
     end
 
-    if (l > GetSpellAmount("Божественный свет", 5000) or h < 30) and DoSpell("Шок небес", u) then return end
+    if (l > GetSpellAmount("Божественный свет", 2000) or h < 99) and DoSpell("Шок небес", u) then return end
 
     
     if (IsAttack() or InCombatLockdown()) and not IsNotAttack("target") then 
@@ -460,10 +463,6 @@ function HolyRotation()
         if InMelee() and DoSpell("Удар воина Света", "target") then return end
         if DoSpell("Правосудие", "target") then return end
     end
-
-    local p = UnitPower("player", 9)
-
-    if p > 0 and (l > 7000 * p ) and DoSpell("Торжество", u) then return true end
 
     if IsShift() and PlayerInPlace() and (l > GetSpellAmount("Святое сияние", 32000) or h < 30)  then 
         DoSpell("Святое сияние")
