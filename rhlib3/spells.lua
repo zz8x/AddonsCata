@@ -98,19 +98,9 @@ function InInteractRange(unit)
     return  CheckInteractDistance(unit, 4) == 1
 end
 ------------------------------------------------------------------------------------------------------------------
-local meleeSpells = {
-    DRUID = "Цапнуть",        
-    DEATHKNIGHT = "Удар чумы", 
-    PALADIN = "Удар воина Света",
-    SHAMAN = "Стихийный удар",
-    WARRIOR = "Кровопускание",
-    HUNTER = "Удар ящера",
-    ROGUE = "Коварный удар"
-}
-MeleeSpell = meleeSpells[GetClass()]
 function InMelee(target)
     if (target == nil) then target = "target" end
-    return (IsSpellInRange(MeleeSpell,target) == 1)
+    return IsItemInRange(37727, "target") == 1
 end
 
 ------------------------------------------------------------------------------------------------------------------
