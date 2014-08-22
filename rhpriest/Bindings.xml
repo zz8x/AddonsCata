@@ -1,0 +1,5 @@
+<Bindings>
+  <Binding name="RH_INTERRUPT" description="Use cast interrupt" header="RHPRIEST">
+    InterruptToggle();
+  </Binding>
+</Bindings>

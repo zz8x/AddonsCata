@@ -263,10 +263,17 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 function HasClass(units, classes)
-	for i = 1, #units do
-        local u = units[i]
-		if UnitExists(u) and UnitIsPlayer(u) and (type(classes) == 'table' and tContains(classes, GetClass(u)) or classes == GetClass(u)) then return true end
-	end
+    local function checkClass(u, classes)
+        return  UnitExists(u) and UnitIsPlayer(u) and (type(classes) == 'table' and tContains(classes, GetClass(u)) or classes == GetClass(u)) 
+    end
+    if type(units) == 'table' then
+    	for i = 1, #units do
+            local u = units[i]
+    		if checkClass(u, classes) then return true end
+    	end
+    else
+        if checkClass(units, classes) then return true end
+    end
     return false
 end
 
