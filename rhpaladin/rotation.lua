@@ -443,7 +443,7 @@ function HolyRotation()
 
     if h > 30 and IsReadySpell("Очищение") and UnitMana100("player") > 10 and IsSpellNotUsed("Очищение", 2) then
         for i = 1, #members do
-            if InControl(u) and TryDispel(members[i]) then return end
+            if InControl(members[i]) and TryDispel(members[i]) then return end
         end
     end
 
