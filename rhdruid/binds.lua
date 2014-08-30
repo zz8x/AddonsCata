@@ -34,7 +34,7 @@ end
 
 function DoSpell(spell, target, mana)
     local baseMana =  (not IsAttack() and IsSpellNotUsed("Лобовая атака(Облик кошки)", 7.5)) and 10 or 0 -- 10 - 2.5
-    local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(spellName)
+    local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(spell)
     if powerType == 3 and cost > 0 and UnitPower("player" , powerType) - cost < baseMana then return false end
     return UseSpell(spell, target, mana)
 end
