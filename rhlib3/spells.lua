@@ -27,6 +27,38 @@ AttachEvent('UNIT_SPELLCAST_START', CastLagTime)
 AttachEvent('UNIT_SPELLCAST_SENT', CastLagTime)
 
 ------------------------------------------------------------------------------------------------------------------
+function GetKickInfo(target) 
+    if target == nil then target = "target" end 
+
+    if not CanAttack(target) then return nil end
+
+    local channel = false
+    local spell, _, _, _, startTime, endTime, _, _, notinterrupt = UnitCastingInfo(target)
+        
+    if not spell then 
+        spell, _, _, _, startTime, endTime, _, nointerrupt = UnitChannelInfo(target)
+        channel = true
+    end
+    
+    if not spell then return false end
+
+    if IsPvP() and not InInterruptRedList(spell) then return end
+    local s = startTime / 1000 -- время начала каста
+    local c = GetTime() -- текущее время
+    local e = endTime / 1000 -- время конца каста 
+    local t = e - c -- осталось до конца каста
+    local l = e - s -- время каста
+    local d = 0.25 + 0.35 * math.random() -- время задержки интерапта, чтоб не палить контору.
+    if d > l * 0.8 then d = l - 0.3 end -- если каст меньше задержки, уменьшаем задержку
+    if c - s < d then return end -- если пока рано сбивать, выходим (зажержка)
+    if t < 0.2 then return false end -- если уже докастил, нет смысла трепыхаться
+    if channel and t < 0.5 then return false end -- нет смысла сбивать последний тик
+    local m = " -> " .. spell .. " ("..target..")"
+
+    return spell, t, channel, notinterrupt, m
+end
+
+------------------------------------------------------------------------------------------------------------------
 function IsPlayerCasting()
     local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo("player")
     if spell == nil then

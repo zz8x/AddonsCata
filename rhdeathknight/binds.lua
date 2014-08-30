@@ -34,30 +34,17 @@ function InterruptToggle()
     end 
 end
 ------------------------------------------------------------------------------------------------------------------
+local interruptTime = 0
 local lichSpells = {"Превращение", "Сглаз", "Соблазн", "Страх", "Вой ужаса", "Контроль над разумом"}
 local conrLichSpells = {"Изгнание зла", "Сковывание нежити"}
 function TryInterrupt(target)
     if target == nil then target = "target" end
-    if not IsValidTarget(target) then return false end
-    local channel = false
-    local spell, _, _, _, _, endTime, _, _, notinterrupt = UnitCastingInfo(target)
-        
-    if not spell then 
-        spell, _, _, _, _, endTime, _, nointerrupt = UnitChannelInfo(target)
-        channel = true
-    end
-    
-    if not spell then return false end
 
     if tContains(conrLichSpells, spell) then RunMacroText("/cancelaura Перерождение") end
 
-    if IsPvP() and not InInterruptRedList(spell) then return false end
-    local t = endTime/1000 - GetTime()
-
-    if t < 0.2 then return false end
-    if channel and t < 0.7 then return false end
-
-    m = " -> " .. spell .. " ("..target..")"
+    if GetTime() < interruptTime  then return false end
+    local spell, t, channel, notinterrupt, m = GetKickInfo(target)
+    if not spell then return end
 
     if IsPvP() and IsHarmfulSpell(spell) and IsOneUnit("player", target .. "-target") and DoSpell("Антимагический панцирь") then 
         echo("Антимагический панцирь"..m)
@@ -70,7 +57,7 @@ function TryInterrupt(target)
          RunMacroText("/cast [@" ..target.."] Отгрызть")
          if not IsReadySpell("Отгрызть") then
              echo("Отгрызть"..m)
-             interruptTime = GetTime() + 4
+             interruptTime = GetTime() + 1
              return false 
          end
     end
@@ -78,25 +65,25 @@ function TryInterrupt(target)
     if not notinterrupt and not IsInterruptImmune(target) and CanMagicAttack(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Заморозка разума", target) then 
             echo("Заморозка разума"..m)
-            interruptTime = GetTime() + 4
+            interruptTime = GetTime() + 1
             return true 
         end
         if (not channel and t < 1.8) and DoSpell("Удушение", target) then 
             echo("Удушение"..m)
-            interruptTime = GetTime() + 2
+            interruptTime = GetTime() + 1
             return true 
         end
     end
     
     if not InMelee() and CanAttack(target) and (channel or t < 0.8) and (UnitIsPlayer(target) or not InParty()) and DoSpell("Хватка смерти", target) then 
         echo("Хватка смерти"..m)
-        interruptTime = GetTime() + 2
+        interruptTime = GetTime() + 1
         return true 
     end
 
     if HasSpell("Перерождение") and IsOneUnit("player",target .. "-target") and tContains(lichSpells, spell) and DoSpell("Перерождение") then 
         echo("Перерождение"..m)
-        interruptTime = GetTime() + 2
+        interruptTime = GetTime() + 1
         return true 
     end
 

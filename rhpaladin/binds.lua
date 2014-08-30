@@ -31,44 +31,28 @@ function IsAOE()
    return (IsShiftKeyDown() == 1) or (AutoAOE and IsValidTarget("target") and IsValidTarget("focus") and not IsOneUnit("target", "focus") and InMelee("focus") and InMelee("target"))
 end
 ------------------------------------------------------------------------------------------------------------------
-
-
-
+local interruptTime = 0
 function TryInterrupt(target)
     if target == nil then target = "target" end
-    if not CanAttack(target) then return false end
-    local channel = false
-    local spell, _, _, _, _, endTime, _, _, notinterrupt = UnitCastingInfo(target)
-        
-    if not spell then 
-        spell, _, _, _, _, endTime, _, nointerrupt = UnitChannelInfo(target)
-        channel = true
-    end
+
+    if GetTime() < interruptTime  then return false end
+    local spell, t, channel, notinterrupt, m = GetKickInfo(target)
+    if not spell then return end
     
-    if not spell then return false end
-
-    if IsPvP() and not InInterruptRedList(spell) then return false end
-    local t = endTime/1000 - GetTime()
-
-    if t < 0.2 then return false end
-    if channel and t < 0.7 then return false end
-
-    m = " -> " .. spell .. " ("..target..")"
-
     local item = "Высокомощный крепежный пистолет"
-    if (not IsArena() and (channel or t < 1.8) and IsOneUnit(target, "mouseover") and not IsInterruptImmune(target) and CanAttack(target))
+    if (not IsArena() and (channel or t < 1.8 ) and t > 1.2 and IsOneUnit(target, "mouseover") and not IsInterruptImmune(target))
         and (GetItemCount(item) > 0 and IsReadyItem(item) and GetItemCount("Горсть обсидиановых болтов") > 0)
         and (UnitIsPlayer(target) or GetUnitName("player") == GetUnitName(target .. "-target")  or UnitClassification(target) == "worldboss") 
         and UseItem(item) then 
         echo(item..m)
-        interruptTime = GetTime() + 2
+        interruptTime = GetTime() + 1
         return true 
     end
 
     if not notinterrupt and not IsInterruptImmune(target) and CanMagicAttack(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Укор", target) then 
             echo("Укор"..m)
-            interruptTime = GetTime() + 2
+            interruptTime = GetTime() + 1
             return true 
         end
     end

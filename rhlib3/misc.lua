@@ -327,5 +327,6 @@ function setTimeout(delay, func, ...)
 end
 ------------------------------------------------------------------------------------------------------------------
 function round(number, decimals)
+    if decimals == nil then decimals = 0 end
     return (("%%.%df"):format(decimals)):format(number)
 end

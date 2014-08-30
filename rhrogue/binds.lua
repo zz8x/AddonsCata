@@ -17,27 +17,12 @@ function UseInterrupt()
 end
 
 ------------------------------------------------------------------------------------------------------------------
+local interruptTime = 0
 function TryInterrupt(target)
     if target == nil then target = "target" end
-    if not IsValidTarget(target) then return false end
-    local channel = false
-    local spell, _, _, _, _, endTime, _, _, notinterrupt = UnitCastingInfo(target)
-        
-    if not spell then 
-        spell, _, _, _, _, endTime, _, nointerrupt = UnitChannelInfo(target)
-        channel = true
-    end
-    
-    if not spell then return false end
-
-    if IsPvP() and not InInterruptRedList(spell) then return false end
-    local t = endTime/1000 - GetTime()
-
-    if t < 0.2 then return false end
-    if channel and t < 0.7 then return false end
-
-    m = " -> " .. spell .. " ("..target..")"
-
+    if GetTime() < interruptTime  then return false end
+    local spell, t, channel, notinterrupt, m = GetKickInfo(target)
+    if not spell then return end
     if not notinterrupt and not IsInterruptImmune(target) then 
         if (channel or t < 0.8) and InMelee(target) and DoSpell("Пинок", target) then 
             echo("Пинок"..m)
@@ -45,7 +30,7 @@ function TryInterrupt(target)
             return true 
         end
     end
-
+    return false
 end
 ------------------------------------------------------------------------------------------------------------------
 local freedomTime = 0

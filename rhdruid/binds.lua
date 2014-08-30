@@ -33,30 +33,18 @@ end
 ------------------------------------------------------------------------------------------------------------------
 
 function DoSpell(spell, target, mana)
+    local baseMana =  (not IsAttack() and IsSpellNotUsed("Лобовая атака(Облик кошки)", 7.5)) and 10 or 0 -- 10 - 2.5
+    local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(spellName)
+    if powerType == 3 and cost > 0 and UnitPower("player" , powerType) - cost < baseMana then return false end
     return UseSpell(spell, target, mana)
 end
 ------------------------------------------------------------------------------------------------------------------
+local interruptTime = 0
 function TryInterrupt(target)
     if target == nil then target = "target" end
-    if not IsValidTarget(target) then return false end
-    local channel = false
-    local spell, _, _, _, _, endTime, _, _, notinterrupt = UnitCastingInfo(target)
-        
-    if not spell then 
-        spell, _, _, _, _, endTime, _, nointerrupt = UnitChannelInfo(target)
-        channel = true
-    end
-    
-    if not spell then return false end
-
-    if IsPvP() and not InInterruptRedList(spell) then return false end
-    local t = endTime/1000 - GetTime()
-
-    if t < 0.2 then return false end
-    if channel and t < 0.7 then return false end
-
-    m = " -> " .. spell .. " ("..target..")"
-
+    if GetTime() < interruptTime  then return false end
+    local spell, t, channel, notinterrupt, m = GetKickInfo(target)
+    if not spell then return end
     if not notinterrupt and not IsInterruptImmune(target) and (channel or t < 0.8)  then 
         if HasBuff("Облик кошки") and InRange("Лобовая атака(Облик кошки)", target) and DoSpell("Лобовая атака(Облик кошки)", target) then 
             echo("Лобовая атака"..m)
@@ -69,5 +57,4 @@ function TryInterrupt(target)
             return true 
         end
     end
-
 end

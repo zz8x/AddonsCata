@@ -63,20 +63,19 @@ function Idle()
     if HasBuff("Облик медведя") and IsValidTarget("target") then
         if UnitMana("player") < 80 and DoSpell("Исступление") then return end
         if IsNotAttack("target") then return end
-        if HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and InRange("Звериный рывок(Облик медведя)", "target") then 
-            DoSpell("Звериный рывок(Облик медведя)")
+        if HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and InRange("Звериный рывок(Облик медведя)", "target") then DoSpell("Звериный рывок(Облик медведя)") end
+        if DoSpell("Оглушить") then return end
+        if myHP < 25 and DoSpell("Неистовое восстановление") then return end
+        if myHP < 60 and DoSpell("Дубовая кожа") then return end
+        if InMelee() and IsReadySpell("Оглушить") then return end
+        if IsReadySpell("Звериный рывок(Облик медведя)") and HasSpell("Звериный рывок(Облик медведя)") and IsAttack() and InRange("Звериный рывок(Облик медведя)", "target") then 
             return
         end
-
-        if DoSpell("Оглушить") then return end
-        if IsReadySpell("Оглушить") then return end
         --RunMacroText("/startattack")
-            if myHP < 25 and DoSpell("Неистовое восстановление") then return end
-            if myHP < 60 and DoSpell("Дубовая кожа") then return end
-            if DoSpell("Увечье(Облик медведя)") then return end
-            if IsShiftKeyDown() == 1 and DoSpell("Размах(Облик медведя)") then return end
-            if DoSpell("Взбучка") then return end
-            if DoSpell("Растерзать") then return end
+        if DoSpell("Увечье(Облик медведя)") then return end
+        if IsShiftKeyDown() == 1 and DoSpell("Размах(Облик медведя)") then return end
+        if DoSpell("Взбучка") then return end
+        if DoSpell("Растерзать") then return end
     end
   
     if HasBuff("Облик кошки") then

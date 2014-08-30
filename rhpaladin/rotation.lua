@@ -404,27 +404,21 @@ function HolyRotation()
         end
     end
 
+    if combat and not HasBuff("Частица Света",1 , u) and #members > 1 and GetTime() - lightTime > 10 then
 
-
-    if combat and not HasBuff("Частица Света",1 , u) and #members > 1 and GetTime() - lightTime > 5 then
-        lightTime = GetTime()
-        local u2 = members[1]
+        local u2 = members[2]
         local h2 = UnitHealth100(u2)
         local l2 = UnitLostHP(u2)
-        if h2 < 50 and not HasBuff("Частица Света",1 , u2) and DoSpell("Частица Света", u2) then return end
+        if h2 < 50 and not HasBuff("Частица Света",1 , u2) and DoSpell("Частица Света", u2) then lightTime = GetTime() return end
         
         for i = 1, #UNITS do
             local ui = UNITS[i]
             if HasBuff("Частица Света",1 , ui) then 
-                if not InRange("Частица Света", ui) and h2 < 60 and DoSpell("Частица Света", u2) then return end
+                if not InRange("Частица Света", ui) and h2 < 70 and DoSpell("Частица Света", u2) then return end
                 break 
             end
         end
-
-
     end
-
-
 
     if combat and IsBers() then 
         if DoSpell("Защитник древних королей") then return end
@@ -432,7 +426,7 @@ function HolyRotation()
     if combat and h < 70  then UseSlot(10) end 
     if combat and not InGCD() and (GetTime() - improveTime > 5) and h < 40 then
         if  UseEquippedItem("Жетон господства беспощадного гладиатора") then improveTime = GetTime() return end
-        if  DoSpell("Гнев карателя") then improveTime = GetTime() return end
+        if  (not IsPvP() or not HasClass(TARGETS, "MAGE")) and DoSpell("Гнев карателя") then improveTime = GetTime() return end
         if  DoSpell("Божественное одобрение") then improveTime = GetTime() return end
     end
 
