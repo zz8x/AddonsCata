@@ -390,49 +390,78 @@ function PlayerInPlace()
 end
 
 ------------------------------------------------------------------------------------------------------------------
---[[if ZoneData == nil then ZoneData = {} end
+ZoneData = nil
+if ZoneData == nil then ZoneData = {} end
 
-local function GetCurrentMapUID()
-    local id = GetCurrentMapAreaID();
-    if ( id < 0 and GetCurrentMapContinent() == WORLDMAP_WORLD_ID ) then
-        return 0;
+
+local mId = nil
+local mData = nil
+
+local updateZoneX, undateZoneY, updateZoneStart, updateZoneSpeed, updateZoneDir = 0, 0, 0, 0, 1
+local function ZoneChanged(event, ...)
+    updateZoneStart = 0
+    if nil ~= mId and mData ~= nil then
+           ZoneData[mId] = mData 
     end
-    return id;
-end
-
-local function GetMapSize(x, y)
-    local id = GetCurrentMapUID()
-    if ZoneData[id] == nil then
-        ZoneData[id] = {1,1}
+    mId = GetCurrentMapAreaID();
+    if ( mId < 0 and GetCurrentMapContinent() == WORLDMAP_WORLD_ID ) then
+        mId = 0;
     end
-    local x, y = unpack(ZoneData[id])
-    return x, y
-end
-
-local function ZoneChanged(event, ...)          --
+    --local map = WorldMapFrame:IsShown()
+    --if map then WorldMapFrame:Hide() end
     SetMapToCurrentZone()
+    --if map then WorldMapFrame:Show() end
+    updateZoneStart = 0
+    if ZoneData[mId] == nil then
+        tex =  GetMapInfo()or "?" 
+        local level = GetCurrentMapDungeonLevel()
+        if level>0 then tex=tex..level end
+        ZoneData[mId] = {
+            name = tex,
+            x = 1000,
+            y = 1000,
+            dvx = 0,
+            dvy = 0,
+            dx = 0.001,
+            dy = 0.001
+        }
+    end
+    mData = ZoneData[mId]
 end
 AttachEvent('PLAYER_ENTERING_WORLD', ZoneChanged)
 AttachEvent('ZONE_CHANGED', ZoneChanged)
 AttachEvent('ZONE_CHANGED_NEW_AREA', ZoneChanged)
 AttachEvent('ZONE_CHANGED_INDOORS', ZoneChanged)
 
-local updateZoneX, undateZoneY, updateZoneStart, updateZoneSpeed, updateZoneDir = 0, 0, 0, 0, 1
-local scale_X, scale_Y = 1000, 1000
 local function UpdateZone() 
     local speed = IsFalling() and 0 or GetUnitSpeed("player")
     local time = GetTime() - updateZoneStart
-    if updateZoneStart > 0 and (speed ~= updateZoneSpeed or math.abs(updateZoneDir - GetPlayerFacing())>0.5) then
-        if time > 5 then
-            local currentX,currentY = GetPlayerMapPosition("player")
-            local dx = updateZoneX - currentX
-            local dy = undateZoneY - currentY
-            local texture, textureHeight, textureWidth =  GetMapInfo();
-            local kxy = texture and textureWidth / textureHeight or 1
-            scale_Y = math.sqrt( (time * updateZoneSpeed)^2 / dx^2 * (dx / (dy * kxy))^2 + dy^2 )
-            scale_X = kxy * scale_Y
-        end
+    if math.abs(updateZoneDir - GetPlayerFacing()) > 0.01 or (speed ~= updateZoneSpeed and time < 1) or (speed ~= updateZoneSpeed) then
         updateZoneStart = 0
+    end
+
+    if updateZoneStart > 0 and  time > 1 then
+        if mData == nil then ZoneChanged() end
+        local currentX,currentY = GetPlayerMapPosition("player")
+        local dx = math.abs(updateZoneX - currentX)
+        if dx > mData.dx then
+            mData.dx = dx
+            local vx = updateZoneSpeed * math.abs(math.sin(updateZoneDir))
+            local dvx = dx / time / vx
+            if dvx > mData.dvx then mData.dvx = dvx end
+            local lx =  time * vx * (dvx / mData.dvx)
+            mData.x =  lx / dx
+        end
+
+        local dy = math.abs(undateZoneY - currentY)
+        if dy > mData.dy then
+            mData.dy = dy
+            local vy = updateZoneSpeed * math.abs(math.cos(updateZoneDir))
+            local dvy = dy / time / vy
+            if dvy > mData.dvy then mData.dvy = dvy end
+            local ly =  time * vy * (dvy / mData.dvy)
+            mData.y =  ly / dy    
+        end
     end
 
     if speed > 0  and updateZoneStart == 0 then
@@ -441,16 +470,18 @@ local function UpdateZone()
         updateZoneSpeed = speed
         updateZoneDir = GetPlayerFacing()
     end
-    local d = CheckDistance("player","target") and round(CheckDistance("player","target")) or '-'
-    Notify("dist:"..d .. "(" .. round(scale_X) .. "x".. round(scale_Y) ..")")
+    --[[local d = CheckDistance("player","target") and round(CheckDistance("player","target")) or '-'
+    Notify("dist:"..d .." " .. mData.name .."(" .. round(mData.x) .. "x".. round(mData.y) ..")")]]
+
 end
 AttachUpdate(UpdateZone)
 
 ------------------------------------------------------------------------------------------------------------------
 function GetYardCoords(unit)
     if not unit then unit = "player" end
+    if mData == nil then ZoneChanged() end
     local x, y = GetPlayerMapPosition(unit)
-    return scale_X * x, scale_Y * y
+    return mData.x * x, mData.y * y
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -472,6 +503,6 @@ end
 function InDistance(unit1,unit2, distance)
   local d = CheckDistance(unit1, unit2)
   return not d or d < distance
-end ]]
+end
 
 ------------------------------------------------------------------------------------------------------------------
