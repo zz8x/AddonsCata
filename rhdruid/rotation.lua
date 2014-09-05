@@ -84,7 +84,7 @@ function Idle()
             return
         end
     
-        if IsAttack() --[[and InRange("Волшебный огонь (облик зверя)", "target") and IsValidTarget("target")]] and not InCombatLockdown() and HasBuff("Облик кошки") and IsReadySpell("Крадущийся зверь") then 
+        if IsAttack() --[[and InRange("Волшебный огонь (облик зверя)", "target") and IsValidTarget("target")]] and not IsCtr() and not InCombatLockdown() and HasBuff("Облик кошки") and IsReadySpell("Крадущийся зверь") then 
             DoSpell("Крадущийся зверь")
             return 
         end
