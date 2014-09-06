@@ -392,7 +392,8 @@ debugFrame:SetScript('OnUpdate', debugFrame_OnUpdate)
 debugFrame:Hide()
 debugFrame.text = debugFrame:CreateFontString(nil, 'BACKGROUND', 'GameFontNormalSmallLeft')
 debugFrame.text:SetAllPoints()
-debugFrame:SetPoint('TOPLEFT', 10, 0)
+debugFrame:SetPoint('TOPLEFT', 2, 0)
+debugFrame:SetScale(0.8);
 
 -- Debug messages.
 function debug(message)
@@ -414,3 +415,79 @@ local function UpdateDebugStats()
     debug(format('MEM: %.1fKB, LAG: %ims, FPS: %i, SPD: %d%%', mem, LagTime * 1000, fps, speed))
 end
 AttachUpdate(UpdateDebugStats) 
+
+
+local showTeammateDirection = false
+function ToggleTeammateDirection()
+    showTeammateDirection = not showTeammateDirection
+end
+local function ColorGradient(perc, ...)
+    local num = select("#", ...)
+    local hexes = type(select(1, ...)) == "string"
+
+    if perc == 1 then
+        return select(num-2, ...), select(num-1, ...), select(num, ...)
+    end
+
+    num = num / 3
+
+    local segment, relperc = math.modf(perc*(num-1))
+    local r1, g1, b1, r2, g2, b2
+    r1, g1, b1 = select((segment*3)+1, ...), select((segment*3)+2, ...), select((segment*3)+3, ...)
+    r2, g2, b2 = select((segment*3)+4, ...), select((segment*3)+5, ...), select((segment*3)+6, ...)
+
+    if not r2 or not g2 or not b2 then
+        return r1, g1, b1
+    else
+        return r1 + (r2-r1)*relperc,
+        g1 + (g2-g1)*relperc,
+        b1 + (b2-b1)*relperc
+    end
+end
+
+local twoPi = math.pi * 2
+local function updateFriendDistance()
+
+    if not TomTom then return end
+
+    local unit, dist
+    if InGroup() then
+        local members = GetGroupUnits()
+        for i = 1, #members, 1 do
+            local u = members[i]
+            if IsFriend(u) and not IsOneUnit(u, "player") then
+                dist = CheckDistance("player",u) 
+                if nil ~= dist then 
+                    unit = u  
+                    break
+                end
+            end
+        end
+    end
+
+    if (unit == nil or not showTeammateDirection) and TomTom:CrazyArrowIsHijacked() then
+        TomTom:ReleaseCrazyArrow()
+        return
+    end
+
+    if showTeammateDirection and unit and not TomTom:CrazyArrowIsHijacked() then
+        TomTom:HijackCrazyArrow(function(self, elapsed)
+            dist = CheckDistance("player",unit) 
+            dist = (nil ~= dist) and round(dist) or "?"
+            local tx, ty = GetPlayerMapPosition (unit)
+            local px, py = GetPlayerMapPosition ("player")
+            local player = GetPlayerFacing()
+            local angle = rad(atan2 (tx - px, py - ty))
+            angle = ((angle > 0) and (twoPi - angle) or -angle)  - player
+            TomTom:SetCrazyArrowDirection(angle)
+            TomTom:SetCrazyArrowColor(ColorGradient(math.abs((math.pi - math.abs(angle)) / math.pi), 1, 0.2, 0.2, 1, 1, 0.2, 0.2, 1, 0.2))
+            TomTom:SetCrazyArrowTitle(UnitName(unit), dist .. 'm.')
+        end)
+    end
+end
+AttachUpdate(updateFriendDistance) 
+
+
+
+
+

@@ -441,17 +441,27 @@ function HolyRotation()
         end
     end
 
-    if HasBuff("Прилив света") then
-        if IsShift()  then
-            if PlayerInPlace() then
-                if (l > GetSpellAmount("Святое сияние", 32000) or h < 30) and DoSpell("Святое сияние") then return end
-            else
-                if (l > GetSpellAmount("Прилив света", 17000) or h < 30) and DoSpell("Вспышка света") then return end
-            end
-        else
-            if PlayerInPlace() and (l > GetSpellAmount("Божественный свет", 32000) or h < 20) and DoSpell("Божественный свет", u) then return end
-            if (l > GetSpellAmount("Прилив света", 17000) or h < 30)  and DoSpell("Вспышка света") then return end
+    local rUnit, rCount = nil, 0
+    for i=1,#members do 
+        local u, c = members[i], 0
+        for j=1,#members do
+            local d = CheckDistance(u, members[j])
+            if d and d < 10 and UnitLostHP(members[j]) > GetSpellAmount("Святое сияние", 6000) then c = c + 1 end 
         end
+        if rUnit == nil or rCount < c then 
+            rUnit = u
+            rCount = c
+        end
+    end 
+        
+
+    if HasBuff("Прилив света") then
+        if PlayerInPlace() then
+            if rCount > 1 and DoSpell("Святое сияние",rUnit) then return end
+            if (l > GetSpellAmount("Божественный свет", 32000) or h < 20) and DoSpell("Божественный свет", u) then return end
+
+        end
+        if (l > GetSpellAmount("Вспышка света", 17000) or h < 30) and DoSpell("Вспышка света") then return end
     end
 
     if (l > GetSpellAmount("Божественный свет", 2000) or h < 99) and DoSpell("Шок небес", u) then return end
@@ -463,11 +473,8 @@ function HolyRotation()
         if DoSpell("Правосудие", "target") then return end
     end
 
-    if IsShift() and PlayerInPlace() and (l > GetSpellAmount("Святое сияние", 32000) or h < 30)  then 
-        DoSpell("Святое сияние")
-        return
-    end
-
+    if PlayerInPlace() and rCount > 3 and DoSpell("Святое сияние",rUnit) then return end
+        
     if IsReadySpell("Очищение") and UnitMana100("player") > 40 and IsSpellNotUsed("Очищение", 5)  and TryDispel(u) then return end
     
     if IsAlt() and h > 40 and IsReadySpell("Очищение") and UnitMana100("player") > 30  then
