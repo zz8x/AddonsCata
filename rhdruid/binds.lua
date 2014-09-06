@@ -58,3 +58,21 @@ function TryInterrupt(target)
         end
     end
 end
+------------------------------------------------------------------------------------------------------------------
+local dispelSpell = "Снятие порчи"
+local dispelTypes = {"Poison", "Curse"}
+local dispelTypesHeal = {"Poison", "Curse", "Magic"}
+
+function TryDispel(unit)
+    if not IsReadySpell(dispelSpell) or InGCD() or not CanHeal(unit) or HasDebuff("Нестабильное колдовство", 0.1, unit) then return false end
+    for i = 1, 40 do
+        if not ret then
+            local name, _, _, _, debuffType, duration, expirationTime   = UnitDebuff(unit, i,true) 
+            if name and (expirationTime - GetTime() >= 3 or expirationTime == 0) and tContains(HasSpell("Буйный рост") and dispelTypesHeal or dispelTypes, debuffType) then
+                return DoSpell(dispelSpell, unit)
+            end
+        end
+    end
+    return false
+end
+------------------------------------------------------------------------------------------------------------------

@@ -373,9 +373,8 @@ function TrySave()
     end
 
     if isPlayer or not UnitIsPet(u) then
-        local combat = UnitAffectingCombat(u)
         if h < ((isPlayer and not IsAttack()) and 70 or 50) and HasLight() and DoSpell("Торжество", u) then return true end
-        if combat and not (IsArena() or InDuel()) and h < 15 and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return true end
+        if  UnitAffectingCombat(u) and not (IsArena() or InDuel()) and h < 15 and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return true end
         if PlayerInPlace() and IsCtr() then
             if h < 90 and DoSpell(HasBuff("Воин света") and "Свет небес" or "Божественный свет", u) then return true end
         end
@@ -392,9 +391,9 @@ function HolyRotation()
     local u = members[1]
     local h = UnitHealth100(u)
     local l = UnitLostHP(u)
-    local combat = UnitAffectingCombat(u)
+    
 
-    if combat and h < 40 and PlayerInPlace() then
+    if InCombatLockdown() and h < 40 and PlayerInPlace() then
         DoSpell("Мастер аур")
     end
     
@@ -404,7 +403,7 @@ function HolyRotation()
         end
     end
 
-    if combat and not HasBuff("Частица Света",1 , u) and #members > 1 and GetTime() - lightTime > 10 then
+    if InCombatLockdown() and not HasBuff("Частица Света",1 , u) and #members > 1 and GetTime() - lightTime > 10 then
 
         local u2 = members[2]
         local h2 = UnitHealth100(u2)
@@ -420,17 +419,17 @@ function HolyRotation()
         end
     end
 
-    if combat and IsBers() then 
+    if InCombatLockdown() and IsBers() then 
         if DoSpell("Защитник древних королей") then return end
     end
-    if combat and h < 70  then UseSlot(10) end 
-    if combat and not InGCD() and (GetTime() - improveTime > 5) and h < 40 then
+    if InCombatLockdown() and h < 70  then UseSlot(10) end 
+    if InCombatLockdown() and not InGCD() and (GetTime() - improveTime > 5) and h < 40 then
         if  UseEquippedItem("Жетон господства беспощадного гладиатора") then improveTime = GetTime() return end
         if  (not IsPvP() or not HasClass(TARGETS, "MAGE")) and DoSpell("Гнев карателя") then improveTime = GetTime() return end
         if  DoSpell("Божественное одобрение") then improveTime = GetTime() return end
     end
 
-    if combat and  h > 50 and UnitMana100("player") < 93 then DoSpell("Святая клятва") end
+    if InCombatLockdown() and  h > 50 and UnitMana100("player") < 93 then DoSpell("Святая клятва") end
 
     local p = UnitPower("player", 9)
     if p > 0 and (l > 5000 * p ) and DoSpell("Торжество", u) then return true end
@@ -464,7 +463,7 @@ function HolyRotation()
         if (l > GetSpellAmount("Вспышка света", 17000) or h < 30) and DoSpell("Вспышка света") then return end
     end
 
-    if (l > GetSpellAmount("Божественный свет", 2000) or h < 99) and DoSpell("Шок небес", u) then return end
+    if (l > GetSpellAmount("Шок небес", 2000) or h < 99) and DoSpell("Шок небес", u) then return end
 
     
     if (IsAttack() or InCombatLockdown()) and not IsNotAttack("target") then 
@@ -483,12 +482,12 @@ function HolyRotation()
         end
     end
 
-    if combat and not (IsArena() or InDuel()) and (l > (UnitHealthMax("player") * 0.9) or h < 10) and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return end
+    if UnitAffectingCombat(u) and not (IsArena() or InDuel()) and (l > (UnitHealthMax("player") * 0.9) or h < 10) and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return end
 
 
     if PlayerInPlace() then
         if (l > GetSpellAmount("Божественный свет", 32000) or h < 20) and DoSpell("Божественный свет", u) then return end
-        if (l > GetSpellAmount("Прилив света", 17000) or h < 30)  and DoSpell("Вспышка света") then return end
+        if (l > GetSpellAmount("Вспышка света", 17000) or h < 30)  and DoSpell("Вспышка света") then return end
     end
 
     if h > 40 and IsReadySpell("Очищение") and UnitMana100("player") > 50 and IsSpellNotUsed("Очищение", InCombatLockdown() and 5 or 0) then

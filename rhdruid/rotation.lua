@@ -14,10 +14,10 @@ end
 function IsBers()
     return (GetTime() - bersTimer < 5)
 end
-
+------------------------------------------------------------------------------------------------------------------
 
 local peaceBuff = {"Пища", "Питье", "Походный облик", "Облик стремительной птицы", "Водный облик"}
-local fixRageTime = 0
+--local fixRageTime = 0
 local steathClass = {"ROGUE", "DRUID"}
 
 function Idle()
@@ -27,14 +27,26 @@ function Idle()
     end
     -- дайте поесть (побегать) спокойно 
     if not IsAttack() and (IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)) then return end
-    
+
+    if HasSpell("Буйный рост") then
+        if IsStealthed() then return end
+        if IsAttack() then TryTarget() end
+        TryBuffs()
+        HealRotation()
+        return
+    end 
+
 	if not (IsAttack() or InCombatLockdown()) then return end
-	TryTarget()
+
     TryBuffs()
-
+    if HasSpell("Берсерк")  then 
+        TryTarget()
+        DDRotation()
+    end
+end
+------------------------------------------------------------------------------------------------------------------
+function DDRotation()
     local myHP = UnitHealth100("player")
-
-  
     if IsCtr() and HasBuff("Быстрота хищника") then
         --if not HasBuff("Облик медведя") and CanHeal("Танак") and UnitHealth100("Танак") < 40 then DoSpell("Целительное прикосновение", "Танак") return end
         if not HasBuff("Облик медведя") and myHP < 80 then DoSpell("Целительное прикосновение", "player") return end
@@ -175,6 +187,7 @@ function Idle()
         if not IsCtr() and not HasBuff("Неистовое восстановление") and ((HasBuff("дикой природы") or HasBuff("королей")) or InCombatLockdown()) and UseMount("Облик кошки") then return end
     end
 end
+------------------------------------------------------------------------------------------------------------------    
 
 function ActualDistance(target)
     if target == nil then target = "target" end
@@ -221,11 +234,80 @@ function TryTarget()
         end
     end
 end
-
+------------------------------------------------------------------------------------------------------------------
 function TryBuffs()
     if HasBuff("Крадущийся зверь") or InCombatLockdown() or (IsFalling() or IsSwimming()) or not IsAttack() then return false end
     if HasBuff("дикой природы", 15 * 60) or HasBuff("королей") then return false end
     if GetShapeshiftForm() ~= 0 then RunMacroText("/cancelform") return true end
     if DoSpell("Знак дикой природы", "player") then return true end
     return false
+end
+------------------------------------------------------------------------------------------------------------------
+function HealRotation()
+    
+
+    local members = GetHealingMembers(UNITS)
+    if #members < 1 then return false end
+    local u = members[1]
+    local h = UnitHealth100(u)
+    local l = UnitLostHP(u)
+    
+
+    if InCombatLockdown() and h < 70  then UseSlot(10) end 
+    --if InCombatLockdown() and h < 40  then UseEquippedItem("Жетон господства беспощадного гладиатора") end 
+
+    if InCombatLockdown() and GetShapeshiftForm() == 0 and UnitPowerType("player") == 0 and UnitMana100() < 80 and DoSpell("Озарение", "player") then return end
+
+    if CanInterrupt and h > 30 and IsReadySpell("Снятие порчи") and UnitMana100("player") > 10 and IsSpellNotUsed("Снятие порчи", 2) then
+        for i = 1, #members do
+            if InControl(members[i]) and TryDispel(members[i]) then return end
+        end
+    end
+
+    if h < 50 and DoSpell("Быстрое восстановление", u) then return end
+
+    if PlayerInPlace() then
+        
+        if (l > GetSpellAmount("Восстановление", 15000) or h < 20) and DoSpell("Восстановление", u) then return end
+
+        if HasBuff("Милость природы", 2, "player") and HasBuff("Скорость", 2, "player") 
+            and (l > GetSpellAmount("Целительное прикосновение", 25000) or h < 20) and DoSpell("Целительное прикосновение", u) then return end
+
+    end
+
+    local rUnit, rCount = nil, 0
+    for i=1,#members do 
+        local u, c = members[i], 0
+        if  (HasBuff("Омоложение", 2, u) or HasBuff("Восстановление", 2, u))  then 
+            for j=1,#members do
+                local d = CheckDistance(u, members[j])
+                if d and d < 8 and UnitHealth100(members[j]) < 90 then c = c + 1 end 
+            end
+            if rUnit == nil or rCount < c then 
+                rUnit = u
+                rCount = c
+            end
+        end
+        
+    end 
+    if rCount > 3 and DoSpell("Быстрое восстановление", rUnit)   then return end
+
+
+    if h < 100 and not HasBuff("Буйный рост", 1, u) and DoSpell("Буйный рост", u) then return end    
+
+    if InCombatLockdown() and not HasBuff("Жизнецвет", 1, "player") and DoSpell("Жизнецвет", "player") then return end
+
+    for i=1,#members do 
+        local u = members[i]
+        if h < 100 and not HasBuff("Омоложение", 1, u) and DoSpell("Омоложение", u) then return end
+    end
+
+    
+
+
+    if CanInterrupt and h > 40 and IsReadySpell("Снятие порчи") and UnitMana100("player") > 50 and IsSpellNotUsed("Снятие порчи", InCombatLockdown() and 5 or 0) then
+        for i = 1, #members do
+            if TryDispel(members[i]) then return end
+        end
+    end
 end
