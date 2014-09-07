@@ -264,11 +264,11 @@ function HealRotation()
         end
     end
 
-    if h < 50 and DoSpell("Быстрое восстановление", u) then return end
+    if h < 70 and DoSpell("Быстрое восстановление", u) then return end
 
     if PlayerInPlace() then
         
-        if (l > GetSpellAmount("Восстановление", 15000) or h < 20) and DoSpell("Восстановление", u) then return end
+        if h < 60 and DoSpell("Восстановление", u) then return end
 
         if HasBuff("Милость природы", 2, "player") and HasBuff("Скорость", 2, "player") 
             and (l > GetSpellAmount("Целительное прикосновение", 25000) or h < 20) and DoSpell("Целительное прикосновение", u) then return end
@@ -281,7 +281,7 @@ function HealRotation()
         if  (HasBuff("Омоложение", 2, u) or HasBuff("Восстановление", 2, u))  then 
             for j=1,#members do
                 local d = CheckDistance(u, members[j])
-                if d and d < 8 and UnitHealth100(members[j]) < 90 then c = c + 1 end 
+                if d and d < 10 and UnitHealth100(members[j]) < 90 then c = c + 1 end 
             end
             if rUnit == nil or rCount < c then 
                 rUnit = u
@@ -290,7 +290,7 @@ function HealRotation()
         end
         
     end 
-    if rCount > 3 and DoSpell("Быстрое восстановление", rUnit)   then return end
+    if rCount > 2 and DoSpell("Быстрое восстановление", rUnit)   then return end
 
 
     if h < 100 and not HasBuff("Буйный рост", 1, u) and DoSpell("Буйный рост", u) then return end    
