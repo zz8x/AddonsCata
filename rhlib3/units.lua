@@ -390,8 +390,15 @@ function PlayerInPlace()
 end
 
 ------------------------------------------------------------------------------------------------------------------
-local mWidth, mHeight = 1,1
-local updateZoneX, undateZoneY, updateZoneStart, updateZoneSpeed, updateZoneDir = 0, 0, 0, 0, 1
+if ZoneData == nil then ZoneData = {} end
+local function getMapID()
+    local id = GetCurrentMapAreaID()
+    if ( id < 0 and GetCurrentMapContinent() == WORLDMAP_WORLD_ID ) then
+        return 0
+    end
+    return id
+end
+local updateZoneX, undateZoneY, updateZoneStart, updateZoneSpeed, updateZoneDir, updateZoneId = 0, 0, 0, 0, 1, 0
 local function ZoneChanged(event, ...)
     SetMapToCurrentZone()
 end
@@ -399,25 +406,37 @@ AttachEvent('PLAYER_ENTERING_WORLD', ZoneChanged)
 AttachEvent('ZONE_CHANGED', ZoneChanged)
 AttachEvent('ZONE_CHANGED_NEW_AREA', ZoneChanged)
 AttachEvent('ZONE_CHANGED_INDOORS', ZoneChanged)
-
+local _dx, _dy
 local function UpdateZone() 
     local speed = IsFalling() and 0 or GetUnitSpeed("player")
     local time = GetTime() - updateZoneStart
-
-    if math.abs(updateZoneDir - GetPlayerFacing()) > 0.01  or (speed ~= updateZoneSpeed) then
+    local id = getMapID()
+    if (math.abs(updateZoneDir - GetPlayerFacing())) > 0.01  or (speed ~= updateZoneSpeed) or (id ~= updateZoneId) then
         updateZoneStart = 0
     end
     
     if updateZoneStart > 0 and time > 0.1 then
         local currentX,currentY = GetPlayerMapPosition("player")
         local l = updateZoneSpeed  * time
-        local dx = math.abs(updateZoneX - currentX)
-        if dx > 0.01 then
-            mWidth = (l * math.abs(math.sin(updateZoneDir))) / dx
+        
+        local dx = updateZoneX - currentX
+        if _dx ~= nil and ((_dx > 0 and dx < 0) or (_dx > 0 and dx < 0)) then
+            updateZoneStart = 0
         end
-        local dy = math.abs(undateZoneY - currentY)
-        if dy > 0.01 then
-            mHeight = (l * math.abs(math.cos(updateZoneDir))) / dy
+        _dx = dx
+        dx = math.abs(dx)
+        if updateZoneStart > 0 and dx > 0.01 then
+            ZoneData[updateZoneId].Width = (l * math.abs(math.sin(updateZoneDir))) / dx
+        end
+
+        local dy = undateZoneY - currentY
+        if _dy ~= nil and ((_dy > 0 and dy < 0) or (_dy > 0 and dy < 0)) then
+            updateZoneStart = 0
+        end
+        _dy = dy
+        dy = math.abs(dy)
+        if updateZoneStart > 0 and dy > 0.01 then
+            ZoneData[updateZoneId].Height = (l * math.abs(math.cos(updateZoneDir))) / dy
         end
     end
     if speed > 0  and updateZoneStart == 0 then
@@ -425,6 +444,10 @@ local function UpdateZone()
         updateZoneStart = GetTime()
         updateZoneSpeed = speed
         updateZoneDir = GetPlayerFacing()
+        updateZoneId = getMapID()
+        if ZoneData[updateZoneId] == nil then
+            ZoneData[updateZoneId] = {Width = 1, Height = 1}
+        end
     end
 end
 AttachUpdate(UpdateZone)
@@ -432,9 +455,9 @@ AttachUpdate(UpdateZone)
 ------------------------------------------------------------------------------------------------------------------
 function GetYardCoords(unit)
     if not unit then unit = "player" end
-    if mData == nil then ZoneChanged() end
+    local id = getMapID()
     local x, y = GetPlayerMapPosition(unit)
-    return x * mWidth, y * mHeight
+    return x *  (ZoneData[id] and ZoneData[id].Width or 1), y * (ZoneData[id] and ZoneData[id].Height or 1)
 end
 
 ------------------------------------------------------------------------------------------------------------------
