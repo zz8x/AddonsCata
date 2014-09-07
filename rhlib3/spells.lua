@@ -345,7 +345,7 @@ local badSpellTarget = {}
 
 local inCastSpells = {"Трепка", "Рунический удар", "Удар героя", "Рассекающий удар", "Гиперскоростное ускорение", "Нарукавная зажигательная ракетница"} -- TODO: Нужно уточнить и дополнить.
 function UseSpell(spellName, target)
-    local dump = false --spellName == "Смерть и разложение"
+    local dump = spellName == "Быстрое восстановление"
     if dump then print("Пытаемся прожать", spellName, "на", target) end
     --if spellName == "Священный щит" then error("Щит") end
 

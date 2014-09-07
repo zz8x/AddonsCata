@@ -264,8 +264,11 @@ function HealRotation()
         end
     end
 
-    if h < 70 and DoSpell("Быстрое восстановление", u) then return end
-
+    if h < 70 and IsSpellNotUsed("Быстрое восстановление", 10) and (HasBuff("Омоложение", 2, u) or HasBuff("Восстановление", 2, u)) then 
+        print("Спел готов")
+        DoSpell("Быстрое восстановление", u)
+        return
+    end
     if PlayerInPlace() then
         
         if h < 60 and DoSpell("Восстановление", u) then return end
