@@ -243,6 +243,7 @@ function TryBuffs()
     return false
 end
 ------------------------------------------------------------------------------------------------------------------
+local hotsList = {"Омоложение", "Восстановление"} 
 function HealRotation()
     
 
@@ -264,24 +265,21 @@ function HealRotation()
         end
     end
 
-    if h < 70 and IsSpellNotUsed("Быстрое восстановление", 10) and (HasBuff("Омоложение", 2, u) or HasBuff("Восстановление", 2, u)) then 
-        print("Спел готов")
-        DoSpell("Быстрое восстановление", u)
-        return
-    end
+    if h < 70 and IsSpellNotUsed("Быстрое восстановление", 10) then
+         RunMacroText("/cast [@"..u.."] !Быстрое восстановление") 
+     end 
+
     if PlayerInPlace() then
-        
-        if h < 60 and DoSpell("Восстановление", u) then return end
-
-        if HasBuff("Милость природы", 2, "player") and HasBuff("Скорость", 2, "player") 
+        if UnitHealthMax(u) > 130000 and  HasBuff(hotsList, 2, u) and HasBuff("Милость природы", 2, "player") and HasBuff("Скорость", 2, "player") 
             and (l > GetSpellAmount("Целительное прикосновение", 25000) or h < 20) and DoSpell("Целительное прикосновение", u) then return end
-
+        local p =  IsSpellNotUsed("Быстрое восстановление", 10) and 3 or (UnitHealthMax(u) > 140000 and 1 or 5)
+        if (IsPvP() and h < 60 or l > GetSpellAmount("Восстановление", 20000)) and IsSpellNotUsed("Восстановление", p) and DoSpell("Восстановление", u) then return end
     end
 
     local rUnit, rCount = nil, 0
     for i=1,#members do 
         local u, c = members[i], 0
-        if  (HasBuff("Омоложение", 2, u) or HasBuff("Восстановление", 2, u))  then 
+        if HasBuff(hotsList, 2, u)  then 
             for j=1,#members do
                 local d = CheckDistance(u, members[j])
                 if d and d < 10 and UnitHealth100(members[j]) < 90 then c = c + 1 end 
@@ -295,8 +293,10 @@ function HealRotation()
     end 
     if rCount > 2 and DoSpell("Быстрое восстановление", rUnit)   then return end
 
-
-    if h < 100 and not HasBuff("Буйный рост", 1, u) and DoSpell("Буйный рост", u) then return end    
+    for i=1,#members do 
+        local u = members[i]
+        if h < 100 and not HasBuff("Буйный рост", 1, u) and DoSpell("Буйный рост", u) then return end
+    end
 
     if InCombatLockdown() and not HasBuff("Жизнецвет", 1, "player") and DoSpell("Жизнецвет", "player") then return end
 
@@ -305,7 +305,12 @@ function HealRotation()
         if h < 100 and not HasBuff("Омоложение", 1, u) and DoSpell("Омоложение", u) then return end
     end
 
-    
+    --[[if PlayerInPlace() then
+        if HasBuff(hotsList, 2, u) and HasBuff("Милость природы", 2, "player") and HasBuff("Скорость", 2, "player") 
+            and (l > GetSpellAmount("Целительное прикосновение", 25000) or h < 20) and DoSpell("Целительное прикосновение", u) then return end
+
+        if h < 60 and IsSpellNotUsed("Восстановление", 1) and DoSpell("Восстановление", u) then return end
+    end]]
 
 
     if CanInterrupt and h > 40 and IsReadySpell("Снятие порчи") and UnitMana100("player") > 50 and IsSpellNotUsed("Снятие порчи", InCombatLockdown() and 5 or 0) then
