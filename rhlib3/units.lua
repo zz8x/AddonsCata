@@ -308,6 +308,7 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 function UnitThreat(u, t)
+    if not UnitIsPlayer(u) then return 0 end
     local threat = UnitThreatSituation(u, t)
     if threat == nil then threat = 0 end
     return threat

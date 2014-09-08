@@ -432,7 +432,7 @@ function HolyRotation()
     if InCombatLockdown() and  h > 50 and UnitMana100("player") < 93 then DoSpell("Святая клятва") end
 
     local p = UnitPower("player", 9)
-    if p > 0 and (l > 5000 * p ) and DoSpell("Торжество", u) then return true end
+    if p > 2 and  h < 100 and DoSpell("Торжество", u) then return end
 
     if h > 30 and IsReadySpell("Очищение") and UnitMana100("player") > 10 and IsSpellNotUsed("Очищение", 2) then
         for i = 1, #members do
@@ -452,7 +452,12 @@ function HolyRotation()
             rCount = c
         end
     end 
-        
+    
+    if h < 100 or (InCombatLockdown() and not IsValidTarget("target")) then 
+        --DoSpell("Шок небес", u)
+        RunMacroText("/cast [@"..u.."] !Шок небес")
+    end
+
 
     if HasBuff("Прилив света") then
         if PlayerInPlace() then
@@ -463,8 +468,6 @@ function HolyRotation()
         if (l > GetSpellAmount("Вспышка света", 17000) or h < 30) and DoSpell("Вспышка света") then return end
     end
 
-    if (l > GetSpellAmount("Шок небес", 2000) or h < 99) and DoSpell("Шок небес", u) then return end
-
     
     if (IsAttack() or InCombatLockdown()) and not IsNotAttack("target") then 
         if DoSpell("Шок небес", "target") then return end
@@ -473,6 +476,8 @@ function HolyRotation()
     end
 
     if PlayerInPlace() and rCount > 3 and DoSpell("Святое сияние",rUnit) then return end
+
+    
         
     if IsReadySpell("Очищение") and UnitMana100("player") > 40 and IsSpellNotUsed("Очищение", 5)  and TryDispel(u) then return end
     
@@ -489,6 +494,8 @@ function HolyRotation()
         if (l > GetSpellAmount("Божественный свет", 32000) or h < 20) and DoSpell("Божественный свет", u) then return end
         if (l > GetSpellAmount("Вспышка света", 17000) or h < 30)  and DoSpell("Вспышка света") then return end
     end
+
+    if p > 0 and (l > 5000 * p ) and DoSpell("Торжество", u) then return true end
 
     if h > 40 and IsReadySpell("Очищение") and UnitMana100("player") > 50 and IsSpellNotUsed("Очищение", InCombatLockdown() and 5 or 0) then
         for i = 1, #members do
