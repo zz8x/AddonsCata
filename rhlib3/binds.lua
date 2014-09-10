@@ -278,6 +278,15 @@ local function UpdateFallingTime()
 end
 --FALLING
 AttachUpdate(UpdateFallingTime)
+
+------------------------------------------------------------------------------------------------------------------
+local function UpdateMacroAlertHider()
+    if StaticPopup1Button2:IsVisible() == 1 and StaticPopup1Button2:IsEnabled() == 1 and StaticPopup1Button2:GetText() == "Пропустить" then
+       chat(StaticPopup1.text:GetText())
+       StaticPopup1Button2:Click()
+    end
+end
+AttachUpdate(UpdateMacroAlertHider)
 ------------------------------------------------------------------------------------------------------------------
 -- нас сапнул рога
 function UpdateSapped(event, ...)
@@ -416,10 +425,9 @@ local function UpdateDebugStats()
 end
 AttachUpdate(UpdateDebugStats) 
 
-
-local showTeammateDirection = false
+if ShowTeammateDirection == nil then ShowTeammateDirection = false end
 function ToggleTeammateDirection()
-    showTeammateDirection = not showTeammateDirection
+    ShowTeammateDirection = not ShowTeammateDirection
 end
 local function ColorGradient(perc, ...)
     local num = select("#", ...)
@@ -465,12 +473,12 @@ local function updateFriendDistance()
         end
     end
 
-    if (unit == nil or not showTeammateDirection) and TomTom:CrazyArrowIsHijacked() then
+    if (unit == nil or not ShowTeammateDirection) and TomTom:CrazyArrowIsHijacked() then
         TomTom:ReleaseCrazyArrow()
         return
     end
 
-    if showTeammateDirection and unit and not TomTom:CrazyArrowIsHijacked() then
+    if ShowTeammateDirection and unit and not TomTom:CrazyArrowIsHijacked() then
         TomTom:HijackCrazyArrow(function(self, elapsed)
             dist = CheckDistance("player",unit) 
             dist = (nil ~= dist) and round(dist) or "?"
