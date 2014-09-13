@@ -159,19 +159,18 @@ local function UpdateIdle()
         ITARGETS = IsArena() and iTargets or TARGETS
     end
 
-
     if FollowTarget and GetTime() - followTime > 1 then
         followTime = GetTime()
         if IsFollow() then
             if not InCombatLockdown() and not IsMounted() then
-                local s = GetUnitSpeed("Танак")
+                local s = GetUnitSpeed(FollowTarget)
                 if s and (s / 7 * 100) > 190 then 
-                    RunMacroText("/run MoveForwardStart()")
+                    RunMacroText("/run MoveForwardStart()")-- сделать  функцию с таймаутом на вторую часть
                     RunMacroText("/run MoveForwardStop()")
                     DoCommand("mount")
                 end
             end
-            --[[if UnitAffectingCombat(FollowTarget) then
+            --[[if UnitAffectingCombat(FollowTarget) then --если скорость 0
                 if IsMounted() and not IsFalling() then
                     RunMacroText("/dismount")
                 end
@@ -186,7 +185,8 @@ local function UpdateIdle()
             if ( CheckInteractDistance(FollowTarget, 4) ) then
               if not IsPlayerCasting() then RunMacroText("/follow ".. FollowTarget) end
             end
-            --if IsFriend(FollowTarget) then RunMacroText("/w "..FollowTarget .. " Вернись чуть назад плиз") end
+            --if IsFriend(FollowTarget) then RunMacroText("/w "..FollowTarget .. " Вернись чуть назад плиз") end --тут пройти чуть вперед
+            --если стоим то развернуться лицом к цели FollowTarget или хотябы как FollowTarget
         end
     end
     

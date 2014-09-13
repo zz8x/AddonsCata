@@ -1,6 +1,6 @@
 ﻿-- Paladin Rotation Helper by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
-local teammate = "Смерчебот"
+local teammate = "Ауи"
 function DoHelpCommand(cmd, param)
      local target = "player"
      if IsAlt() then target = teammate end

@@ -14,7 +14,7 @@ local peaceBuff = {"Пища", "Питье"}
 local steathClass = {"ROGUE", "DRUID"}
 function Idle()
     if bersTimer ~= 0 and not InCombatLockdown() then bersTimer = 0 end
-    if not IsPlayerCasting() and TryAura() then return end
+    if (IsAttack() or IsMounted()) and not IsPlayerCasting() and TryAura() then return end
     if IsAttack() then
         if HasBuff("Парашют") then RunMacroText("/cancelaura Парашют") return end
         if CanExitVehicle() then VehicleExit() return end
@@ -22,6 +22,7 @@ function Idle()
     else
         -- дайте поесть (побегать) спокойно
         if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)  or IsPlayerCasting() then return end
+
     end
      
     if IsMouse3() and TryTaunt("mouseover") then return end
@@ -299,7 +300,10 @@ function Rotation()
     if not HasLight() and DoSpell("Правосудие") then return end
     if HasLight(2) and not HasBuff("Дознание") and DoSpell("Дознание") then return end   
     if canMagic and HasBuff("Искусство войны") and DoSpell("Экзорцизм") then return end
-    if HasLight() and HasBuff("Дознание", 1) and DoSpell("Вердикт храмовника")  then return end
+    if InMelee() and HasLight() and HasBuff("Дознание", 1)  then
+        --if DoSpell("Вердикт храмовника") then return end
+        RunMacroText("/cast [@target] !Вердикт храмовника")
+    end
     
 
     if canMagic and DoSpell("Молот гнева") then return end
@@ -403,20 +407,11 @@ function HolyRotation()
         end
     end
 
-    if InCombatLockdown() and not HasBuff("Частица Света",1 , u) and #members > 1 and GetTime() - lightTime > 10 then
-
+    if InCombatLockdown()  and #members > 1 and GetTime() - lightTime > 10 then
         local u2 = members[2]
         local h2 = UnitHealth100(u2)
         local l2 = UnitLostHP(u2)
-        if h2 < 50 and not HasBuff("Частица Света",1 , u2) and DoSpell("Частица Света", u2) then lightTime = GetTime() return end
-        
-        for i = 1, #UNITS do
-            local ui = UNITS[i]
-            if HasBuff("Частица Света",1 , ui) then 
-                if not InRange("Частица Света", ui) and h2 < 70 and DoSpell("Частица Света", u2) then return end
-                break 
-            end
-        end
+        if not HasBuff("Частица Света",1 , u2) and h2 < (HasBuff("Частица Света",1 , UNITS) and 60 or 80) and DoSpell("Частица Света", u2) then lightTime = GetTime() return end
     end
 
     if InCombatLockdown() and IsBers() then 

@@ -412,14 +412,14 @@ local function UpdateZone()
     local speed = IsFalling() and 0 or GetUnitSpeed("player")
     local time = GetTime() - updateZoneStart
     local id = getMapID()
-    if (math.abs(updateZoneDir - GetPlayerFacing())) > 0.01  or (speed ~= updateZoneSpeed) or (id ~= updateZoneId) then
+    if (math.abs(updateZoneDir - GetPlayerFacing())) > 0.01 or (speed ~= updateZoneSpeed) or (id ~= updateZoneId) then
         updateZoneStart = 0
     end
     
     if updateZoneStart > 0 and time > 0.1 then
         local currentX,currentY = GetPlayerMapPosition("player")
         local l = updateZoneSpeed  * time
-        
+
         local dx = updateZoneX - currentX
         if _dx ~= nil and ((_dx > 0 and dx < 0) or (_dx > 0 and dx < 0)) then
             updateZoneStart = 0
