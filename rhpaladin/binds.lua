@@ -95,6 +95,7 @@ function TryDispel(unit)
 end
 ------------------------------------------------------------------------------------------------------------------
 local forbearanceSpells = {"Божественный щит", "Возложение рук", "Длань защиты"}
+local forceSpells = {"Торжество", "Шок небес", "Вердикт храмовника"}
 ------------------------------------------------------------------------------------------------------------------
 function DoSpell(spell, target, mana)
     if tContains(forbearanceSpells, spellName) then
@@ -107,6 +108,13 @@ function DoSpell(spell, target, mana)
             end
         end
         if HasDebuff("Воздержанность", 0.01, unit) then return false end
+    end
+    if tContains(forceSpells, spellName) then
+        if not target then target = "target" end
+        if InRange(spell, target) and IsSpellNotUsed(0.1) then 
+            RunMacroText("/cast [@"..target.."] !"..spell) 
+        end
+        return not IsSpellNotUsed(0.1)
     end
     return UseSpell(spell, target, mana)
 end
