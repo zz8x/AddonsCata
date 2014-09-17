@@ -287,8 +287,8 @@ function frostRotation()
     if not HasMyDebuff("Озноб", 3, "target") and DoSpell(frostSpell) then return end
     if Dotes() and UnitHealth100("player") < (IsAttack() and 45 or 75) and DoSpell("Удар смерти") then return end 
     -- собственно ротация
-    --if HasRunes(002, true) and DoSpell(IsPvP() and HasDebuff("Осквернение") and "Некротический удар" or "Удар чумы") then return end
-    if HasRunes(002, true) and DoSpell(IsPvP() and "Некротический удар" or "Удар чумы") then return end
+    if HasRunes(002, true) and DoSpell(IsPvP() and HasDebuff("Осквернение") and "Некротический удар" or "Удар чумы") then return end
+    --if HasRunes(002, true) and DoSpell(IsPvP() and "Некротический удар" or "Удар чумы") then return end
     if canMagic and DoSpell(frostSpell) then return end
     if canMagic and not InMelee() and DoSpell("Лик смерти", "target", baseRP) then return end
     if (UnitMana("player") < 120 or not HasBuff("Зимний горн")) and DoSpell("Зимний горн") then return end

@@ -2,6 +2,13 @@
 ------------------------------------------------------------------------------------------------------------------
 --UIParentLoadAddOn("Blizzard_DebugTools");
 --DevTools_Dump(n)
+
+--[[
+/run UIParentLoadAddOn("Blizzard_DebugTools");
+/fstack true
+/etrace 
+]]
+
 ------------------------------------------------------------------------------------------------------------------
 function RegBG()
     RunMacroText([[

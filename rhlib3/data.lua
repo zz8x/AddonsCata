@@ -211,6 +211,7 @@ local AlertList = {
     "Длань свободы",
     "Воля Отрекшихся",
     "Перерождение",
+    "Неистовое восстановление"
 }
 
 function InAlertList(spellName)
