@@ -86,7 +86,7 @@ function Idle()
     end
 
     if HasSpell("Шок небес") then
-        if IsAttack() then TryTarget() end
+        if not IsInteractUnit("target") or IsAttack() then TryTarget() end
         HolyRotation()
         if not IsPlayerCasting() and TryBuff() then return end
         return
@@ -197,7 +197,7 @@ function TryAura()
         for a, w in pairs(_auraW) do
             tinsert(_aura, a)
         end
-        table.sort(_aura, _sortAura)
+        sort(_aura, _sortAura)
         for i = 1, #_aura do
             local a = _aura[i]
             if not HasBuff(a) then return DoSpell(a) end

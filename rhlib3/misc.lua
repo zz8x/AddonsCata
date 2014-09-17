@@ -167,7 +167,7 @@ function printtable(t, indent)
   local keys = {};
   for k in pairs(t) do
     keys[#keys+1] = k;
-    table.sort(keys, function(a, b)
+      sort(keys, function(a, b)
       local ta, tb = type(a), type(b);
       if (ta ~= tb) then
         return ta < tb;

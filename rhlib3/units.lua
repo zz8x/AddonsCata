@@ -50,7 +50,7 @@ function GetHealingMembers(units)
             membersHP[u] = h
         end
     end
-    table.sort(members, compareMembers)  
+    sort(members, compareMembers)  
     return members
 end
 ------------------------------------------------------------------------------------------------------------------
@@ -407,6 +407,9 @@ AttachEvent('ZONE_CHANGED', ZoneChanged)
 AttachEvent('ZONE_CHANGED_NEW_AREA', ZoneChanged)
 AttachEvent('ZONE_CHANGED_INDOORS', ZoneChanged)
 local _dx, _dy
+local abs = math.abs
+local cos = math.cos
+local sin = math.sin
 local function UpdateZone() 
     local speed = IsFalling() and 0 or GetUnitSpeed("player")
     local time = GetTime() - updateZoneStart
@@ -415,7 +418,7 @@ local function UpdateZone()
         updateZoneStart = 0
     end
     
-    if updateZoneStart > 0 and time > 0.1 then
+    if updateZoneStart > 0 and time > 0.3 then
         local currentX,currentY = GetPlayerMapPosition("player")
         local l = updateZoneSpeed  * time
 
@@ -424,9 +427,9 @@ local function UpdateZone()
             updateZoneStart = 0
         end
         _dx = dx
-        dx = math.abs(dx)
-        if updateZoneStart > 0 and dx > 0.01 then
-            ZoneData[updateZoneId].Width = (l * math.abs(math.sin(updateZoneDir))) / dx
+        dx = abs(dx)
+        if updateZoneStart > 0 and dx > 0.005 then
+            ZoneData[updateZoneId].Width = (l * abs(sin(updateZoneDir))) / dx
         end
 
         local dy = undateZoneY - currentY
@@ -434,9 +437,9 @@ local function UpdateZone()
             updateZoneStart = 0
         end
         _dy = dy
-        dy = math.abs(dy)
-        if updateZoneStart > 0 and dy > 0.01 then
-            ZoneData[updateZoneId].Height = (l * math.abs(math.cos(updateZoneDir))) / dy
+        dy = abs(dy)
+        if updateZoneStart > 0 and dy > 0.005 then
+            ZoneData[updateZoneId].Height = (l * abs(cos(updateZoneDir))) / dy
         end
     end
     if speed > 0  and updateZoneStart == 0 then

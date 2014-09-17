@@ -41,16 +41,16 @@ function AttachUpdate(f, w)
     if w == nil then w = 0 end
     tinsert(UpdateList, { func = f, weight = w })
     -- сортируем по важности
-    table.sort(UpdateList, upadteSort)
+    sort(UpdateList, upadteSort)
 end
 
 ------------------------------------------------------------------------------------------------------------------
 -- Выполняем обработчики события OnUpdate, согласно приоритету (return true - выход)
 FastUpdate = false
-local UpdateInterval = 0.35
+local UpdateInterval = 0.55
 local LastUpdate = 0
 -- для снижения нагрузки на проц
-local UpdateIntervalFast = 0.03
+local UpdateIntervalFast = 0.05
 local LastUpdateFast = 0
 
 local function OnUpdate(frame, elapsed)

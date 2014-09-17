@@ -139,7 +139,7 @@ local function UpdateIdle()
                 friendTargets[guid] = w
             end
         end
-        table.sort(UNITS, compareUnits)
+        sort(UNITS, compareUnits)
         
         -- Update targets
         TARGETS = GetTargets()
@@ -148,7 +148,7 @@ local function UpdateIdle()
             local t = TARGETS[i]
             targetWeights[t] = getTargetWeight(t)
         end
-        table.sort(TARGETS, compareTargets)
+        sort(TARGETS, compareTargets)
         wipe(IUNITS)
         for i = 0, #UNITS do
             local u = UNITS[i]
@@ -429,6 +429,7 @@ if ShowTeammateDirection == nil then ShowTeammateDirection = false end
 function ToggleTeammateDirection()
     ShowTeammateDirection = not ShowTeammateDirection
 end
+local modf = math.modf
 local function ColorGradient(perc, ...)
     local num = select("#", ...)
     local hexes = type(select(1, ...)) == "string"
@@ -439,7 +440,7 @@ local function ColorGradient(perc, ...)
 
     num = num / 3
 
-    local segment, relperc = math.modf(perc*(num-1))
+    local segment, relperc = modf(perc*(num-1))
     local r1, g1, b1, r2, g2, b2
     r1, g1, b1 = select((segment*3)+1, ...), select((segment*3)+2, ...), select((segment*3)+3, ...)
     r2, g2, b2 = select((segment*3)+4, ...), select((segment*3)+5, ...), select((segment*3)+6, ...)
@@ -452,8 +453,9 @@ local function ColorGradient(perc, ...)
         b1 + (b2-b1)*relperc
     end
 end
-
-local twoPi = math.pi * 2
+local pi = math.pi
+local twoPi = pi * 2
+local abs = math.abs
 local function updateFriendDistance()
 
     if not TomTom then return end
@@ -488,7 +490,7 @@ local function updateFriendDistance()
             local angle = rad(atan2 (tx - px, py - ty))
             angle = ((angle > 0) and (twoPi - angle) or -angle)  - player
             TomTom:SetCrazyArrowDirection(angle)
-            TomTom:SetCrazyArrowColor(ColorGradient(math.abs((math.pi - math.abs(angle)) / math.pi), 1, 0.2, 0.2, 1, 1, 0.2, 0.2, 1, 0.2))
+            TomTom:SetCrazyArrowColor(ColorGradient(abs((pi - abs(angle)) / pi), 1, 0.2, 0.2, 1, 1, 0.2, 0.2, 1, 0.2))
             TomTom:SetCrazyArrowTitle(UnitName(unit), dist .. 'm.')
         end)
     end
