@@ -37,6 +37,7 @@ local lastCP = 0;
 local lastGUID
 local peaceBuff = {"Пища", "Питье"}
 function Idle()
+    if AutoFreedom() then return end
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
         if IsMounted() then Dismount() return end 

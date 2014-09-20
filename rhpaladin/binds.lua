@@ -61,7 +61,7 @@ function TryInterrupt(target)
 end
 ------------------------------------------------------------------------------------------------------------------
 local freedomTime = 0
-function UpdateAutoFreedom()
+function AutoFreedom()
     -- не слишком часто
     if GetTime() - freedomTime < 0.5 then return end
     freedomTime = GetTime()
@@ -72,10 +72,10 @@ function UpdateAutoFreedom()
         Notify('freedom: ' .. debuff)
         if DoSpell("Каждый за себя") then
             chat('freedom: ' .. debuff)
+            return true
         end
     end 
 end
-AttachUpdate(UpdateAutoFreedom, -7)
 ------------------------------------------------------------------------------------------------------------------
 local dispelSpell = "Очищение"
 local dispelTypes = {"Poison", "Disease"}

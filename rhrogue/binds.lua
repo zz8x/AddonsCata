@@ -34,7 +34,7 @@ function TryInterrupt(target)
 end
 ------------------------------------------------------------------------------------------------------------------
 local freedomTime = 0
-function UpdateAutoFreedom(event, ...)
+function AutoFreedom()
     -- не слишком часто
     if GetTime() - freedomTime < 0.5 then return end
     freedomTime = GetTime()
@@ -45,10 +45,10 @@ function UpdateAutoFreedom(event, ...)
         Notify('freedom: ' .. debuff)
         if DoSpell("Каждый за себя") then
             chat('freedom: ' .. debuff)
+            return true
         end
     end 
 end
-AttachUpdate(UpdateAutoFreedom, -1)
 ------------------------------------------------------------------------------------------------------------------
 function DoSpell(spell, target, mana)
     return UseSpell(spell, target, mana)

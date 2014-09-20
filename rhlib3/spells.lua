@@ -341,14 +341,11 @@ function TrySpellTargeting()
     end
 end
 ------------------------------------------------------------------------------------------------------------------
-local badSpellTarget = {}
-
-local inCastSpells = {"Трепка", "Рунический удар", "Удар героя", "Рассекающий удар", "Гиперскоростное ускорение", "Нарукавная зажигательная ракетница"} -- TODO: Нужно уточнить и дополнить.
-function UseSpell(spellName, target)
+local lastSpell, lastTarget = nil, nil
+local badSpellTarget = {}local inCastSpells = {"Трепка", "Рунический удар", "Удар героя", "Рассекающий удар", "Гиперскоростное ускорение", "Нарукавная зажигательная ракетница"} -- TODO: Нужно уточнить и дополнить.
+local function trySpell(spellName, target)
     local dump = false --spellName == "Быстрое восстановление"
     if dump then print("Пытаемся прожать", spellName, "на", target) end
-    --if spellName == "Священный щит" then error("Щит") end
-
     -- Не мешаем выбрать область для спела (нажат вручную)
     if SpellIsTargeting() then 
         if dump or true then print("Ждем выбор цели, не можем прожать", spellName) end
@@ -380,12 +377,13 @@ function UseSpell(spellName, target)
         return false 
     end
      -- проверяем, что не кастится другой спел
-     for s,_ in pairs(InCast) do
-		if not IsBusy and not tContains(inCastSpells, s) and IsSpellInUse(s) then
+    for s,_ in pairs(InCast) do
+        if not IsBusy and not tContains(inCastSpells, s) and IsSpellInUse(s) then
             if dump then print("Уже прожали " .. s .. ", ждем окончания, пока не можем больше прожать", spellName) end
             IsBusy = true
+            break
         end
-     end
+    end
     if IsBusy then return false end
     -- проверяем, что цель подходящая для этого спела
     if UnitExists(target) and badSpellTarget[spellName] then 
@@ -423,6 +421,7 @@ function UseSpell(spellName, target)
         -- пробуем скастовать
         if Debug then print("Жмем", cast .. "!" .. spellName) end
         RunMacroText(cast .. "!" .. spellName)
+        lastSpell, lastTarget = spellName, target
         -- если нужно выбрать область - кидаем на текущий mouseover
         TrySpellTargeting()
         -- данные о кастах
@@ -444,15 +443,31 @@ function UseSpell(spellName, target)
                     castInfo.TargetName = nil
                     castInfo.TargetGUID = nil
                 end
-             end
-            if dump then print("Спел вроде прожался", spellName) end
-            if Debug then
-                print(spellName, cost, target)
             end
-            return true
         end
-        if dump then print("SPELL_CAST - не произошел для", spellName) end
+        if dump then print("Спел вроде прожался", spellName) end
+        if Debug then
+            print(spellName, cost, target)
+        end
+        return true
     end
     if dump then print("Не готово, не можем прожать", spellName) end
     return false
 end
+------------------------------------------------------------------------------------------------------------------
+function UseSpell(spellName, target)
+    if lastSpell then return false end
+    return trySpell(spellName, target)
+end
+------------------------------------------------------------------------------------------------------------------
+function ResetReCast()
+    lastSpell, lastTarget = nil, nil
+end
+------------------------------------------------------------------------------------------------------------------
+local function UpdateReCast()
+    --if lastSpell then print('-->', lastSpell, lastTarget) end
+    if lastSpell and not trySpell(lastSpell, lastTarget) then
+       ResetReCast()
+    end
+end
+AttachUpdate(UpdateReCast, 0.02)

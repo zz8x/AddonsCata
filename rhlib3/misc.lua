@@ -323,9 +323,9 @@ local function waitUpdate(self,elapse)
     end
   end
 end
-AttachUpdate(waitUpdate)
+AttachUpdate(waitUpdate, 0.25)
 
-function setTimeout(delay, func, ...)
+function setTimeout(delay, func, ...) 
   if(type(delay)~="number" or type(func)~="function") then
     return false;
   end

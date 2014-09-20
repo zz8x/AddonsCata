@@ -1,4 +1,4 @@
-﻿-- Rotation Helper Library by Timofeev Alexey
+-- Rotation Helper Library by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
 -- protected lock test
 RunMacroText("/cleartarget")
@@ -33,54 +33,23 @@ end
 frame:SetScript("OnEvent", onEvent)
 
 ------------------------------------------------------------------------------------------------------------------
--- Список обработчик -> вес/значимость
 local UpdateList = {}
-local function upadteSort(u1,u2) return u1.weight > u2.weight end
-function AttachUpdate(f, w) 
+function AttachUpdate(f, i) 
     if nil == f then error("Func can't be nil") end  
-    if w == nil then w = 0 end
-    tinsert(UpdateList, { func = f, weight = w })
-    -- сортируем по важности
-    sort(UpdateList, upadteSort)
+    if i == nil then i = 1 end -- одна секунда по умолчанию
+    tinsert(UpdateList, {func = f, interval = i, update = 0})
 end
 
 ------------------------------------------------------------------------------------------------------------------
--- Выполняем обработчики события OnUpdate, согласно приоритету (return true - выход)
-FastUpdate = false
-local UpdateInterval = 0.55
-local LastUpdate = 0
--- для снижения нагрузки на проц
-local UpdateIntervalFast = 0.05
-local LastUpdateFast = 0
-
+-- Выполняем обработчики события OnUpdate
 local function OnUpdate(frame, elapsed)
-
-    LastUpdate = LastUpdate + elapsed 
-    LastUpdateFast = LastUpdateFast + elapsed 
-
-    if LastUpdate > UpdateInterval then 
-        LastUpdate = 0
-        LastUpdateFast = 0
-        FastUpdate = false
-        for i = 1, #UpdateList do
-            local upd = UpdateList[i]
-            -- выполняем все что есть
-            upd.func(frame, elapsed)
-        end
-        return
-    end
-
-    if LastUpdateFast > UpdateIntervalFast then 
-        LastUpdateFast = 0
-        FastUpdate = true
-        for i = 1, #UpdateList do
-            local upd = UpdateList[i]
-            -- выполняем только самое важное
-            if upd.weight < 0 then 
-                upd.func(frame, elapsed) 
-            end
+    for i=1, #UpdateList do
+        local u = UpdateList[i]
+        u.update = u.update + elapsed
+        if u.update > u.interval then
+            u.func(u.update)
+            u.update = 0
         end
     end
-   
 end
 frame:SetScript("OnUpdate", OnUpdate)

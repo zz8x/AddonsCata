@@ -27,6 +27,8 @@ function Idle()
         end
     end
 
+    if AutoFreedom() then return end
+
     if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
 
     if IsAttack() then

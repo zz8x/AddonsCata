@@ -32,9 +32,13 @@ function DebugToggle()
     Debug = not Debug
     if Debug then
         SetCVar("scriptErrors", 1)
+        UIErrorsFrame:RegisterEvent("UI_ERROR_MESSAGE");
+        SetCVar("Sound_EnableErrorSpeech", "1");
         echo("Режим отладки: ON",true)
     else
         SetCVar("scriptErrors", 0)
+        UIErrorsFrame:UnregisterEvent("UI_ERROR_MESSAGE");
+        SetCVar("Sound_EnableErrorSpeech", "0");
         echo("Режим отладки: OFF",true)
     end 
 end
@@ -74,6 +78,14 @@ end
 AttachEvent("AUTOFOLLOW_END", FollowEnd)
 
 ------------------------------------------------------------------------------------------------------------------
+function UpdateInternal()
+    if (IsAttack() and Paused) then
+        echo("Авто ротация: ON",true)
+        Paused = false
+    end
+end
+AttachUpdate(UpdateInternal, 0.025)
+------------------------------------------------------------------------------------------------------------------
 -- Вызывает функцию Idle если таковая имеется, с заданным рекомендованным интервалом UpdateInterval, 
 -- при включенной Авто-ротации
 local iTargets = {"target", "focus", "mouseover"}
@@ -103,12 +115,9 @@ end
 local targetWeights = {}
 local function compareTargets(t1,t2) return targetWeights[t1] < targetWeights[t2] end
 
-local function UpdateIdle()
-
-    if (IsAttack() and Paused) then
-        echo("Авто ротация: ON",true)
-        Paused = false
-    end
+FastUpdate = false
+local function UpdateIdle(elapsed)
+    ResetReCast()
 
     if UpdateCommands() then return end
     
@@ -123,6 +132,8 @@ local function UpdateIdle()
 
     if UnitIsDeadOrGhost("player") or UnitIsCharmed("player") 
         or not UnitPlayerControlled("player") then return end
+
+    FastUpdate = (elapsed < 1)
     if not FastUpdate then    
         -- Update units
         UNITS = GetUnits()
@@ -159,6 +170,7 @@ local function UpdateIdle()
         ITARGETS = IsArena() and iTargets or TARGETS
     end
 
+
     if FollowTarget and GetTime() - followTime > 1 then
         followTime = GetTime()
         if IsFollow() then
@@ -192,7 +204,8 @@ local function UpdateIdle()
     
     if Idle then Idle() end
 end
-AttachUpdate(UpdateIdle, -1000)
+AttachUpdate(UpdateIdle, 0.20)
+AttachUpdate(UpdateIdle)
 
 ------------------------------------------------------------------------------------------------------------------
 --Arena Raid Icons
@@ -495,9 +508,4 @@ local function updateFriendDistance()
         end)
     end
 end
-AttachUpdate(updateFriendDistance) 
-
-
-
-
-
+AttachUpdate(updateFriendDistance)

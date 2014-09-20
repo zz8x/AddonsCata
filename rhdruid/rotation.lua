@@ -244,6 +244,7 @@ function TryBuffs()
 end
 ------------------------------------------------------------------------------------------------------------------
 local hotsList = {"Омоложение", "Восстановление"} 
+local rUnit, rCount = nil, 0
 function HealRotation()
     
 
@@ -276,21 +277,27 @@ function HealRotation()
         if (IsPvP() and h < 60 or l > GetSpellAmount("Восстановление", 20000)) and IsSpellNotUsed("Восстановление", p) and DoSpell("Восстановление", u) then return end
     end
 
-    local rUnit, rCount = nil, 0
-    for i=1,#members do 
-        local u, c = members[i], 0
-        if HasBuff(hotsList, 2, u)  then 
-            for j=1,#members do
-                local d = CheckDistance(u, members[j])
-                if d and d < 10 and UnitHealth100(members[j]) < 90 then c = c + 1 end 
-            end
-            if rUnit == nil or rCount < c then 
-                rUnit = u
-                rCount = c
-            end
+    if FastUpdate then
+        if not CanHeal(rUnit) then
+            rUnit, rCount = nil, 0
         end
-        
-    end 
+    else
+        rUnit, rCount = nil, 0
+        for i=1,#members do 
+            local u, c = members[i], 0
+            if HasBuff(hotsList, 2, u)  then 
+                for j=1,#members do
+                    local d = CheckDistance(u, members[j])
+                    if d and d < 10 and UnitHealth100(members[j]) < 90 then c = c + 1 end 
+                end
+                if rUnit == nil or rCount < c then 
+                    rUnit = u
+                    rCount = c
+                end
+            end
+            
+        end 
+    end
     if rCount > 2 and DoSpell("Быстрое восстановление", rUnit)   then return end
 
     for i=1,#members do 

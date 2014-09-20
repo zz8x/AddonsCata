@@ -128,7 +128,7 @@ local lichList = {
 }
 
 local freedomTime = 0
-function UpdateAutoFreedom()
+function AutoFreedom()
     -- не слишком часто
     if GetTime() - freedomTime < 0.5 then return end
     freedomTime = GetTime()
@@ -144,6 +144,7 @@ function UpdateAutoFreedom()
             if not HasBuff("Перерождение") then  
                 if DoSpell("Каждый за себя") then
                     print("lich->Каждый за себя", debuff)
+                    return true
                 end
             end
         end
@@ -156,10 +157,11 @@ function UpdateAutoFreedom()
         Notify('freedom: ' .. debuff)
         if DoSpell("Каждый за себя") then
             print("freedom", debuff)
+            return true
         end
     end 
 end
-AttachUpdate(UpdateAutoFreedom, -1)
+
 ------------------------------------------------------------------------------------------------------------------
 
 local macroSpell = {

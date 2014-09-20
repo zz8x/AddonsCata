@@ -340,6 +340,7 @@ end
 function UnitLostHP(unit)
     local hp = UnitHP(unit)
     local maxhp = UnitHealthMax(unit) 
+   -- if target == "player" and IsCtr() then return maxhp / 2 end
     local lost = maxhp - hp
     if UnitThreatAlert(unit) == 3 then lost = lost * 1.5 end
     return lost
@@ -453,7 +454,7 @@ local function UpdateZone()
         end
     end
 end
-AttachUpdate(UpdateZone)
+AttachUpdate(UpdateZone, 0.25)
 
 ------------------------------------------------------------------------------------------------------------------
 function GetYardCoords(unit)
@@ -473,6 +474,7 @@ end
 
 ------------------------------------------------------------------------------------------------------------------
 function CheckDistance(unit1,unit2)
+  if IsOneUnit(unit1,unit2) then return 0 end
   local x1,y1 = GetYardCoords(unit)
   local x2,y2 = GetYardCoords(unit2)
   return CheckDistanceCoord(x1, y1, x2, y2)

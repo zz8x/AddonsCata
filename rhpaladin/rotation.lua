@@ -13,6 +13,7 @@ local fearTargetTime = 0
 local peaceBuff = {"Пища", "Питье"}
 local steathClass = {"ROGUE", "DRUID"}
 function Idle()
+    if AutoFreedom() then return end
     if bersTimer ~= 0 and not InCombatLockdown() then bersTimer = 0 end
     if not IsAttack() and not IsPlayerCasting() and TryAura() then return end
     if IsAttack() then
@@ -22,7 +23,6 @@ function Idle()
     else
         -- дайте поесть (побегать) спокойно
         if IsMounted() or CanExitVehicle() or HasBuff(peaceBuff)  or IsPlayerCasting() then return end
-
     end
      
     if IsMouse3() and TryTaunt("mouseover") then return end
@@ -272,7 +272,7 @@ function Rotation()
         end
     end
 
-    if IsReadySpell("Очищение") and UnitMana100("player") > 10  and DispelParty(u, true) then return end
+    if IsReadySpell("Очищение") and UnitMana100("player") > 10  and DispelParty(not IsAlt()) then return end
 
     if (IsAttack() or UnitHealth100() > 60) and HasBuff("Длань защиты") then RunMacroText("/cancelaura Длань защиты") end
     if (UnitMana100("player") < 30 or UnitHealth100("player") < 30) and not HasBuff("Печать прозрения") and DoSpell("Печать прозрения") then return end
@@ -315,7 +315,7 @@ function Rotation()
     if canMagic and HasBuff("Искусство войны") and DoSpell("Экзорцизм") then return end
     -- кд Торжества - 10 сек в ретри, поэтому тратим частицы, если hp > 50 или (Торжество на кд больше еще больше 5 сек)
     if UnitHealth100("player") > 50 or not IsSpellNotUsed("Торжество", 5) then
-        if not IsFinishHim("target") and HasLight(2) and not HasBuff("Дознание") and DoSpell("Дознание") then return end   
+        if not IsFinishHim("target") and HasLight(2) and not HasBuff("Дознание") and DoSpell("Дознание", "player") then return end   
         if HasLight() and HasBuff("Дознание", 1) and DoSpell("Вердикт храмовника") then return end
     end
 
@@ -323,7 +323,6 @@ function Rotation()
     if IsShift() and UnitMana100() > 65 and DoSpell("Освящение") then return end
     --if HasLight() and InMelee() then return end
     if InMelee() and UnitMana100() > 30 and DoSpell("Гнев небес") then return end
-    if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 30 and IsSpellNotUsed("Очищение", 2) and DispelParty() then return end
     if not InMelee("target") and not IsFinishHim("target") and UnitMana100("player") > 50 and TryBuff() then return end
 end
 
@@ -399,6 +398,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 local improveTime = 0;
 local lightTime = 0;
+local rUnit, rCount, rDist = nil, 0, {}
 function HolyRotation()
     local members = GetHealingMembers(UNITS)
     if #members < 1 then return false end
@@ -406,17 +406,13 @@ function HolyRotation()
     local h = UnitHealth100(u)
     local l = UnitLostHP(u)
     
-    if InCombatLockdown() and h < 40 and PlayerInPlace() then
-        DoSpell("Мастер аур")
-    end
-    
     if h > 40 and CanInterrupt then
         for i=1,#TARGETS do
             if TryInterrupt(TARGETS[i]) then return end
         end
     end
 
-    if DispelParty(true, members) then return end
+    if h > 60 and DispelParty(true, members) then return end
 
     if InCombatLockdown()  and #members > 1 and GetTime() - lightTime > 5 then
         local u2 = members[2]
@@ -450,18 +446,35 @@ function HolyRotation()
         end
     end
 
-    local rUnit, rCount = nil, 0
-    for i=1,#members do 
-        local u, c = members[i], 0
-        for j=1,#members do
-            local d = CheckDistance(u, members[j])
-            if d and d < 10 and UnitLostHP(members[j]) > GetSpellAmount("Святое сияние", 6000) then c = c + 1 end 
+    if FastUpdate then
+        if not CanHeal(rUnit) then
+            rUnit, rCount = nil, 0    
         end
-        if rUnit == nil or rCount < c then 
-            rUnit = u
-            rCount = c
-        end
-    end 
+    else
+        rTime = GetTime()
+        rUnit, rCount = nil, 0
+        wipe(rDist)
+        local amount = GetSpellAmount("Святое сияние", 6000)
+        for i=1,#members do 
+            local u, c = members[i], 0
+            for j=1,#members do
+                local u2 = members[j]
+                if UnitLostHP(u2) > amount then
+                    local d = rDist[u..u2] or rDist[u2..u] 
+                    if not d then
+                        d = CheckDistance(u, u2) or 100
+                        rDist[u..u2] = d
+                        rDist[u2..u] = d
+                    end
+                    if d < 10  then c = c + 1 end 
+                end
+            end
+            if rUnit == nil or rCount < c then 
+                rUnit = u
+                rCount = c
+            end
+        end 
+    end
     
     if h < (IsOneUnit("player", u) and 91 or 75) and DoSpell("Божественная защита", u) then return end
 
@@ -485,13 +498,13 @@ function HolyRotation()
     if UnitAffectingCombat(u) and not (IsArena() or InDuel()) and (l > (UnitHealthMax("player") * 0.9) or h < 10) and DoSpell("Возложение рук",u) then  chat("Возложение рук на " .. UnitName(u) .. " " .. round(h,1).."%") return end
 
     if PlayerInPlace() then
-        if (l > GetSpellAmount("Божественный свет", 32000) or h < 20) and DoSpell("Божественный свет", u) then return end
-        if (l > GetSpellAmount("Вспышка света", 17000) * 2 or h < 30)  and DoSpell("Вспышка света") then return end
+        if h > (IsPvP() and 50 or 20) and (l > GetSpellAmount("Божественный свет", 32000) or h < 20) and DoSpell("Божественный свет", u) then return end
+        if (l > GetSpellAmount("Вспышка света", 17000) * 1.5 or h < 30)  and DoSpell("Вспышка света") then return end
     end
 
     if p > 0 and (l > 5000 * p ) and h < 50 and DoSpell("Торжество", u) then return true end
 
-    if UnitMana100("player") > 30 and DispelParty(false, members) then return end
+    if h > 80 and UnitMana100("player") > 30 and DispelParty(false, members) then return end
 end
 
 ------------------------------------------------------------------------------------------------------------------
