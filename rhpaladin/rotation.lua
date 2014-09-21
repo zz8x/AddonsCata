@@ -84,7 +84,7 @@ function Idle()
             end
         end
     end
-
+    if not IsPlayerCasting() and not InCombatLockdown() and IsAttack() and TryBuff() then return end
     if HasSpell("Шок небес") then
         if not IsInteractUnit("target") or IsAttack() then TryTarget() end
         HolyRotation()
