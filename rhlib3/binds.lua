@@ -9,7 +9,11 @@ BINDING_NAME_RHLIB_FOLLOW = "Вкл/Выкл режим следования"
 ------------------------------------------------------------------------------------------------------------------
 -- Условие для включения ротации
 function IsAttack()
-    return (IsMouseButtonDown(4) == 1)
+    local attackTime = 0
+    if (IsMouseButtonDown(4) == 1) then
+        attackTime = GetTime()
+    end
+    return GetTime() - attackTime < 0.5
 end
 
 ------------------------------------------------------------------------------------------------------------------
