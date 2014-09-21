@@ -143,8 +143,8 @@ function DDRotation()
 
         if (CP == 5) then
             if UnitMana("player") < 40 and DoSpell("Тигриное неистовство") then return end
-            if HasDebuff("Разорвать", 5) and not HasBuff("Дикий рев", 5) and DoSpell("Дикий рев") then return end
-            if HasDebuff("Разорвать", 7) and HasBuff("Дикий рев", 7) and DoSpell("Свирепый укус") then return end
+            --if HasDebuff("Разорвать", 5) and not HasBuff("Дикий рев", 5) and DoSpell("Дикий рев") then return end
+            if HasDebuff("Разорвать", 7) and DoSpell("Свирепый укус") then return end
             if not HasDebuff("Разорвать", 5) and DoSpell("Разорвать") then return end
             if InGCD() or UnitMana("player") < 25 then return end
         end
