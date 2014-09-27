@@ -499,7 +499,7 @@ function CheckTarget(useFocus , actualDistance)
     end
     -- проверяем на 
     if IsValidTarget("target") then
-       checkHunter = ("HUNTER" == GetClass("target"))
+       checkHunter = UnitIsPlayer("target") and ("HUNTER" == GetClass("target"))
     else
         if checkHunter then
             RunMacroText("/targetlasttarget")
