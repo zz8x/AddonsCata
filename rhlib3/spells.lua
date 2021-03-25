@@ -59,13 +59,15 @@ function GetKickInfo(target)
 end
 
 ------------------------------------------------------------------------------------------------------------------
-function IsPlayerCasting()
+function IsPlayerCasting(spellName, lag)
+    if lag == nil then lag = LagTime end
     local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo("player")
     if spell == nil then
         spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo("player")
     end
     if not spell or not endTime then return false end
-    local res = ((endTime/1000 - GetTime()) < LagTime)
+    if spellName and spellName ~= spell then return false end
+    local res = ((endTime/1000 - GetTime()) < lag)
     if res then return false end
     return true
 end
@@ -219,7 +221,8 @@ function GetSpellLastTime(spell)
 end
 
 function IsSpellNotUsed(spell, t)
-    local last  = GetSpellLastTime(spell)
+    local castInfo = getCastInfo(spell)
+    local last = castInfo.LastCastTime or 0
     return GetTime() - last >= t
 end
 
@@ -342,6 +345,11 @@ function TrySpellTargeting()
 end
 ------------------------------------------------------------------------------------------------------------------
 local lastSpell, lastTarget = nil, nil
+
+function GetLastSpell()
+    return lastSpell
+end
+
 local badSpellTarget = {}local inCastSpells = {"Трепка", "Рунический удар", "Удар героя", "Рассекающий удар", "Гиперскоростное ускорение", "Нарукавная зажигательная ракетница"} -- TODO: Нужно уточнить и дополнить.
 local function trySpell(spellName, target)
     local dump = false --spellName == "Быстрое восстановление"

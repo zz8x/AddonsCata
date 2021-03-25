@@ -3,12 +3,4 @@
 # except foo
 !.gitignore
 !/rhlib3/
-!/rhrogue/
-!/rhpaladin/
-!/rhpriest/
-!/rhdruid/
-!/rhdeathknight/
-!/rhshaman/
-!/rhhunter/
-
-/addons.sublime-workspace
+!/rhprist/
