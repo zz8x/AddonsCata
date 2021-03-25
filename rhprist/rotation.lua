@@ -4,6 +4,10 @@
 local peaceBuff = {"Пища", "Питье"}
 
 function Idle()
+
+    --print(IsPlayerCasting("Пытка разума") and 'Yes' or 'No')
+    --print(DoSpell("Прикосновение вампира", "target"))
+    --if 1 then return end
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
         if IsMounted() then Dismount() return end 
@@ -48,6 +52,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 
 function RDDRotation()
+  
 	local myHP = UnitHealth100("player")
 	local myMana = UnitMana100("player")
 	local inPlace = PlayerInPlace()
@@ -61,6 +66,7 @@ function RDDRotation()
     end
     
     
+
     if myHP < (InMelee() and 80 or 50) and not HasDebuff("Ослабленная душа", 0.01, "player") and DoSpell("Слово силы: Щит") then return end
     
     if not (IsValidTarget("target") and CanAttack("target") and (UnitAffectingCombat("target")  or IsAttack()))  then return end
@@ -117,6 +123,7 @@ function RDDRotation()
     
     if not HasDebuff("Всепожирающая чума") then
         if DoSpell("Всепожирающая чума", "target") then return end
+        --print(11234)
         return
     end
     if not HasDebuff("Слово Тьмы: Боль") then 
@@ -124,7 +131,8 @@ function RDDRotation()
         return
     end
 
-   
+    
     if inPlace and DoSpell("Пытка разума", "target") then return end
     --if not IsSpellInUse("Выстрел") then DoSpell("Выстрел") end
+    
 end

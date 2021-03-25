@@ -124,7 +124,6 @@ local function compareTargets(t1,t2) return targetWeights[t1] < targetWeights[t2
 
 FastUpdate = false
 local function UpdateIdle(elapsed)
-    ResetReCast()
 
     if UpdateCommands() then return end
     

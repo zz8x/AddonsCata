@@ -6,70 +6,57 @@ local lastUpdate = 0
 local function UpdateLagTime()
     if GetTime() - lastUpdate < 30 then return end
     lastUpdate = GetTime() 
-    LagTime = tonumber(select(3, GetNetStats()) / 1000)  * 1.5
-
+    LagTime = tonumber((select(3, GetNetStats()) or 0)) / 1000
 end
 AttachUpdate(UpdateLagTime)
-local sendTime = 0
+
+local sendTime = nil
 local function CastLagTime(event, ...)
     local unit, spell = select(1,...)
     if spell and unit == "player" then
         if event == "UNIT_SPELLCAST_SENT" then
             sendTime = GetTime()
-        end
-        if event == "UNIT_SPELLCAST_START" then
+        else
             if not sendTime then return end
-            LagTime = GetTime() - sendTime
+            LagTime = (GetTime() - sendTime)
+            sendTime = nil
         end
     end
 end
-AttachEvent('UNIT_SPELLCAST_START', CastLagTime)
 AttachEvent('UNIT_SPELLCAST_SENT', CastLagTime)
+AttachEvent('UNIT_SPELLCAST_START', CastLagTime)
+AttachEvent('UNIT_SPELLCAST_SUCCEEDED', CastLagTime)
+AttachEvent('UNIT_SPELLCAST_FAILED', CastLagTime)
 
 ------------------------------------------------------------------------------------------------------------------
-function GetKickInfo(target) 
-    if target == nil then target = "target" end 
+function IsPlayerCasting(spellName, last)
+    local spell = UnitIsCasting("player", last)
+    if not spell then return false end
+    if spellName then
+        return (spell == spellName)
+    end
+    return true
+end
 
-    if not CanAttack(target) then return nil end
-
+-- using (nil if nothing casting)
+-- local spell, left, duration, channel, nointerrupt = UnitIsCasting("unit")
+function UnitIsCasting(unit, last)
+    if type(last) ~= "number" then last = LagTime * 0.7 end
+    if not unit then unit = "player" end
     local channel = false
-    local spell, _, _, _, startTime, endTime, _, _, notinterrupt = UnitCastingInfo(target)
-        
-    if not spell then 
-        spell, _, _, _, startTime, endTime, _, nointerrupt = UnitChannelInfo(target)
+    -- name, subText, text, texture, startTime, endTime, isTradeSkill, castID, notInterruptible = UnitCastingInfo("unit")
+    local spell, _, _, _, startTime, endTime, _, _, notinterrupt = UnitCastingInfo(unit)
+    if spell == nil then
+        --name, subText, text, texture, startTime, endTime, isTradeSkill, notInterruptible = UnitChannelInfo("unit")
+        spell, _, _, _, startTime, endTime, _, nointerrupt = UnitChannelInfo(unit)
         channel = true
     end
-    
-    if not spell then return false end
-
-    if IsPvP() and not InInterruptRedList(spell) then return end
-    local s = startTime / 1000 -- время начала каста
-    local c = GetTime() -- текущее время
-    local e = endTime / 1000 -- время конца каста 
-    local t = e - c -- осталось до конца каста
-    local l = e - s -- время каста
-    local d = 0.28 + 0.42 * random() -- время задержки интерапта, чтоб не палить контору.
-    if d > l * 0.8 then d = l - 0.3 end -- если каст меньше задержки, уменьшаем задержку
-    if c - s < d then return end -- если пока рано сбивать, выходим (зажержка)
-    if t < 0.2 then return false end -- если уже докастил, нет смысла трепыхаться
-    if channel and t < 0.5 then return false end -- нет смысла сбивать последний тик
-    local m = " -> " .. spell .. " ("..target..")"
-
-    return spell, t, channel, notinterrupt, m
-end
-
-------------------------------------------------------------------------------------------------------------------
-function IsPlayerCasting(spellName, lag)
-    if lag == nil then lag = LagTime end
-    local spell, rank, displayName, icon, startTime, endTime = UnitCastingInfo("player")
-    if spell == nil then
-        spell, rank, displayName, icon, startTime, endTime = UnitChannelInfo("player")
-    end
-    if not spell or not endTime then return false end
-    if spellName and spellName ~= spell then return false end
-    local res = ((endTime/1000 - GetTime()) < lag)
-    if res then return false end
-    return true
+    if spell == nil or not startTime or not endTime then return nil end
+    local left = endTime * 0.001 - GetTime()
+    local duration = (endTime - startTime) * 0.001
+    if left < last then return nil end
+    --print(unit, spell, left, duration, channel, nointerrupt)
+    return spell, left, duration, channel, nointerrupt
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -98,21 +85,29 @@ function HasSpell(spellName)
     return false
 end
 ------------------------------------------------------------------------------------------------------------------
-local gcd_starttime, gcd_duration
-local function UpdateGCD(event, unit, spell)
-    if unit == "player" then
-        local start, dur = GetSpellCooldown(spell)
-        if dur and dur > 0 and dur <= 1.5 then
-            gcd_starttime = start
-            gcd_duration = dur
-        end
-    end
+GCDDuration = 1.5
+function GetGCDLeft()
+  local start, duration = GetSpellCooldown(61304);
+  if not start then return 0 end
+  if start == 0 then return 0 end
+  if duration then GCDDuration = duration end
+  return start + duration - GetTime()
 end
-AttachEvent('UNIT_SPELLCAST_SENT', UpdateGCD)
-AttachEvent('UNIT_SPELLCAST_SUCCEEDED', UpdateGCD)
 
 function InGCD()
-    return gcd_starttime and not ((GetTime() - gcd_starttime) / gcd_duration > 1)
+    return GetGCDLeft() > LagTime
+end
+
+local abs = math.abs
+function IsReady(left, checkGCD)
+    if checkGCD == nil then checkGCD = false end
+    if not checkGCD then
+        local gcdLeft = GetGCDLeft()
+        if (abs(left - gcdLeft) < 0.01) then return true end
+    end
+    --if left > LagTime then return false end
+    if left ~= 0 then return false end
+    return true
 end
 ------------------------------------------------------------------------------------------------------------------
 -- Interact range - 40 yards
@@ -128,7 +123,7 @@ function InInteractRange(unit)
     -- need test and review
     if (unit == nil) then unit = "target" end
     if not IsInteractUnit(unit) then return false end
-    if InteractRangeSpell then return IsSpellInRange(InteractRangeSpell,unit) == 1 end
+    if InteractRangeSpell then return IsSpellInRange(InteractRangeSpell, unit) == 1 end
     return  CheckInteractDistance(unit, 4) == 1
 end
 ------------------------------------------------------------------------------------------------------------------
@@ -138,20 +133,9 @@ function InMelee(target)
 end
 
 ------------------------------------------------------------------------------------------------------------------
-function SpellCastTime(spell)
-    local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange = GetSpellInfo(spell)
-    if not name then return 0 end
-    return castTime / 1000
-end
-
-------------------------------------------------------------------------------------------------------------------
-function IsReadySpell(name)
-    local usable, nomana = IsUsableSpell(name)
-    if not usable then return false end
+function IsReadySpell(name, checkGCD)
     local left = GetSpellCooldownLeft(name)
-    if left > LagTime then return false end
-    local spellName, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(name)
-    return IsSpellNotUsed(name, 0.5)
+    return IsReady(left, checkGCD)
 end
 
 ------------------------------------------------------------------------------------------------------------------
@@ -168,7 +152,7 @@ end
 function UseMount(mountName)
     if IsPlayerCasting() then return false end
     if InGCD() then return false end
-    if IsMounted()then return false end
+    if IsMounted() then return false end
     if Debug then
         print(mountName)
     end
@@ -178,7 +162,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function InRange(spell, target) 
     if target == nil then target = "target" end
-    if spell and IsSpellInRange(spell,target) == 0 then return false end 
+    if spell and IsSpellInRange(spell, target) == 0 then return false end 
     return true    
 end
 
@@ -344,14 +328,10 @@ function TrySpellTargeting()
     end
 end
 ------------------------------------------------------------------------------------------------------------------
-local lastSpell, lastTarget = nil, nil
 
-function GetLastSpell()
-    return lastSpell
-end
-
-local badSpellTarget = {}local inCastSpells = {"Трепка", "Рунический удар", "Удар героя", "Рассекающий удар", "Гиперскоростное ускорение", "Нарукавная зажигательная ракетница"} -- TODO: Нужно уточнить и дополнить.
-local function trySpell(spellName, target)
+local badSpellTarget = {}
+local inCastSpells = {"Трепка", "Рунический удар", "Удар героя", "Рассекающий удар", "Гиперскоростное ускорение", "Нарукавная зажигательная ракетница"} -- TODO: Нужно уточнить и дополнить.
+function UseSpell(spellName, target)
     local dump = false --spellName == "Быстрое восстановление"
     if dump then print("Пытаемся прожать", spellName, "на", target) end
     -- Не мешаем выбрать область для спела (нажат вручную)
@@ -409,7 +389,7 @@ local function trySpell(spellName, target)
         return false
     end  
     -- Проверяем что все готово
-    if IsReadySpell(spellName) then
+    if IsReadySpell(spellName, true) then
         -- собираем команду
         local cast = "/cast "
         -- с учетом цели
@@ -429,7 +409,6 @@ local function trySpell(spellName, target)
         -- пробуем скастовать
         if Debug then print("Жмем", cast .. "!" .. spellName) end
         RunMacroText(cast .. "!" .. spellName)
-        lastSpell, lastTarget = spellName, target
         -- если нужно выбрать область - кидаем на текущий mouseover
         TrySpellTargeting()
         -- данные о кастах
@@ -463,19 +442,3 @@ local function trySpell(spellName, target)
     return false
 end
 ------------------------------------------------------------------------------------------------------------------
-function UseSpell(spellName, target)
-    if lastSpell then return false end
-    return trySpell(spellName, target)
-end
-------------------------------------------------------------------------------------------------------------------
-function ResetReCast()
-    lastSpell, lastTarget = nil, nil
-end
-------------------------------------------------------------------------------------------------------------------
-local function UpdateReCast()
-    --if lastSpell then print('-->', lastSpell, lastTarget) end
-    if lastSpell and not trySpell(lastSpell, lastTarget) then
-       ResetReCast()
-    end
-end
-AttachUpdate(UpdateReCast, 0.02)

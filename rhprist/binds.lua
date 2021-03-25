@@ -20,19 +20,8 @@ function DoSpell(spell, target, mana)
     return UseSpell(spell, target, mana)
 end
 ------------------------------------------------------------------------------------------------------------------
-local interruptTime = 0
 function TryInterrupt(target)
     if target == nil then target = "target" end
-    if GetTime() < interruptTime  then return false end
-    local spell, t, channel, notinterrupt, m = GetKickInfo(target)
-    if not spell then return end
-    if not notinterrupt and not IsInterruptImmune(target) and (channel or t < 0.8)  then 
-       --[[ if HasBuff("Облик медведя") and InRange("Лобовая атака(Облик медведя)", target) and DoSpell("Лобовая атака(Облик медведя)", target) then 
-            echo("Лобовая атака"..m)
-            interruptTime = GetTime() + 4
-            return true 
-        end]]
-    end
 end
 ------------------------------------------------------------------------------------------------------------------
 function IsTrash(itemName)
