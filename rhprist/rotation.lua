@@ -4,9 +4,8 @@
 local peaceBuff = {"Пища", "Питье"}
 
 function Idle()
-
-    --print(IsPlayerCasting("Пытка разума") and 'Yes' or 'No')
-    --print(DoSpell("Прикосновение вампира", "target"))
+    --print(IsSpellNotUsed("Прикосновение вампира", 2, true) and 'Yes' or 'No')
+    --if IsSpellNotUsed("Прикосновение вампира", 2, true) and DoSpell("Прикосновение вампира", "target") then return end
     --if 1 then return end
     if IsAttack() then
         if CanExitVehicle() then VehicleExit() end
@@ -108,25 +107,31 @@ function RDDRotation()
         return
     end 
 
-    if inPlace and HasBuff("Сфера Тьмы") and HasDebuff("Прикосновение вампира") and GetSpellCooldownLeft("Взрыв Разума") < 0.1 then
-        if IsPlayerCasting("Пытка разума") then 
+    if inPlace and HasBuff("Сфера Тьмы") 
+        and HasMyDebuff("Прикосновение вампира")
+        and IsSpellNotUsed("Взрыв разума", 2, true)
+        and IsReadySpell("Взрыв Разума") then
+
+        if IsPlayerCasting("Пытка разума") and not InGCD() then 
             if DEBUG then print("stopcasting for Взрыв разума") end
             RunMacroText("/stopcasting") 
         end
+
         if DoSpell("Взрыв разума", "target") then return end
+
         return
     end
 
-    if inPlace and not HasDebuff("Прикосновение вампира") then
-        if not IsPlayerCasting("Прикосновение вампира", 0) and IsSpellNotUsed("Прикосновение вампира", 2) and DoSpell("Прикосновение вампира", "target") then return end
-    end
+    if inPlace and not HasMyDebuff("Прикосновение вампира") 
+        and IsSpellNotUsed("Прикосновение вампира", 2, true) 
+        and DoSpell("Прикосновение вампира", "target") then return end
     
-    if not HasDebuff("Всепожирающая чума") then
+    
+    if not HasMyDebuff("Всепожирающая чума") and IsSpellNotUsed("Всепожирающая чума", 2, true) then
         if DoSpell("Всепожирающая чума", "target") then return end
-        --print(11234)
         return
     end
-    if not HasDebuff("Слово Тьмы: Боль") then 
+    if not HasMyDebuff("Слово Тьмы: Боль") and IsSpellNotUsed("Слово Тьмы: Боль", 2, true) then 
         if DoSpell("Слово Тьмы: Боль", "target") then return end
         return
     end

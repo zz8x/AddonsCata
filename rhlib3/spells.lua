@@ -184,6 +184,7 @@ local function UpdateIsCast(event, ...)
         end
         if event == "UNIT_SPELLCAST_SENT" then
             castInfo.StartTime = GetTime()
+            castInfo.LastStartTime = castInfo.StartTime
             castInfo.TargetName = target
         else
             castInfo.StartTime = 0
@@ -196,25 +197,30 @@ AttachEvent('UNIT_SPELLCAST_FAILED', UpdateIsCast)
 
 function GetLastSpellTarget(spell)
     local castInfo = getCastInfo(spell)
-    return (castInfo.Target and castInfo.TargetGUID and UnitExists(castInfo.Target) and UnitGUID(castInfo.Target) == castInfo.TargetGUID) and castInfo.Target or nil
+    local isActualTarget = castInfo.Target and castInfo.TargetGUID and UnitExists(castInfo.Target) and UnitGUID(castInfo.Target) == castInfo.TargetGUID
+    return isActualTarget and castInfo.Target or nil
 end
 
-function GetSpellLastTime(spell)
+function GetSpellLastTime(spell, start)
     local castInfo = getCastInfo(spell)
+    if start then
+       return castInfo.LastStartTime or 0
+    end
     return castInfo.LastCastTime or 0
 end
 
-function IsSpellNotUsed(spell, t)
-    local castInfo = getCastInfo(spell)
-    local last = castInfo.LastCastTime or 0
-    return GetTime() - last >= t
+function IsSpellNotUsed(spell, t, start)
+    local last  = GetSpellLastTime(spell, start)
+    return last == 0 or GetTime() - last >= t
 end
 
-function IsSpellInUse(spellName)
-    if not spellName or not InCast[spellName] or not InCast[spellName].StartTime then return false end
-    local start = InCast[spellName].StartTime
-    if (GetTime() - start <= 0.5) then return true end
-    if IsReadySpell(spellName) then InCast[spellName].StartTime = 0 end
+function IsSpellInUse(spell)
+    if not spell then return false end
+    if IsCurrentSpell(spell) == 1 then
+      local spell, left, duration, channel, nointerrupt = UnitIsCasting("player", 0)
+      if not spell then return true end
+      if left > LagTime then return true end
+    end
     return false
 end
 ------------------------------------------------------------------------------------------------------------------
@@ -311,41 +317,37 @@ function GetSpellAmount(spellName, expected)
     return nil == amount and expected or amount
 end
 ------------------------------------------------------------------------------------------------------------------
-local cameraCD = 0;
 function TrySpellTargeting()
-    if SpellIsTargeting() and GetTime() - cameraCD > 0.05 then 
-        cameraCD = GetTime()
-        local look = IsMouselooking()
-        if look then
-            TurnOrActionStop()
-        end
-        CameraOrSelectOrMoveStart() 
-        CameraOrSelectOrMoveStop()
-        if look then
-            TurnOrActionStart() 
-        end
-        SpellStopTargeting()
+    if not SpellIsTargeting() then return end
+    local look = IsMouselooking()
+    if look then
+        TurnOrActionStop()
     end
+    CameraOrSelectOrMoveStart() 
+    CameraOrSelectOrMoveStop()
+    if look then
+        TurnOrActionStart() 
+    end
+    SpellStopTargeting()
 end
 ------------------------------------------------------------------------------------------------------------------
 
-local badSpellTarget = {}
-local inCastSpells = {"Трепка", "Рунический удар", "Удар героя", "Рассекающий удар", "Гиперскоростное ускорение", "Нарукавная зажигательная ракетница"} -- TODO: Нужно уточнить и дополнить.
-function UseSpell(spellName, target)
+function CanUseSpell(spellName, target)
     local dump = false --spellName == "Быстрое восстановление"
     if dump then print("Пытаемся прожать", spellName, "на", target) end
+    
     -- Не мешаем выбрать область для спела (нажат вручную)
     if SpellIsTargeting() then 
         if dump or true then print("Ждем выбор цели, не можем прожать", spellName) end
-        SpellStopTargeting()
         return false 
     end 
+    
     -- Не пытаемся что либо прожимать во время каста
     if IsPlayerCasting() then 
         if dump then print("Кастим, не можем прожать", spellName) end
         return false 
     end
-    if target == nil and IsHarmfulSpell(spellName) then target = "target" end
+
     -- Проверяем на наличе спела в спелбуке
     local name, rank, icon, cost, isFunnel, powerType, castTime, minRange, maxRange  = GetSpellInfo(spellName)
     if not name then
@@ -353,92 +355,82 @@ function UseSpell(spellName, target)
         return false;
     end
 
+    -- проверяем, что этот спел не используется сейчас
+    if IsSpellInUse(spellName) then
+        if dump then print("Уже прожали, SPELL_SENT пошел, не можем больше прожать", spellName) end
+        return false 
+    end
+
+    -- проверяем, хватает ли нам маны
+    local usable, nomana = IsUsableSpell(spellName)
+    if not usable then 
+        if dump then print("Не usable, не можем прожать", spellName) end
+        return false 
+    end
+    if nomana then 
+        if dump then print("Не достаточно маны, не можем прожать", spellName) end
+        return false 
+    end
+
+    -- Проверяем что все готово
+    if not IsReadySpell(spellName, true) then
+        if dump then print("Не готово, не можем прожать", spellName) end
+        return false
+    end
+
     local err = GetLastSpellError(spellName, 0.15)
     if err then
         if Debug then chat(spellName .. " - " .. err) end
         return false
     end 
-    -- проверяем, что этот спел не используется сейчас
-    local IsBusy = IsSpellInUse(spellName)
-    if IsBusy then
-        if dump then print("Уже прожали, SPELL_SENT пошел, не можем больше прожать", spellName) end
-        return false 
-    end
-     -- проверяем, что не кастится другой спел
-    for s,_ in pairs(InCast) do
-        if not IsBusy and not tContains(inCastSpells, s) and IsSpellInUse(s) then
-            if dump then print("Уже прожали " .. s .. ", ждем окончания, пока не можем больше прожать", spellName) end
-            IsBusy = true
-            break
-        end
-    end
-    if IsBusy then return false end
-    -- проверяем, что цель подходящая для этого спела
-    if UnitExists(target) and badSpellTarget[spellName] then 
-        local badTargetTime = badSpellTarget[spellName][UnitGUID(target)]
-        if badTargetTime and (GetTime() - badTargetTime < 10) then 
-            if dump then 
-                print(target, "- Цель не подходящая, не можем прожать", spellName) 
-            end
-            return false 
-        end
-    end
+
+    if target == nil and IsHarmfulSpell(spellName) then target = "target" end
     -- проверяем что цель в зоне досягаемости
     if not InRange(spellName, target) then 
         if dump then print(target," - Цель вне зоны досягаемости, не можем прожать", spellName) end
         return false
     end  
-    -- Проверяем что все готово
-    if IsReadySpell(spellName, true) then
-        -- собираем команду
-        local cast = "/cast "
-        -- с учетом цели
-        if target ~= nil then cast = cast .."[@".. target .."] "  end
-        -- проверяем, хватает ли нам маны
-        if cost and cost > 0 and UnitManaMax("player") > cost and UnitMana("player") <= cost then 
-            if dump then print("Не достаточно маны, не можем прожать", spellName) end
-            return false
-        end
-        if UnitExists(target) then 
-            -- данные о кастах
-            local castInfo = getCastInfo(spellName)
-            castInfo.Target = target
-            castInfo.TargetName = UnitName(target)
-            castInfo.TargetGUID = UnitGUID(target)
-        end
-        -- пробуем скастовать
-        if Debug then print("Жмем", cast .. "!" .. spellName) end
-        RunMacroText(cast .. "!" .. spellName)
-        -- если нужно выбрать область - кидаем на текущий mouseover
-        TrySpellTargeting()
+
+    return true
+end
+
+local function UpdateStopCast()
+    local spell, left = UnitIsCasting("player", 0)
+    if not spell then return end
+    if left < LagTime * 0.7 then
+        print('stopcasting')
+        RunMacroText("/stopcasting")
+    end
+end
+AttachUpdate(UpdateStopCast, 0.1)
+
+function UseSpell(spellName, target)
+    -- Не мешаем выбрать область для спела (нажат вручную)
+    if not CanUseSpell(spellName, target) then 
+        return false 
+    end 
+
+    -- собираем команду
+    local cast = "/cast "
+    -- с учетом цели
+    if target ~= nil then cast = cast .."[@".. target .."] "  end
+
+    if UnitExists(target) then 
         -- данные о кастах
         local castInfo = getCastInfo(spellName)
-        -- проверка на успешное начало кд
-        if castInfo.StartTime and (GetTime() - castInfo.StartTime < 0.01) then
-            if UnitExists(target) then
-                -- проверяем цель на соответствие реальной
-                if castInfo.TargetName and castInfo.TargetName ~= "" and castInfo.TargetName ~= UnitName(target) then 
-                    if dump then print("Цели не совпали", spellName) end
-                    RunMacroText("/stopcasting") 
-                    --chat("bad target", target, spellName)
-                    if nil == badSpellTarget[spellName] then
-						badSpellTarget[spellName] = {}
-                    end
-                    local badTargets = badSpellTarget[spellName]
-                    badTargets[UnitGUID(target)] = GetTime()
-                    castInfo.Target = nil
-                    castInfo.TargetName = nil
-                    castInfo.TargetGUID = nil
-                end
-            end
-        end
-        if dump then print("Спел вроде прожался", spellName) end
-        if Debug then
-            print(spellName, cost, target)
-        end
-        return true
+        castInfo.Target = target
+        castInfo.TargetName = UnitName(target)
+        castInfo.TargetGUID = UnitGUID(target)
     end
-    if dump then print("Не готово, не можем прожать", spellName) end
-    return false
+    -- пробуем скастовать
+    if Debug then print("Жмем", cast .. "!" .. spellName) end
+    RunMacroText(cast .. "!" .. spellName)
+    -- если нужно выбрать область - кидаем на текущий mouseover
+    TrySpellTargeting()
+    -- данные о кастах
+    if Debug then
+        print(spellName, cost, target)
+    end
+    return true
 end
 ------------------------------------------------------------------------------------------------------------------
