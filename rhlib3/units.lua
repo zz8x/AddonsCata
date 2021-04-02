@@ -380,10 +380,28 @@ function IsArena()
     local inInstance, instanceType = IsInInstance()
     return (inInstance ~= nil and instanceType =="arena")
 end
+------------------------------------------------------------------------------------------------------------------
+local inDuel = false
+local function startDuel()
+    inDuel = true
+end
+hooksecurefunc("StartDuel", startDuel);
 
+function InDuel()
+    return inDuel
+end
+local function DuelUpdate(event)
+   inDuel = (event == 'DUEL_REQUESTED' and true or false)
+end
+AttachEvent('DUEL_REQUESTED', DuelUpdate)
+AttachEvent('DUEL_FINISHED', DuelUpdate)
 ------------------------------------------------------------------------------------------------------------------
 function IsPvP()
-    return (IsBattleground() or IsArena() or (IsValidTarget("target") and UnitIsPlayer("target")))
+    if IsValidTarget("target") and UnitIsPlayer("target") then return true end
+    local inInstance, instanceType = IsInInstance()
+    if InDuel() then return true end
+    if inInstance ~= nil and (instanceType =="pvp" or instanceType =="arena") then return true end
+    return false
 end
 ------------------------------------------------------------------------------------------------------------------
 function PlayerInPlace()
@@ -492,6 +510,20 @@ function TargetActualDistance(target)
     return (CheckInteractDistance(target, 4) == 1)
 end
 ------------------------------------------------------------------------------------------------------------------
+function InCombatMode()
+    if IsValidTarget("target") then
+        TimerStart('CombatTarget')
+    end
+    if InCombatLockdown() then
+        TimerStart('CombatLock')
+    end
+    if IsAttack() or (TimerLess('CombatLock', 1) and TimerLess('CombatTarget', 3)) then
+        TimerStart('InCombatMode')
+        return true
+    end
+    return false
+end
+------------------------------------------------------------------------------------------------------------------
 local checkHunter = false;
 function CheckTarget(useFocus , actualDistance)
     if not actualDistance then
@@ -544,7 +576,7 @@ function CheckTarget(useFocus , actualDistance)
     end
 
     if useFocus ~= false then 
-        if IsMouse3() and IsValidTarget("mouseover") and not IsOneUnit("target", "mouseover") then 
+        if IsMouse(3) and IsValidTarget("mouseover") and not IsOneUnit("target", "mouseover") then 
             RunMacroText("/focus mouseover") 
         end
         if not IsValidTarget("focus") then

@@ -5,7 +5,7 @@
 ## DefaultState: Disabled
 ## LoadOnDemand: 1
 ## SavedVariables: HarmfulCastingSpell,ZoneData
-## SavedVariablesPerCharacter: Paused,Debug,ShowTeammateDirection,FollowTarget
+## SavedVariablesPerCharacter: Paused,Debug,ExcludeItemsList
 lib.lua
 misc.lua
 units.lua

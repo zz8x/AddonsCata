@@ -1,40 +1,54 @@
 ﻿-- Rotation Helper Library by Timofeev Alexey
 ------------------------------------------------------------------------------------------------------------------
+local UnitAura = UnitAura
+local UnitBuff = UnitBuff
+local UnitDebuff = UnitDebuff
+local GetTime = GetTime
+------------------------------------------------------------------------------------------------------------------
+-- local stack = select(4, HasMyBuff("Жизнецвет", 0.01, u))
+-- local rakeLeft = max((select(7, HasMyDebuff("Глубокая рана", 0.01, "target")) or 0) - GetTime(), 0)
+------------------------------------------------------------------------------------------------------------------
 -- Универсальный внутренний метод, для работы с бафами и дебафами
--- bool HasAura('auraName' or {'aura1', ...}, minExpiresTime(s), 'target' or {'target', 'focus', ...}, UnitDebuff or UnitBuff or UnitAura, bool AuraCaster = player)
-local function HasAura(aura, last, target, method, my)
-    if aura == nil then return false end
+-- HasAura('auraName' or {'aura1', ...}, minExpiresTime(s), 'target' or {'target', 'focus', ...}, UnitDebuff or UnitBuff or UnitAura, bool AuraCaster = player)
+function HasAura(aura, last, target, method, my)
+    if aura == nil then return nil end
     if method == nil then method = UnitAura end
     if target == nil then target = "player" end
     if last == nil then last = 0.1 end
-    local result = false
-    if type(target) == 'table' and #target > 0 then 
-        for i = 1, #target do 
-			result = HasAura(aura, last, target[i], method, my)
-			if result then break end
-		end
-		return result
-    end
-    
-    if not UnitExists(target) then return false end
-    if (type(aura) == 'table' and #aura > 0) then
-		for i = 1, #aura do 
-			result = HasAura(aura[i], last, target, method, my)
-			if result then break end
-		end
-		return result
-    end
+
+    local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId
+
+    if not UnitExists(target) then return nil end
+    local find = false
     for i = 1, 40 do
-        local name, _, _, _, debuffType, _, Expires, unitCaster  = method(target, i)
-        if not name then break end
-        if (sContains(name, aura) or (debuffType and sContains(debuffType, aura)))
-            and (Expires - GetTime() >= last or Expires == 0) 
-            and (not my or unitCaster == "player") then
-            result = name
-            break
-        end 
-    end 
-    return result
+        name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId  = method(target, i)
+
+        if not name then return nil end
+
+        if (expirationTime - GetTime() >= last or expirationTime == 0) and (not my or IsOneUnit(unitCaster, "player")) then
+            if (type(aura) == 'table') then
+                for i = 1, #aura do
+                    local a = aura[i]
+                    if type(a) == "number" and spellId == a then
+                      find = true break
+                    else
+                      if sContains(name, a) then find = true break end
+                      if debuffType and sContains(debuffType, a) then find = true break end
+                    end
+                end
+                if find then break end
+            else
+                if type(aura) == "number" and spellId == aura then
+                  find = true break
+                else
+                  if sContains(name, aura) then find = true break end
+                  if debuffType and sContains(debuffType, aura) then find = true break end
+                end
+            end
+        end
+    end
+    if not find then return nil end
+    return name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId
 end
 
 ------------------------------------------------------------------------------------------------------------------

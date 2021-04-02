@@ -32,13 +32,3 @@ function IsTrash(itemName)
 end
 
 ------------------------------------------------------------------------------------------------------------------
--- Автоматическая покупка предметов
-local function autoBuy(name, count)
-    local c = count - countItem(name)
-    if c > 0 then buy(name, c) end
-end
-
-local function UpdateItems(name)
-    autoBuy("Легкое перышко", 20)
-end
-AttachEvent('MERCHANT_SHOW', UpdateItems)

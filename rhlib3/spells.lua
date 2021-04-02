@@ -397,8 +397,8 @@ end
 local function UpdateStopCast()
     local spell, left = UnitIsCasting("player", 0)
     if not spell then return end
-    if left < LagTime * 0.7 then
-        print('stopcasting')
+    if left < LagTime * 0.6 then
+        --print('stopcasting')
         RunMacroText("/stopcasting")
     end
 end

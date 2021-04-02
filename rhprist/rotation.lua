@@ -43,8 +43,8 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function TryBuffs()
     if not HasBuff("Слово силы: Стойкость") and DoSpell("Слово силы: Стойкость", "player") then return true end
-    if not HasBuff("Внутренний огонь") and DoSpell("Внутренний огонь", "player") then return true end
-    if not HasBuff("Объятия вампира") and DoSpell("Объятия вампира", "player") then return true end
+    if not HasMyBuff("Внутренний огонь") and DoSpell("Внутренний огонь", "player") then return true end
+    if not HasMyBuff("Объятия вампира") and DoSpell("Объятия вампира", "player") then return true end
     if not HasBuff("Защита от темной магии") and DoSpell("Защита от темной магии", "player") then return true end
     return false
 end
@@ -70,6 +70,8 @@ function RDDRotation()
     
     if not (IsValidTarget("target") and CanAttack("target") and (UnitAffectingCombat("target")  or IsAttack()))  then return end
     
+    RunMacroText("/startattack") 
+    
     if HasBuff("Слияние с Тьмой") then return end
     
     if not inPlace and (myHP < 30 or myMana < 30) and DoSpell("Слияние с Тьмой") then return end
@@ -90,8 +92,8 @@ function RDDRotation()
     
     if (myHP > 60 and myMana < 90) and  DoSpell("Слово Тьмы: Смерть", "target") then return end
     
-    UseSlot(13)
-    UseSlot(14)
+    -- UseSlot(13)
+    -- UseSlot(14)
     
     if DoSpell("Исчадие Тьмы") then return end
     --if DoSpell("Ракетный обстрел") then return end
@@ -107,16 +109,19 @@ function RDDRotation()
         return
     end 
 
-    if inPlace and HasBuff("Сфера Тьмы") 
+    if inPlace 
+        --and GetBuffStack("Сфера Тьмы", "player") > 2 
+        and HasBuff("Сфера Тьмы") 
         and HasMyDebuff("Прикосновение вампира")
         and IsSpellNotUsed("Взрыв разума", 2, true)
         and IsReadySpell("Взрыв Разума") then
 
-        if IsPlayerCasting("Пытка разума") and not InGCD() then 
-            if DEBUG then print("stopcasting for Взрыв разума") end
-            RunMacroText("/stopcasting") 
-        end
-
+        -- if IsPlayerCasting("Пытка разума") and not InGCD() then 
+        --     if DEBUG then print("stopcasting for Взрыв разума") end
+        --     RunMacroText("/stopcasting") 
+        -- end
+        UseSlot(13)
+        UseSlot(14)
         if DoSpell("Взрыв разума", "target") then return end
 
         return

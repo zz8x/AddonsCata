@@ -3,26 +3,31 @@
 -- l18n
 BINDING_HEADER_RHLIB = "Rotation Helper Library"
 BINDING_NAME_RHLIB_OFF = "Выкл ротацию"
+BINDING_NAME_RHLIB_ON = "Вкл ротацию"
 BINDING_NAME_RHLIB_DEBUG = "Вкл/Выкл режим отладки"
 BINDING_NAME_RHLIB_RELOAD = "Перезагрузить интерфейс"
-BINDING_NAME_RHLIB_FOLLOW = "Вкл/Выкл режим следования"
-------------------------------------------------------------------------------------------------------------------
--- Условие для включения ротации
-local attackTime = 0
-function TryAttack()
-    attackTime = GetTime() + 0.5
-end
-function IsAttack()
-    if (IsMouseButtonDown(4) == 1) then
-        attackTime = GetTime()
-    end
-    return GetTime() - attackTime < 0.5
-end
-
 ------------------------------------------------------------------------------------------------------------------
 if Paused == nil then Paused = false end
+------------------------------------------------------------------------------------------------------------------
+-- Условие для включения ротации
+function IsAttack()
+    if IsMouse(4) then
+        TimerStart('Attack')
+    end
+    return TimerLess('Attack', 0.05)
+end
+
+-- Включаем авторотацию
+function AutoRotationOn()
+if Paused then
+    echo("Авто ротация: ON")
+    Paused = false
+    end
+end
+
 -- Отключаем авторотацию, при повторном нажатии останавливаем каст (если есть)
 function AutoRotationOff()
+    TimerReset('Attack')
     if IsPlayerCasting() and Paused then 
         RunMacroText("/stopcasting") 
     end
@@ -49,49 +54,6 @@ function DebugToggle()
         echo("Режим отладки: OFF",true)
     end 
 end
-
-
-------------------------------------------------------------------------------------------------------------------
-
-if FollowTarget == nil then FollowTarget = false end
--- Переключает режим следования
-function FollowToggle()
-    if FollowTarget then
-       FollowTarget = false
-       echo("Режим следования: OFF",true)
-    else
-        if CanHeal("target") then
-            FollowTarget = UnitName("target")
-            RunMacroText("/follow target")
-            echo("Режим следования ("..FollowTarget.."): ON",true)
-        end
-    end
-end
-
-local followTime = 0
-local followState = false
-function IsFollow()
-    return followState
-end
-
-function FollowBegin(event, unit)
-    followState = true
-end
-AttachEvent("AUTOFOLLOW_BEGIN", FollowBegin)
-
-function FollowEnd()
-    followState = false
-end
-AttachEvent("AUTOFOLLOW_END", FollowEnd)
-
-------------------------------------------------------------------------------------------------------------------
-function UpdateInternal()
-    if (IsAttack() and Paused) then
-        echo("Авто ротация: ON",true)
-        Paused = false
-    end
-end
-AttachUpdate(UpdateInternal, 0.025)
 ------------------------------------------------------------------------------------------------------------------
 -- Вызывает функцию Idle если таковая имеется, с заданным рекомендованным интервалом UpdateInterval, 
 -- при включенной Авто-ротации
@@ -100,7 +62,7 @@ TARGETS = iTargets
 ITARGETS = iTargets
 UNITS = {"player"}
 IUNITS = UNITS -- Important Units
-local StartTime = GetTime()
+
 local function getUnitWeight(u)
     local w = 0
     if IsFriend(u) then w = 2 end
@@ -123,13 +85,18 @@ local targetWeights = {}
 local function compareTargets(t1,t2) return targetWeights[t1] < targetWeights[t2] end
 
 FastUpdate = false
+local StartTime = GetTime()
 local function UpdateIdle(elapsed)
+    if (IsAttack() and Paused) then
+        echo("Авто ротация: ON",true)
+        Paused = false
+    end
 
     if UpdateCommands() then return end
-    
+
     if Paused then return end
 
-    if GetTime() - StartTime < 2 then return end
+    --if GetTime() - StartTime < 2 then return end -- await for load ?
 
     if IsBattleground() and UnitIsDead("player") and not UnitIsGhost("player") then
         --Notify("Выходим из тела!")
@@ -174,38 +141,6 @@ local function UpdateIdle(elapsed)
     		end
     	end
         ITARGETS = IsArena() and iTargets or TARGETS
-    end
-
-
-    if FollowTarget and GetTime() - followTime > 1 then
-        followTime = GetTime()
-        if IsFollow() then
-            if not InCombatLockdown() and not IsMounted() then
-                local s = GetUnitSpeed(FollowTarget)
-                if s and (s / 7 * 100) > 190 then 
-                    RunMacroText("/run MoveForwardStart()")-- сделать  функцию с таймаутом на вторую часть
-                    RunMacroText("/run MoveForwardStop()")
-                    DoCommand("mount")
-                end
-            end
-            --[[if UnitAffectingCombat(FollowTarget) then --если скорость 0
-                if IsMounted() and not IsFalling() then
-                    RunMacroText("/dismount")
-                end
-                if not IsOneUnit("target",  FollowTarget .."-target") then
-                    RunMacroText("/target " .. FollowTarget .. "-target")
-                end
-                if UnitAffectingCombat("target") then
-                    RunMacroText("/startattack target")
-                end
-            end]]
-        else
-            if ( CheckInteractDistance(FollowTarget, 4) ) then
-              if not IsPlayerCasting() then RunMacroText("/follow ".. FollowTarget) end
-            end
-            --if IsFriend(FollowTarget) then RunMacroText("/w "..FollowTarget .. " Вернись чуть назад плиз") end --тут пройти чуть вперед
-            --если стоим то развернуться лицом к цели FollowTarget или хотябы как FollowTarget
-        end
     end
     
     if Idle then Idle() end
@@ -299,87 +234,6 @@ end
 AttachUpdate(UpdateFallingTime)
 
 ------------------------------------------------------------------------------------------------------------------
-local function UpdateMacroAlertHider()
-    if StaticPopup1Button2:IsVisible() == 1 and StaticPopup1Button2:IsEnabled() == 1 and StaticPopup1Button2:GetText() == "Пропустить" then
-       chat(StaticPopup1.text:GetText())
-       StaticPopup1Button2:Click()
-    end
-end
-AttachUpdate(UpdateMacroAlertHider)
-------------------------------------------------------------------------------------------------------------------
--- нас сапнул рога
-function UpdateSapped(event, ...)
-    local timestamp, type, hideCaster,                                                                      
-      sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,   
-      spellId, spellName, spellSchool,                                                                     
-      amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ...
-	if spellName == "Ошеломление"
-	and destGUID == UnitGUID("player")
-	and type == "SPELL_AURA_APPLIED"
-	then
-		RunMacroText("/к Меня сапнули, помогите плиз!")
-		Notify("Словил сап от роги: "..(sourceName or "(unknown)"))
-	end
-end
-AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateSapped)
-------------------------------------------------------------------------------------------------------------------
--- Alert опасных спелов
-local checkedTargets = {"target", "focus", "arena1", "arena2", "mouseover"}
-
-
-function UpdateSpellAlert(event, ...)
-    local timestamp, type, hideCaster,                                                                      
-      sourceGUID, sourceName, sourceFlags, sourceRaidFlags, destGUID, destName, destFlags, destRaidFlags,   
-      spellId, spellName, spellSchool,                                                                     
-      amount, overkill, school, resisted, blocked, absorbed, critical, glancing, crushing = ...
-    if type and InAlertList(spellName) then
-        type = type:gsub("SPELL_", "")
-        type = type:gsub("AURA_", "")
-        type = type:gsub("CAST_", "")
-        if type == "APPLIED" or type == "FAILED" or type == "PERIODIC_ENERGIZE" then return end
-        if UnitGUID("player") == sourceGUID and IsArena() then
-            RunMacroText("/p " .. spellName .. (destName and (": ".. destName) or "") .." - " .. type .. "!")
-        end
-        for i=1,#checkedTargets do
-            local t = checkedTargets[i]
-            if IsValidTarget(t) and UnitGUID(t) == sourceGUID then
-                Notify(spellName .. ": "..(sourceName or "unknown").." - " .. type .. "!")
-                PlaySound("AlarmClockWarning2", "master");
-                break
-            end
-        end
-    end
-end
-AttachEvent("COMBAT_LOG_EVENT_UNFILTERED", UpdateSpellAlert)
-------------------------------------------------------------------------------------------------------------------
--- Автоматическая продажа хлама и починка
-local function SellGrayAndRepair()
-    SellGray()
-    DelGray()
-    RepairAllItems(1) -- сперва пробуем за счет ги банка
-    RepairAllItems()
-end
-AttachEvent('MERCHANT_SHOW', SellGrayAndRepair)
-------------------------------------------------------------------------------------------------------------------
--- Автоматическoe удаление хлама
-AttachEvent('MERCHANT_CLOSED', DelGray)
-------------------------------------------------------------------------------------------------------------------
-local inDuel = false
-local startDuel = StartDuel
-function StartDuel()
-    inDuel = true
-    startDuel()
-end
-
-function InDuel()
-    return inDuel
-end
-local function DuelUpdate(event)
-   inDuel = event == 'DUEL_REQUESTED' and true or false
-end
-AttachEvent('DUEL_REQUESTED', DuelUpdate)
-AttachEvent('DUEL_FINISHED', DuelUpdate)
-------------------------------------------------------------------------------------------------------------------
 -- Запоминаем вредоносные спелы которые нужно кастить (нужно для сбивания кастов, например тотемом заземления)
 if HarmfulCastingSpell == nil then HarmfulCastingSpell = {} end
 function IsHarmfulCast(spellName)
@@ -399,119 +253,29 @@ end
 AttachEvent('COMBAT_LOG_EVENT_UNFILTERED', UpdateHarmfulSpell)
 
 ------------------------------------------------------------------------------------------------------------------
-local debugFrame
-local debugFrameTime = 0
-local function debugFrame_OnUpdate()
-        if (debugFrameTime > 0 and debugFrameTime < GetTime() - 1) then
-                local alpha = debugFrame:GetAlpha()
-                if (alpha ~= 0) then debugFrame:SetAlpha(alpha - .005) end
-                if (aplha == 0) then 
-					debugFrame:Hide() 
-					debugFrameTime = 0
-				end
-        end
-end
 -- Debug & Notification Frame
-debugFrame = CreateFrame('Frame')
+local debugFrame = CreateFrame('Frame')
 debugFrame:ClearAllPoints()
 debugFrame:SetHeight(15)
 debugFrame:SetWidth(800)
-debugFrame:SetScript('OnUpdate', debugFrame_OnUpdate)
-debugFrame:Hide()
 debugFrame.text = debugFrame:CreateFontString(nil, 'BACKGROUND', 'GameFontNormalSmallLeft')
 debugFrame.text:SetAllPoints()
 debugFrame:SetPoint('TOPLEFT', 2, 0)
 debugFrame:SetScale(0.8);
+debugFrame:SetAlpha(1)
 
--- Debug messages.
-function debug(message)
-        debugFrame.text:SetText(message)
-        debugFrame:SetAlpha(1)
-        debugFrame:Show()
-        debugFrameTime = GetTime()
-end
-
-local updateDebugStatsTime = 0
-local function UpdateDebugStats()
-	if not Debug or GetTime() - updateDebugStatsTime < 0.5 then return end
-    updateDebugStatsTime = GetTime()
-	UpdateAddOnMemoryUsage()
-    UpdateAddOnCPUUsage()
-    local mem  = GetAddOnMemoryUsage("rhlib3")
-    local fps = GetFramerate();
-    local speed = GetUnitSpeed("Player") / 7 * 100
-    debug(format('MEM: %.1fKB, LAG: %ims, FPS: %i, SPD: %d%%', mem, LagTime * 1000, fps, speed))
-end
-AttachUpdate(UpdateDebugStats) 
-
-if ShowTeammateDirection == nil then ShowTeammateDirection = false end
-function ToggleTeammateDirection()
-    ShowTeammateDirection = not ShowTeammateDirection
-end
-local modf = math.modf
-local function ColorGradient(perc, ...)
-    local num = select("#", ...)
-    local hexes = type(select(1, ...)) == "string"
-
-    if perc == 1 then
-        return select(num-2, ...), select(num-1, ...), select(num, ...)
-    end
-
-    num = num / 3
-
-    local segment, relperc = modf(perc*(num-1))
-    local r1, g1, b1, r2, g2, b2
-    r1, g1, b1 = select((segment*3)+1, ...), select((segment*3)+2, ...), select((segment*3)+3, ...)
-    r2, g2, b2 = select((segment*3)+4, ...), select((segment*3)+5, ...), select((segment*3)+6, ...)
-
-    if not r2 or not g2 or not b2 then
-        return r1, g1, b1
-    else
-        return r1 + (r2-r1)*relperc,
-        g1 + (g2-g1)*relperc,
-        b1 + (b2-b1)*relperc
-    end
-end
-local pi = math.pi
-local twoPi = pi * 2
-local abs = math.abs
-local function updateFriendDistance()
-
-    if not TomTom then return end
-
-    local unit, dist
-    if InGroup() then
-        local members = GetGroupUnits()
-        for i = 1, #members, 1 do
-            local u = members[i]
-            if IsFriend(u) and not IsOneUnit(u, "player") then
-                dist = CheckDistance("player",u) 
-                if nil ~= dist then 
-                    unit = u  
-                    break
-                end
-            end
-        end
-    end
-
-    if (unit == nil or not ShowTeammateDirection) and TomTom:CrazyArrowIsHijacked() then
-        TomTom:ReleaseCrazyArrow()
+local function updateDebugStats()
+    if TimerLess('DebugFrame', 2) then return end
+    TimerStart('DebugFrame')
+    if not Debug then
+        if debugFrame:IsVisible() then debugFrame:Hide() end
         return
     end
-
-    if ShowTeammateDirection and unit and not TomTom:CrazyArrowIsHijacked() then
-        TomTom:HijackCrazyArrow(function(self, elapsed)
-            dist = CheckDistance("player",unit) 
-            dist = (nil ~= dist) and round(dist) or "?"
-            local tx, ty = GetPlayerMapPosition (unit)
-            local px, py = GetPlayerMapPosition ("player")
-            local player = GetPlayerFacing()
-            local angle = rad(atan2 (tx - px, py - ty))
-            angle = ((angle > 0) and (twoPi - angle) or -angle)  - player
-            TomTom:SetCrazyArrowDirection(angle)
-            TomTom:SetCrazyArrowColor(ColorGradient(abs((pi - abs(angle)) / pi), 1, 0.2, 0.2, 1, 1, 0.2, 0.2, 1, 0.2))
-            TomTom:SetCrazyArrowTitle(UnitName(unit), dist .. 'm.')
-        end)
-    end
+    UpdateAddOnMemoryUsage()
+    local mem  = GetAddOnMemoryUsage("rhlib2")
+    local fps = GetFramerate();
+    local speed = GetUnitSpeed("player") / 7 * 100
+    debugFrame.text:SetText(format('MEM: %.1fKB, LAG: %ims, FPS: %i, SPD: %d%%',  mem, LagTime * 1000, fps, speed))
+    if not debugFrame:IsVisible() then debugFrame:Show() end
 end
-AttachUpdate(updateFriendDistance)
+AttachUpdate(updateDebugStats)
