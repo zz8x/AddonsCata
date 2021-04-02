@@ -248,9 +248,7 @@ AttachEvent('UNIT_SPELLCAST_FAILED', UpdateIsCast)
 
 function GetLastSpellTarget(spell)
     local castInfo = getCastInfo(spell)
-    local isActualTarget =
-        castInfo.Target and castInfo.TargetGUID and UnitExists(castInfo.Target) and
-        UnitGUID(castInfo.Target) == castInfo.TargetGUID
+    local isActualTarget = castInfo.Target and castInfo.TargetGUID and UnitExists(castInfo.Target) and UnitGUID(castInfo.Target) == castInfo.TargetGUID
     return isActualTarget and castInfo.Target or nil
 end
 

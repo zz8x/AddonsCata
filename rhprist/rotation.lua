@@ -87,10 +87,7 @@ function RDDRotation()
         end
     end
 
-    if
-        myHP < (InMelee() and 80 or 50) and not HasDebuff('Ослабленная душа', 0.01, 'player') and
-            DoSpell('Слово силы: Щит')
-     then
+    if myHP < (InMelee() and 80 or 50) and not HasDebuff('Ослабленная душа', 0.01, 'player') and DoSpell('Слово силы: Щит') then
         return
     end
 
@@ -168,10 +165,7 @@ function RDDRotation()
         return
     end
 
-    if
-        inPlace and not HasMyDebuff('Прикосновение вампира') and IsSpellNotUsed('Прикосновение вампира', 2, true) and
-            DoSpell('Прикосновение вампира', 'target')
-     then
+    if inPlace and not HasMyDebuff('Прикосновение вампира') and IsSpellNotUsed('Прикосновение вампира', 2, true) and DoSpell('Прикосновение вампира', 'target') then
         return
     end
 

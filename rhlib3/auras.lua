@@ -24,34 +24,14 @@ function HasAura(aura, last, target, method, my)
         last = 0.1
     end
 
-    local name,
-        rank,
-        icon,
-        count,
-        debuffType,
-        duration,
-        expirationTime,
-        unitCaster,
-        isStealable,
-        shouldConsolidate,
-        spellId
+    local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId
 
     if not UnitExists(target) then
         return nil
     end
     local find = false
     for i = 1, 40 do
-        name,
-            rank,
-            icon,
-            count,
-            debuffType,
-            duration,
-            expirationTime,
-            unitCaster,
-            isStealable,
-            shouldConsolidate,
-            spellId = method(target, i)
+        name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = method(target, i)
 
         if not name then
             return nil
@@ -135,17 +115,7 @@ function GetBuffStack(aura, target)
     if target == nil then
         target = 'player'
     end
-    local name,
-        rank,
-        icon,
-        count,
-        debuffType,
-        duration,
-        expirationTime,
-        unitCaster,
-        isStealable,
-        shouldConsolidate,
-        spellId = UnitBuff(target, aura)
+    local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitBuff(target, aura)
     if not name or unitCaster ~= 'player' or not count then
         return 0
     end
@@ -199,17 +169,7 @@ function GetMyDebuffTime(debuff, target)
     end
     local result = 0
     for i = 1, 40 do
-        local name,
-            rank,
-            icon,
-            count,
-            debuffType,
-            duration,
-            expirationTime,
-            unitCaster,
-            isStealable,
-            shouldConsolidate,
-            spellId = UnitDebuff(target, i)
+        local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitDebuff(target, i)
         if not name then
             break
         end

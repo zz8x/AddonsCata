@@ -26,10 +26,7 @@ function HasTotem(name, last)
 
     for index = 1, 4 do
         local _, totemName, startTime, duration = GetTotemInfo(index)
-        if
-            totemName and strlower(totemName):match(strlower(name)) and startTime and
-                (startTime + duration - GetTime() > last)
-         then
+        if totemName and strlower(totemName):match(strlower(name)) and startTime and (startTime + duration - GetTime() > last) then
             return true
         end
     end

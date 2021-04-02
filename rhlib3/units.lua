@@ -37,8 +37,7 @@ function GetHealingMembers(units)
                     for j = 1, #TARGETS do
                         local t = TARGETS[j]
                         if tContains(dangerousType, UnitClassification(t)) then
-                            local isTanking, state, scaledPercent, rawPercent, threatValue =
-                                UnitDetailedThreatSituation('player', t)
+                            local isTanking, state, scaledPercent, rawPercent, threatValue = UnitDetailedThreatSituation('player', t)
                             if state ~= nil and state > status then
                                 status = state
                             end
@@ -225,10 +224,7 @@ function GetTargets()
             end
         end
 
-        if
-            not exists and IsValidTarget(u) and
-                (IsArena() or CheckInteractDistance(u, 1) or IsOneUnit('player', u .. '-target'))
-         then
+        if not exists and IsValidTarget(u) and (IsArena() or CheckInteractDistance(u, 1) or IsOneUnit('player', u .. '-target')) then
             tinsert(realTargets, u)
         end
     end
@@ -305,8 +301,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function HasClass(units, classes)
     local function checkClass(u, classes)
-        return UnitExists(u) and UnitIsPlayer(u) and
-            (type(classes) == 'table' and tContains(classes, GetClass(u)) or classes == GetClass(u))
+        return UnitExists(u) and UnitIsPlayer(u) and (type(classes) == 'table' and tContains(classes, GetClass(u)) or classes == GetClass(u))
     end
     if type(units) == 'table' then
         for i = 1, #units do
@@ -371,10 +366,7 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function UnitThreatAlert(u)
     local threat, target = UnitThreat(u), format('%s-target', u)
-    if
-        UnitAffectingCombat(target) and UnitIsPlayer(target) and IsValidTarget(target) and
-            IsOneUnit(u, target .. '-target')
-     then
+    if UnitAffectingCombat(target) and UnitIsPlayer(target) and IsValidTarget(target) and IsOneUnit(u, target .. '-target') then
         threat = 3
     end
     return threat
@@ -673,10 +665,7 @@ function CheckTarget(useFocus, actualDistance)
             end
             for i = 1, #TARGETS do
                 local t = TARGETS[i]
-                if
-                    UnitAffectingCombat(t) and actualDistance(t) and not IsOneUnit('target', t) and
-                        (not IsPvP() or UnitIsPlayer(t))
-                 then
+                if UnitAffectingCombat(t) and actualDistance(t) and not IsOneUnit('target', t) and (not IsPvP() or UnitIsPlayer(t)) then
                     RunMacroText('/focus ' .. t)
                     break
                 end
