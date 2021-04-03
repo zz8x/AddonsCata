@@ -27,11 +27,3 @@ function TryInterrupt(target)
     end
 end
 ------------------------------------------------------------------------------------------------------------------
-function IsTrash(itemName)
-    if sContains(itemName, 'ларец') or sContains(itemName, 'сейф') then
-        return true
-    end
-    return false
-end
-
-------------------------------------------------------------------------------------------------------------------

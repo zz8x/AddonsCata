@@ -6,6 +6,7 @@ BINDING_NAME_RHLIB_OFF = 'Выкл ротацию'
 BINDING_NAME_RHLIB_ON = 'Вкл ротацию'
 BINDING_NAME_RHLIB_DEBUG = 'Вкл/Выкл режим отладки'
 BINDING_NAME_RHLIB_RELOAD = 'Перезагрузить интерфейс'
+BINDING_NAME_RHLIB_TRASH = 'Переключение предмета хлам/нужно'
 ------------------------------------------------------------------------------------------------------------------
 if Paused == nil then
     Paused = false

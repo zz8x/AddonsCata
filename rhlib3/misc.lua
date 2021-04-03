@@ -6,7 +6,7 @@
 --[[
 /run UIParentLoadAddOn("Blizzard_DebugTools");
 /fstack true
-/etrace 
+/etrace
 ]]
 ------------------------------------------------------------------------------------------------------------------
 function RegBG()
@@ -17,6 +17,81 @@ function RegBG()
 ]])
 end
 -------------------------------------------------------------------------------------------------------------------
+if ExcludeItemsList == nil then
+    ExcludeItemsList = {}
+end
+-------------------------------------------------------------------------------------------------------------------
+function IsTrash(n, minItemLevel)
+    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(n)
+    if nil == itemName then
+        return '!GetItemInfo'
+    end
+    local status = ExcludeItemsList[itemName]
+    if status ~= nil then
+        if status then
+            return nil
+        else
+            return 'Список'
+        end
+    end
+    if string.find(n, 'ff9d9d9d') then
+        return 'Мусор'
+    end
+    -- if sContains(itemName, 'Эскиз:') or sContains(itemName, 'ларец') or sContains(itemName, 'сейф') then
+    --     print(n, ' - Выкидываем эскизы, ларецы и сейфы в режиме фарма')
+    --     return 'Ящик/Эскиз'
+    -- end
+
+    if minItemLevel ~= nil then
+        local m = 0.67
+        local trashItemLevel = math.floor(minItemLevel * m)
+        --print(itemType, itemSubType)
+        if minItemLevel and itemSellPrice > 0 and #itemEquipLoc > 0 and itemLevel and itemLevel < trashItemLevel and itemSubType ~= 'Разное' then
+            --print(n, " - низкий уровень предмета ", itemLevel, " min: " .. minItemLevel)
+            return 'ilvl < ' .. trashItemLevel
+        end
+    end
+
+    return nil
+end
+-------------------------------------------------------------------------------------------------------------------
+local tipHook = function(self, ...)
+    -- if not IsShift() then
+    --     return
+    -- end
+    local itemName, itemLink = self:GetItem()
+    if not itemLink or not GetItemInfo(itemName) then
+        return
+    end
+    local auto = (ExcludeItemsList[itemName] == nil)
+    local info = IsTrash(itemLink, GetMinEquippedItemLevel())
+    --if info or not auto then
+    local line1 = (info == nil and format('|cff55ff55%s|r', 'Не хлам') or format('|cffff5555%s|r', 'Хлам'))
+    local line2 = format('|cff00ff9a( %s )|r', info and info or (auto and 'Авто' or 'Список'))
+    self:AddDoubleLine(line1, line2)
+    self:Show()
+    --end
+end
+GameTooltip:HookScript('OnTooltipSetItem', tipHook)
+ItemRefTooltip:HookScript('OnTooltipSetItem', tipHook)
+-------------------------------------------------------------------------------------------------------------------
+function TrashToggle()
+    local itemName, itemLink = GameTooltip:GetItem()
+    if nil == itemName then
+        return
+    end
+    local status = ExcludeItemsList[itemName]
+    if status == nil then
+        status = true
+    elseif status then
+        status = false
+    else
+        status = nil
+    end
+    ExcludeItemsList[itemName] = status
+    --print('ExcludeItemsList[', itemName, '] = ', status)
+end
+-------------------------------------------------------------------------------------------------------------------
 -- Автоматическая продажа хлама и починка
 local money = 0
 OpenMerchant = false
@@ -24,11 +99,10 @@ local function SellGrayAndRepair()
     OpenMerchant = true
     money = GetMoney()
     TimerStart('Sell')
-    if CanMerchantRepair() then
-        RepairAllItems(1) -- сперва пробуем за счет ги банка
-        RepairAllItems()
-    end
     SellGray()
+    if CanMerchantRepair() then
+        RepairAllItems(CanGuildBankRepair())
+    end
 end
 AttachEvent('MERCHANT_SHOW', SellGrayAndRepair)
 local function StopSell()
@@ -38,17 +112,8 @@ local function StopSell()
         chat(('Итого: %s, за %s'):format(m, SecondsToTime(TimerElapsed('Sell'))), 1, 1, 1)
     end
     OpenMerchant = false
-    DelGray() -- удаляем то, что не смогли продать
 end
 AttachEvent('MERCHANT_CLOSED', StopSell)
-------------------------------------------------------------------------------------------------------------------
--- Автоматическая покупка предметов
-local function autoBuy(name, count)
-    local c = count - countItem(name)
-    if c > 0 then
-        buy(name, c)
-    end
-end
 -----------------------------------------------------------------------------------------------------------------
 function GetMinEquippedItemLevel()
     local minItemLevel = nil
@@ -66,12 +131,24 @@ function GetMinEquippedItemLevel()
 end
 -----------------------------------------------------------------------------------------------------------------
 function SellGray()
-    for b = 0, 4 do
-        for s = 1, GetContainerNumSlots(b) do
-            local n = GetContainerItemLink(b, s)
-            if n then
-                if string.find(n, 'ff9d9d9d') or (IsGray and IsGray(n)) then
-                    UseContainerItem(b, s)
+    if not OpenMerchant then
+        chat('Нужен торговец')
+        return
+    end
+    ClearCursor()
+    local minItemLevel = GetMinEquippedItemLevel()
+    for bag = 0, NUM_BAG_SLOTS do
+        for slot = 1, GetContainerNumSlots(bag) do
+            local link = GetContainerItemLink(bag, slot)
+            if link then
+                if IsTrash(link, minItemLevel) then
+                    local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = GetItemInfo(link)
+                    if itemSellPrice > 0 then
+                        UseContainerItem(bag, slot)
+                    else
+                        PickupContainerItem(bag, slot)
+                        DeleteCursorItem()
+                    end
                 end
             end
         end
@@ -81,12 +158,12 @@ end
 ------------------------------------------------------------------------------------------------------------------
 function DelGray()
     ClearCursor()
-    for b = 0, 4 do
-        for s = 1, GetContainerNumSlots(b) do
-            local n = GetContainerItemLink(b, s)
-            if n then
-                if string.find(n, 'ff9d9d9d') or (IsTrash and IsTrash(n)) then
-                    PickupContainerItem(b, s)
+    for bag = 0, NUM_BAG_SLOTS do
+        for slot = 1, GetContainerNumSlots(bag) do
+            local link = GetContainerItemLink(bag, slot)
+            if link then
+                if IsTrash(link) then
+                    PickupContainerItem(bag, slot)
                     DeleteCursorItem()
                 end
             end
@@ -94,47 +171,88 @@ function DelGray()
     end
 end
 ------------------------------------------------------------------------------------------------------------------
-function buy(name, q)
-    if q < 1 then
-        return
-    end
-    local c = 0
+function GetFreeBagSlotCount()
+    local free = 0
+    -- считаем сободное место
     for bag = 0, NUM_BAG_SLOTS do
-        local numberOfFreeSlots = GetContainerNumFreeSlots(bag)
-        if numberOfFreeSlots then
-            c = c + numberOfFreeSlots
+        local n = GetContainerNumFreeSlots(bag)
+        if n then
+            free = free + n
         end
     end
-    if c < 1 then
+    return free
+end
+------------------------------------------------------------------------------------------------------------------
+-- Автоматическая покупка предметов
+function autoBuy(name, count)
+    local c = count - countItem(name)
+    if c > 0 then
+        buy(name, c)
+    end
+end
+------------------------------------------------------------------------------------------------------------------
+function buy(name, count)
+    if not OpenMerchant then
+        chat('Нужен торговец')
         return
     end
-    if q == nil then
-        q = 255
+    if count == nil then
+        count = 1
     end
+    local merchantIndex = nil
     for i = 1, 100 do
-        if name == GetMerchantItemInfo(i) then
-            local s = c * GetMerchantItemMaxStack(i)
-            if q > s then
-                q = s
-            end
-            BuyMerchantItem(i, q)
+        local itemName = GetMerchantItemInfo(i)
+        if itemName and itemName:match(name) then
+            merchantIndex = i
             break
         end
     end
+    if merchantIndex == nil then
+        chat('Прeдмет ' .. name .. ' не найден у торговца')
+        return
+    end
+    local freeBagSlots = GetFreeBagSlotCount()
+    if freeBagSlots < 1 then
+        chat('Нет свободныйх слотов в сумках')
+        return
+    end
+
+    local currentCount = GetItemCount(name)
+    local needToBuy = count - currentCount
+    if needToBuy < 1 then
+        chat('В сумках уже есть ' .. count .. ' ' .. name)
+        return
+    end
+    if needToBuy > 255 then
+        needToBuy = 255
+        chat('Нельзя купить больше чем 255шт. за 1 раз')
+    end
+    BuyMerchantItem(merchantIndex, needToBuy)
 end
 
 ------------------------------------------------------------------------------------------------------------------
 function sell(name)
+    if not OpenMerchant then
+        chat('Нужен торговец')
+        return
+    end
     if not name then
         name = ''
     end
+    local find = false
     for bag = 0, NUM_BAG_SLOTS do
         for slot = 1, GetContainerNumSlots(bag) do
-            local item = GetContainerItemLink(bag, slot)
-            if item and string.find(item, name) then
-                UseContainerItem(bag, slot)
+            local link = GetContainerItemLink(bag, slot)
+            if link then
+                if string.find(link, name) then
+                    find = true
+                    UseContainerItem(bag, slot)
+                end
             end
         end
+    end
+    if not find then
+        chat('Прeдмет ' .. name .. ' не найден в сумках')
     end
 end
 

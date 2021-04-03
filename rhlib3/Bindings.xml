@@ -11,4 +11,7 @@
   <Binding name="RHLIB_RELOAD" description="Reload UI" header="RHLIB">
     ReloadUI();
   </Binding>
+  <Binding name="RHLIB_TRASH" description="Trash Toggle" header="RHLIB">
+    TrashToggle();
+  </Binding>
 </Bindings>
