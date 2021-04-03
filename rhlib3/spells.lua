@@ -561,15 +561,15 @@ function UseSpell(spellName, target)
         castInfo.TargetGUID = UnitGUID(target)
     end
     -- пробуем скастовать
-    if Debug then
-        print('Жмем', cast .. '!' .. spellName)
-    end
+    -- if Debug then
+    --     print('Жмем', cast .. '!' .. spellName)
+    -- end
     RunMacroText(cast .. '!' .. spellName)
     -- если нужно выбрать область - кидаем на текущий mouseover
     TrySpellTargeting()
     -- данные о кастах
     if Debug then
-        print(spellName, cost, target)
+        print(spellName, '@' .. (target or 'none'), IsReadySpell(spellName) and 'прожали' or 'не прожался')
     end
     return true
 end

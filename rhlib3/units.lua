@@ -215,17 +215,17 @@ function GetTargets()
     wipe(realTargets)
     for i = 1, #targets do
         local u = targets[i]
-
-        local exists = false
-        for j = 1, #realTargets do
-            exists = IsOneUnit(realTargets[j], u)
-            if exists then
-                break
+        if IsValidTarget(u) then
+            local exists = false
+            for j = 1, #realTargets do
+                exists = IsOneUnit(realTargets[j], u)
+                if exists then
+                    break
+                end
             end
-        end
-
-        if not exists and IsValidTarget(u) and (IsArena() or CheckInteractDistance(u, 1) or IsOneUnit('player', u .. '-target')) then
-            tinsert(realTargets, u)
+            if not exists then
+                tinsert(realTargets, u)
+            end
         end
     end
     return realTargets
@@ -250,17 +250,17 @@ function IsValidTarget(target)
         IsValidTargetInfo = 'Цель дохлая'
         return false
     end
-    --[[if (UnitInParty(target) or UnitInRaid(target)) then 
+    --[[if (UnitInParty(target) or UnitInRaid(target)) then
         IsValidTargetInfo = "Цель из нашей пати"
-        return false 
+        return false
     end]]
     if not UnitCanAttack('player', target) then
         IsValidTargetInfo = 'Невозможно атаковать'
         return false
     end
 
-    --[[if UnitIsEnemy("player",target) then 
-        return true 
+    --[[if UnitIsEnemy("player",target) then
+        return true
     end]]
     return true
 end
@@ -619,19 +619,21 @@ function CheckTarget(useFocus, actualDistance)
             end
         end
     end
+
+    local arena = IsArena()
+    local pvp = arena or IsBattleground()
+    local attack = IsAttack()
     -- помощь в группе
     if not IsValidTarget('target') and InGroup() then
         -- если что-то не то есть в цели
         if UnitExists('target') then
             RunMacroText('/cleartarget')
         end
-        for i = 1, #TARGET do
-            local t = TARGET[i]
-            if t and (UnitAffectingCombat(t) or IsPvP()) and actualDistance(t) and (not IsPvP() or UnitIsPlayer(t)) then
+        for i = 1, #TARGETS do
+            local t = TARGETS[i]
+            if t and (attack or pvp or UnitAffectingCombat(t)) and actualDistance(t) and (not pvp or UnitIsPlayer(t)) and CanAttack(t) then
                 RunMacroText('/target [@' .. t .. ']')
-                if CanAttack('target') then
-                    break
-                end
+                break
             end
         end
     end
@@ -645,9 +647,9 @@ function CheckTarget(useFocus, actualDistance)
         if
             not IsAttack() and -- если в авторежиме
                 (not IsValidTarget('target') or -- вообще не цель
-                    (not IsArena() and not actualDistance('target')) or -- далековато
-                    (not IsPvP() and not UnitAffectingCombat('target')) or -- моб не в бою
-                    (IsPvP() and not UnitIsPlayer('target')))
+                    (not arena and not actualDistance('target')) or -- далековато
+                    (not pvp and not UnitAffectingCombat('target')) or -- моб не в бою
+                    (pvp and not UnitIsPlayer('target')))
          then -- не игрок в пвп
             if UnitExists('target') then
                 RunMacroText('/cleartarget')
@@ -665,21 +667,21 @@ function CheckTarget(useFocus, actualDistance)
             end
             for i = 1, #TARGETS do
                 local t = TARGETS[i]
-                if UnitAffectingCombat(t) and actualDistance(t) and not IsOneUnit('target', t) and (not IsPvP() or UnitIsPlayer(t)) then
+                if (attack or pvp or UnitAffectingCombat(t)) and actualDistance(t) and not IsOneUnit('target', t) and (not IsPvP() or UnitIsPlayer(t)) and CanAttack(t) then
                     RunMacroText('/focus ' .. t)
                     break
                 end
             end
         end
 
-        if not IsValidTarget('focus') or IsOneUnit('target', 'focus') or (not IsArena() and not actualDistance('focus')) then
+        if not IsValidTarget('focus') or IsOneUnit('target', 'focus') or (not arena and not actualDistance('focus')) then
             if UnitExists('focus') then
                 RunMacroText('/clearfocus')
             end
         end
     end
 
-    if IsArena() then
+    if arena then
         if IsValidTarget('target') and (not UnitExists('focus') or IsOneUnit('target', 'focus')) then
             if IsOneUnit('target', 'arena1') then
                 RunMacroText('/focus arena2')

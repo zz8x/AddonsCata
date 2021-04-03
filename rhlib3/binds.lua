@@ -12,6 +12,13 @@ if Paused == nil then
     Paused = false
 end
 ------------------------------------------------------------------------------------------------------------------
+function TryAttack()
+    if Paused then
+        return
+    end
+    TimerStart('Attack')
+end
+
 -- Условие для включения ротации
 function IsAttack()
     if IsMouse(4) then
@@ -106,7 +113,7 @@ local function compareTargets(t1, t2)
 end
 
 FastUpdate = false
-local StartTime = GetTime()
+--local StartTime = GetTime()
 local function UpdateIdle(elapsed)
     if (IsAttack() and Paused) then
         echo('Авто ротация: ON', true)
@@ -259,27 +266,18 @@ function NotInCombat(t)
     return not InCombatLockdown() and endCombatTime and GetTime() - endCombatTime > t
 end
 ------------------------------------------------------------------------------------------------------------------
-local FallingTime
 function GetFalingTime()
-    if IsFalling() and FallingTime then
-        return GetTime() - FallingTime
-    end
-    return 0
-end
-
-local function UpdateFallingTime()
     if IsFalling() then
-        if FallingTime == nil then
-            FallingTime = GetTime()
+        if not TimerStarted('Falling') then
+            TimerStart('Falling')
         end
     else
-        if FallingTime ~= nil then
-            FallingTime = nil
+        if TimerStarted('Falling') then
+            TimerReset('Falling')
         end
     end
+    return TimerStarted('Falling') and TimerElapsed('Falling') or 0
 end
---FALLING
-AttachUpdate(UpdateFallingTime)
 
 ------------------------------------------------------------------------------------------------------------------
 -- Запоминаем вредоносные спелы которые нужно кастить (нужно для сбивания кастов, например тотемом заземления)

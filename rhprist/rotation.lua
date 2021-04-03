@@ -21,10 +21,6 @@ function Idle()
         return
     end
 
-    if not (IsAttack() or InCombatLockdown()) then
-        return
-    end
-
     --    if CanInterrupt then
     --        for i=1,#TARGETS do
     --            TryInterrupt(TARGETS[i])
@@ -33,6 +29,9 @@ function Idle()
 
     if HasSpell('Облик тьмы') then
         TryBuffs()
+        if not (InCombatMode() or IsArena()) then
+            return
+        end
         TryTarget()
         RDDRotation()
     end
@@ -43,7 +42,7 @@ function ActualDistance(target)
     if target == nil then
         target = 'target'
     end
-    return (CheckInteractDistance(target, 3) == 1) and not InRange('Пытка разума', target)
+    return InRange('Пытка разума', target)
     --return (CheckInteractDistance(target, 3) == 1)
 end
 
