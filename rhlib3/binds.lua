@@ -6,7 +6,7 @@ BINDING_NAME_RHLIB_OFF = 'Выкл ротацию'
 BINDING_NAME_RHLIB_ON = 'Вкл ротацию'
 BINDING_NAME_RHLIB_DEBUG = 'Вкл/Выкл режим отладки'
 BINDING_NAME_RHLIB_RELOAD = 'Перезагрузить интерфейс'
-BINDING_NAME_RHLIB_TRASH = 'Переключение предмета хлам/нужно'
+BINDING_NAME_RHLIB_BLACKLIST = 'Черный список: предмет/цель мод мышкой'
 ------------------------------------------------------------------------------------------------------------------
 if Paused == nil then
     Paused = false
@@ -47,6 +47,11 @@ function AutoRotationOff()
     echo('Авто ротация: OFF', true)
 end
 
+------------------------------------------------------------------------------------------------------------------
+function BlacklistToggle()
+    TrashToggle()
+    UnitToggle()
+end
 ------------------------------------------------------------------------------------------------------------------
 if Debug == nil then
     Debug = false

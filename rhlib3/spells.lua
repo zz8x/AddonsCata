@@ -529,16 +529,22 @@ function CanUseSpell(spellName, target)
 end
 
 local function UpdateStopCast()
+    if TimerLess('updateStopCast', 0.25) then
+        return
+    end
     local spell, left = UnitIsCasting('player', 0)
     if not spell then
         return
     end
-    if left < LagTime * 0.6 then
-        --print('stopcasting')
+    if left < LagTime * 0.5 then
+        -- if Debug then
+        --     print(spell, 'stopcasting')
+        -- end
         RunMacroText('/stopcasting')
+        TimerStart('updateStopCast')
     end
 end
-AttachUpdate(UpdateStopCast, 0.1)
+AttachUpdate(UpdateStopCast, 0.001)
 
 function UseSpell(spellName, target)
     -- Не мешаем выбрать область для спела (нажат вручную)
@@ -565,6 +571,7 @@ function UseSpell(spellName, target)
     --     print('Жмем', cast .. '!' .. spellName)
     -- end
     RunMacroText(cast .. '!' .. spellName)
+    --RunMacroText(cast .. spellName)
     -- если нужно выбрать область - кидаем на текущий mouseover
     TrySpellTargeting()
     -- данные о кастах

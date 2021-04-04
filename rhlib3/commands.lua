@@ -30,6 +30,13 @@ function SetCommand(name, applyFunc, checkFunc, initFunc)
 end
 
 ------------------------------------------------------------------------------------------------------------------
+function ProlongCommand(name, time)
+    if Commands[name] then
+        Commands[name].Timer = GetTime() + (time or 2)
+    end
+end
+
+------------------------------------------------------------------------------------------------------------------
 function ApplyCommand(cmd, ...)
     if HaveCommand(cmd) and not InUseCommand(cmd) then
         DoCommand(cmd, ...)

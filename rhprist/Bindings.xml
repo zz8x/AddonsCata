@@ -1,5 +1,5 @@
 <Bindings>
-  <Binding name="PRH_INTERRUPT" description="Use cast interrupt" header="PRH">
-    InterruptToggle();
+  <Binding name="PRH_BERS" description="Bers mode toggle" header="PRH">
+    BersModeToggle();
   </Binding>
 </Bindings>

@@ -1,19 +1,19 @@
 ﻿-- Prist Rotation Helper by Timofeev Alexey
 -- Binding
 BINDING_HEADER_PRH = 'Prist Rotation Helper'
-BINDING_NAME_PRH_INTERRUPT = 'Вкл/Выкл сбивание кастов'
+BINDING_NAME_PRH_BERS = 'Вкл/Выкл режим берсерка'
 print('|cff0055ffRotation Helper|r|cffffe00a > |r|cffbbbbbbPrist|r loaded')
 ------------------------------------------------------------------------------------------------------------------
-if CanInterrupt == nil then
-    CanInterrupt = true
+if BersMode == nil then
+    BersMode = false
 end
 
-function InterruptToggle()
-    CanInterrupt = not CanInterrupt
-    if CanInterrupt then
-        echo('Interrupt: ON', true)
+function BersModeToggle()
+    BersMode = not BersMode
+    if BersMode then
+        echo('BersMode: ON', true)
     else
-        echo('Interrupt: OFF', true)
+        echo('BersMode: OFF', true)
     end
 end
 ------------------------------------------------------------------------------------------------------------------
@@ -21,9 +21,8 @@ function DoSpell(spell, target)
     return UseSpell(spell, target)
 end
 ------------------------------------------------------------------------------------------------------------------
-function TryInterrupt(target)
-    if target == nil then
-        target = 'target'
-    end
+local function autobuy()
+    buy('Высокогорная ключевая вода', 60)
 end
+AttachEvent('MERCHANT_SHOW', autobuy)
 ------------------------------------------------------------------------------------------------------------------

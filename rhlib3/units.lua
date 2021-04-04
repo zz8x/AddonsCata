@@ -99,7 +99,7 @@ function Ignore(target)
         return
     end
     IgnoredNames[n] = true
-    Notify('Ignore ' .. n)
+    chat('Игнорируем ' .. n, 1, 0, 0)
 end
 
 function IsIgnored(target)
@@ -110,7 +110,6 @@ function IsIgnored(target)
     if n == nil or not IgnoredNames[n] then
         return false
     end
-    -- Notify(n .. " in ignore list")
     return true
 end
 
@@ -121,16 +120,49 @@ function NotIgnore(target)
     local n = UnitName(target)
     if n then
         IgnoredNames[n] = false
-        Notify('Not ignore ' .. n)
+        chat('Не игнорируем ' .. n, 0, 1, 0)
     end
 end
 
 function NotIgnoreAll()
     wipe(IgnoredNames)
-    Notify('Not ignore all')
+    chat('Нет игорируемых целей', 0, 1, 0)
 end
--- unit filted start end
 
+function UnitToggle()
+    local target = 'mouseover'
+    local n = UnitName(target)
+    if not n then
+        target = 'target'
+        n = UnitName(target)
+        if not n then
+            return
+        end
+    end
+    if IsIgnored(target) then
+        NotIgnore(target)
+    else
+        Ignore(target)
+    end
+end
+
+local tipHook = function(self, ...)
+    local unit = (select(2, self:GetUnit())) or (GetMouseFocus() and GetMouseFocus().GetAttribute and GetMouseFocus():GetAttribute('unit')) or (UnitExists('mouseover') and 'mouseover') or nil
+    if not unit then
+        return
+    end
+    if not IsIgnored(unit) then
+        return
+    end
+    local line1 = format('|cff00ff9a %s |r', 'Выбор цели:')
+    local line2 = format('|cffff5555%s|r', 'Черный список')
+    self:AddDoubleLine(line1, line2)
+    self:Show()
+end
+GameTooltip:HookScript('OnTooltipSetUnit', tipHook)
+ItemRefTooltip:HookScript('OnTooltipSetUnit', tipHook)
+
+-- unit filted start end
 ------------------------------------------------------------------------------------------------------------------
 local units = {}
 local realUnits = {}

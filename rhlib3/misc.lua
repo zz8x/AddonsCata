@@ -183,14 +183,7 @@ function GetFreeBagSlotCount()
     return free
 end
 ------------------------------------------------------------------------------------------------------------------
--- Автоматическая покупка предметов
-function autoBuy(name, count)
-    local c = count - countItem(name)
-    if c > 0 then
-        buy(name, c)
-    end
-end
-------------------------------------------------------------------------------------------------------------------
+-- Автоматическая докупка предметов
 function buy(name, count)
     if not OpenMerchant then
         chat('Нужен торговец')

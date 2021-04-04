@@ -21,12 +21,6 @@ function Idle()
         return
     end
 
-    --    if CanInterrupt then
-    --        for i=1,#TARGETS do
-    --            TryInterrupt(TARGETS[i])
-    --        end
-    --    end
-
     if HasSpell('Облик тьмы') then
         TryBuffs()
         if not (InCombatMode() or IsArena()) then
@@ -71,20 +65,20 @@ function RDDRotation()
     local myHP = UnitHealth100('player')
     local myMana = UnitMana100('player')
     local inPlace = PlayerInPlace()
-    if not HasBuff('Облик Тьмы') then
-        --if GetBuffStack("Жизнецвет", "player") < 3 and DoSpell("Жизнецвет", "player") then return end
-        if (myHP < 50 and myMana > 30) then
-            if not HasBuff('Обновление') and DoSpell('Обновление', 'player') then
-                return
-            end
-            if not HasBuff('Молитва восстановления') and DoSpell('Молитва восстановления', 'player') then
-                return
-            end
-        end
-        if DoSpell('Облик Тьмы', 'player') then
-            return true
-        end
-    end
+    -- if not HasBuff('Облик Тьмы') then
+
+    --     if (myHP < 50 and myMana > 30) then
+    --         if not HasBuff('Обновление') and DoSpell('Обновление', 'player') then
+    --             return
+    --         end
+    --         if not HasBuff('Молитва восстановления') and DoSpell('Молитва восстановления', 'player') then
+    --             return
+    --         end
+    --     end
+    --     if DoSpell('Облик Тьмы', 'player') then
+    --         return true
+    --     end
+    -- end
 
     if myHP < (InMelee() and 80 or 50) and not HasDebuff('Ослабленная душа', 0.01, 'player') and DoSpell('Слово силы: Щит') then
         return
@@ -97,87 +91,62 @@ function RDDRotation()
     RunMacroText('/startattack')
 
     if HasBuff('Слияние с Тьмой') then
-        return
-    end
-
-    if not inPlace and (myHP < 30 or myMana < 30) and DoSpell('Слияние с Тьмой') then
-        return
-    end
-
-    --    if not IsCtr() and  myMana < (IsSpellInUse("Выстрел") and 70 or 30) then
-    --        if not IsSpellInUse("Выстрел") then DoSpell("Выстрел") end
-    --print(1)
-    --        return
-    --    end
-
-    if GetBuffStack('Приверженность Тьме', 'player') > 4 and DoSpell('Архангел', 'player') then
-        return
-    end
-
-    local tHP = UnitHealth('target') or 0
-    local tHP100 = UnitHealth('target') or 0
-
-    if (myHP > 60 and myMana < 90) and DoSpell('Слово Тьмы: Смерть', 'target') then
-        return
-    end
-
-    -- UseSlot(13)
-    -- UseSlot(14)
-
-    if DoSpell('Исчадие Тьмы') then
-        return
-    end
-    --if DoSpell("Ракетный обстрел") then return end
-
-    if IsShift() then
-        if IsPlayerCasting('Пытка разума') then
-            if DEBUG then
-                print('stopcasting for Иссушение разума')
-            end
-            RunMacroText('/stopcasting')
+        if not IsSpellInUse('Выстрел') then
+            DoSpell('Выстрел')
         end
-
-        if inPlace and DoSpell('Иссушение разума', 'target') then
-            return
-        end
-        --print(2)
         return
     end
 
-    if
-        inPlace and --and GetBuffStack("Сфера Тьмы", "player") > 2
-            HasBuff('Сфера Тьмы') and
-            HasMyDebuff('Прикосновение вампира') and
-            IsSpellNotUsed('Взрыв разума', 2, true) and
-            IsReadySpell('Взрыв Разума')
-     then
-        -- if IsPlayerCasting("Пытка разума") and not InGCD() then
-        --     if DEBUG then print("stopcasting for Взрыв разума") end
-        --     RunMacroText("/stopcasting")
-        -- end
+    if ((myHP < 20) or (not inPlace and (myMana < 20))) and DoSpell('Слияние с Тьмой') then
+        return
+    end
+    local bers = BersMode or (IsOneUnit('target', 'boss1') or IsOneUnit('target', 'boss2') or IsOneUnit('target', 'boss3'))
+    if BersMode then
+        -- if DoSpell("Ракетный обстрел") then return end
         UseSlot(13)
         UseSlot(14)
-        if DoSpell('Взрыв разума', 'target') then
+    end
+    if (BersMode or (myMana < 40)) then
+        if DoSpell('Исчадие Тьмы', 'target') then
             return
         end
-
-        return
-    end
-
-    if inPlace and not HasMyDebuff('Прикосновение вампира') and IsSpellNotUsed('Прикосновение вампира', 2, true) and DoSpell('Прикосновение вампира', 'target') then
-        return
-    end
-
-    if not HasMyDebuff('Всепожирающая чума') and IsSpellNotUsed('Всепожирающая чума', 2, true) then
-        if DoSpell('Всепожирающая чума', 'target') then
+        if GetBuffStack('Приверженность Тьме', 'player') > 4 and DoSpell('Архангел', 'player') then
             return
         end
+    end
+    if ((UnitHealth100('target') < 25) or (myMana < 40)) and (myHP > 30) and IsReadySpell('Слово Тьмы: Смерть') then
+        DoSpell('Слово Тьмы: Смерть', 'target')
         return
     end
+
+    if IsShift() and inPlace then
+        if IsPlayerCasting('Пытка разума') then
+            RunMacroText('/stopcasting')
+        end
+        DoSpell('Иссушение разума', 'target')
+        return
+    end
+
     if not HasMyDebuff('Слово Тьмы: Боль') and IsSpellNotUsed('Слово Тьмы: Боль', 2, true) then
         if DoSpell('Слово Тьмы: Боль', 'target') then
             return
         end
+        return
+    end
+
+    local spheres = GetBuffStack('Сфера Тьмы', 'player')
+
+    if inPlace and spheres > 0 and IsSpellNotUsed('Взрыв разума', 2, true) and IsReadySpell('Взрыв Разума') then
+        DoSpell('Взрыв разума', 'target')
+        return
+    end
+
+    if inPlace and not HasMyDebuff('Прикосновение вампира', GCDDuration) and IsSpellNotUsed('Прикосновение вампира', 2, true) and DoSpell('Прикосновение вампира', 'target') then
+        return
+    end
+
+    if not HasMyDebuff('Всепожирающая чума') and IsSpellNotUsed('Всепожирающая чума', 2, true) then
+        DoSpell('Всепожирающая чума', 'target')
         return
     end
 
